@@ -54,7 +54,8 @@ Run `db:push` after every new migration, before or together with the deploy that
 
 1. New Project, import the GitHub repository `vms_demo`. Framework preset: Next.js (detected).
    Root directory `./`, build command `npm run build`, install command `npm install`.
-2. Settings → General → Node.js version: 24.x.
+2. Settings → General → Node.js version: 24.x. The function region comes from `vercel.json`
+   (`bom1`, Mumbai, next to vms-prod in ap-south-1); no dashboard change is needed.
 3. Settings → Environment Variables (Production, vms-prod values):
 
    | Name | Value | Notes |
