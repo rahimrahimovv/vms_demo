@@ -1,0 +1,121 @@
+{
+  "app": {
+    "name": "VMS Core",
+    "tagline": "Procurement platform"
+  },
+  "nav": {
+    "home": "My tasks",
+    "adminUsers": "Users",
+    "groups": {
+      "main": "Work",
+      "admin": "Administration"
+    }
+  },
+  "roles": {
+    "REQUESTER": "Requester",
+    "APPROVER": "Approver",
+    "PROCUREMENT_SPECIALIST": "Procurement Specialist",
+    "COMMITTEE_MEMBER": "Committee Member",
+    "ADMIN": "Admin",
+    "VENDOR": "Vendor"
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "INACTIVE": "Inactive"
+  },
+  "common": {
+    "none": "—",
+    "required": "Required",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "genericError": "Something went wrong, try again",
+    "sortBy": "Sort by {column}"
+  },
+  "signIn": {
+    "title": "Sign in",
+    "subtitle": "Use the e-mail and password you were given.",
+    "email": "E-mail",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "errors": {
+      "invalid": "Incorrect e-mail or password",
+      "unavailable": "Sign-in is unavailable, try again"
+    }
+  },
+  "userMenu": {
+    "signOut": "Sign out"
+  },
+  "access": {
+    "denied": "You do not have access to this page",
+    "back": "Back to My tasks"
+  },
+  "bell": {
+    "title": "Notifications",
+    "label": "Notifications, {count} unread",
+    "empty": "You have no notifications."
+  },
+  "notifications": {
+    "fallback": "Update on {number}",
+    "events": {}
+  },
+  "home": {
+    "unreadCard": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
+    "listTitle": "Waiting for you",
+    "empty": "Nothing is waiting for you.",
+    "addUser": "Add user"
+  },
+  "users": {
+    "add": "Add user",
+    "empty": "No users yet. Add the first user to give them access.",
+    "newTitle": "New user",
+    "editTitle": "Edit user",
+    "columns": {
+      "name": "Name",
+      "email": "E-mail",
+      "roles": "Roles",
+      "status": "Status",
+      "created": "Created"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "email": "E-mail",
+      "password": "Initial password",
+      "passwordHint": "At least 8 characters",
+      "roles": "Roles",
+      "active": "Active",
+      "activeHint": "Inactive users cannot sign in."
+    },
+    "errors": {
+      "emailInUse": "This e-mail is already in use",
+      "fullNameRequired": "Enter the full name",
+      "emailInvalid": "Enter a valid e-mail",
+      "passwordShort": "The password must have at least 8 characters",
+      "rolesRequired": "Select at least one role",
+      "ownAdmin": "You cannot remove your own Admin role",
+      "ownDeactivate": "You cannot deactivate your own account",
+      "vendorAccount": "Vendor accounts are managed through vendor registration",
+      "notFound": "This user does not exist"
+    }
+  },
+  "record": {
+    "tabs": {
+      "details": "Details",
+      "files": "Files",
+      "history": "History",
+      "qa": "Q&A"
+    }
+  },
+  "history": {
+    "empty": "No status changes yet.",
+    "system": "System",
+    "columns": {
+      "when": "Date and time",
+      "user": "User",
+      "from": "From",
+      "to": "To",
+      "reason": "Reason or comment"
+    }
+  }
+}
