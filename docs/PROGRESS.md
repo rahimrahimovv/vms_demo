@@ -28,8 +28,8 @@ Updated after each slice (CLAUDE.md "How to work").
 
 ### Open issues
 
-1. **NFR-012 lint rule not active.** `eslint-plugin-i18next` is installed, but the `ecc` plugin's
-   config-protection hook blocks edits to `eslint.config.mjs`. The rule to add (in a block for
+1. **NFR-012 lint rule not active (deferred, decided 06 Nov 2026).** `eslint-plugin-i18next` is installed, but the `ecc`
+   plugin's config-protection hook blocks edits to `eslint.config.mjs`; left for later on purpose. The rule to add (in a block for
    `src/app/**/*.tsx` and `src/components/**/*.tsx`, ignoring `src/components/ui/**`):
    `"i18next/no-literal-string": ["error", { mode: "jsx-text-only" }]` with `plugins: { i18next }`.
    Until then `tests/unit/messages.test.ts` checks labels and error keys only.
