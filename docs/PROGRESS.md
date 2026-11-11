@@ -69,8 +69,8 @@ and maximum points on questionnaire_answer; `vendor_certificate.expired_notified
    block for `src/app/**/*.tsx` and `src/components/**/*.tsx`, ignoring `src/components/ui/**`):
    `"i18next/no-literal-string": ["error", { mode: "jsx-text-only" }]` with `plugins: { i18next }`.
    Until then `tests/unit/messages.test.ts` checks labels, error keys (code and SQL) and notification texts.
-2. **vms-prod not migrated for Slice 2 yet.** Run `db:push` and `db:seed` with `.env.production.local`
-   before the push to `main` that deploys this slice.
+2. vms-prod migrated and seeded for Slice 2 on 11 Nov 2026 (schema, policies and grants checked equal to
+   vms-dev). Run `db:push` with `.env.production.local` before every push that brings a new migration.
 3. **Vendor read access to sourcing details** (no PR estimates) and the published Q&A without the asker's
    name come as security-definer functions in Slices 4 and 6; until then vendors read no sourcing data.
 4. Deactivating a user also bans the Auth account, so open sessions end at the next token refresh (about
