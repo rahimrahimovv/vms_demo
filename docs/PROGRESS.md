@@ -33,7 +33,6 @@ migrated yet, so the table is part of the Slice 2 migration (42 tables).
 | REG-04 Specialist qualifies; AVL | done | AC1-AC4; expiry applied on read and by the daily job |
 | REG-05 Questionnaire and A–D grade | done | AC1-AC9 incl. the D rule and the 30-day early retake |
 | REG-06 Profile, certificates, vendor card | done | AC1-AC10; certificate reminders at once on save and daily; bank accounts kept on Profile, listed on the card |
-| MDM-01, MDM-02 | data only | Dictionaries and category tree seeded; Admin screens in Slice 3 |
 
 Data model for Slices 3-7 is in place (`20261111130000_procurement_model.sql`): tables, constraints,
 read policies (sealed proposals, two envelopes, final-offer round hidden until it closes), status audit
@@ -75,4 +74,47 @@ and maximum points on questionnaire_answer; `vendor_certificate.expired_notified
    name come as security-definer functions in Slices 4 and 6; until then vendors read no sourcing data.
 4. Deactivating a user also bans the Auth account, so open sessions end at the next token refresh (about
    1 hour); pages already refuse them immediately.
-5. Items (25 in the catalogue) are seeded with MDM-02 in Slice 3.
+5. Items (25 in the catalogue) are seeded with MDM-02 in Slice 3 (done).
+
+## Slice 3 (11 Nov 2026)
+
+Changes agreed on 11 Nov 2026: a Currencies dictionary (ISO code, name, active; seed AZN, USD, EUR, TRY,
+RUB, GBP, CNY) feeds every currency dropdown (vendor bank accounts, bank guarantee) instead of a fixed list
+(MDM-01 AC4, ERD `currency`, 43 tables); a PR draft may be saved without lines, "Add at least one line" is
+checked on Submit only (PR-01 AC5-AC6); a plan line's category is fixed once a PR uses it, a RETURNED PR
+keeps its plan line even when the line was closed, PRs and plan lines are never deleted (PLN-01 AC2).
+Seed: 25 items plus 3 under Irrigation systems; "Ammonium nitrate 34.4%, 50 kg bag" under Mineral
+fertilisers and "Foliar fertiliser, 1 L" under Foliar fertilisers; plan line 2026 / Fertilisers /
+"Spring fertiliser programme" / 500,000.00 AZN / Q1.
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| MDM-01 Dictionaries | done | AC1-AC6; Admin → Dictionaries with five tabs; Incoterms rename and deactivate only |
+| MDM-02 Category tree and item catalogue | done | AC1-AC6; Admin → Categories (tree, add child, licence flag) and Items (search, category filter) |
+| PLN-01 Plan lines | done | AC1-AC5; planned, committed, remaining; add, edit, close for the Admin only |
+| PR-01 Create a PR from the catalogue | done | AC1-AC7; items of the plan line's category and its children; live estimated value; plan warning |
+| PR-02 Approve, return or reject | done | AC1-AC5; no decision on one's own PR (#83); comment in History; PS notified on approval |
+
+Master data, plan lines and PRs are written only through database functions (the Slice 2 direct-write
+policies were dropped), so each rule and message is checked in one place. Home cards: "N PRs to approve"
+(Approver, own PRs excluded), "N PRs returned to you" (Requester), "N approved PRs ready for sourcing" (PS).
+
+### Verified
+
+- `npm test`: 70 unit tests (adds dictionary, item and plan-line checks, PR line rules, estimated value
+  with the demo figures, plan excess, Role Matrix menus for the new sections).
+- `npm run test:rls`: 94 tests on vms-dev (21 new): Admin-only writes and no direct writes; name and code
+  uniqueness in any case; entries in use cannot be deleted; deactivated currency kept only where already
+  used (bank account and guarantee); category with children; plan readers (not the Committee Member or a
+  vendor); draft privacy; line rules on Save; Submit notifications; committed and remaining; return with
+  comment in History; closed plan line; own-PR refusal; approve, reject final; plan excess 510.00.
+- Click-through in Edge at 1280 px on the dev server (vms-dev), 42 checks across the five stories; the
+  Slice 2 click-through (39 checks) passes again with the currency dropdowns from the dictionary.
+- Slice 2 click-through on the production URL (12 checks): register, approve as Nigar, Beta Trade's card.
+
+### Open issues
+
+6. **Test vendor left on vms-prod.** The Slice 2 production click-through registered "Alpha Agro UI …"
+   (e-mail `ui2-alpha-…@rls.test`, status APPROVED). Its login is banned, but the vendor row and its user
+   stay, because their audit entries reference them and the audit log is immutable. Removing them means
+   deleting those audit rows on vms-prod; that needs an explicit decision.
