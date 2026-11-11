@@ -15,8 +15,13 @@ export type SectionKey =
   | "questionnaires"
   | "categoryApplications"
   | "avl"
+  | "plan"
+  | "requisitions"
   | "adminUsers"
-  | "adminQuestionnaire";
+  | "adminQuestionnaire"
+  | "adminDictionaries"
+  | "adminCategories"
+  | "adminItems";
 
 export type SectionIcon =
   | "home"
@@ -27,7 +32,12 @@ export type SectionIcon =
   | "building"
   | "listChecks"
   | "shieldCheck"
-  | "clipboardList";
+  | "clipboardList"
+  | "wallet"
+  | "shoppingCart"
+  | "bookOpen"
+  | "folderTree"
+  | "package";
 
 export type Section = {
   key: SectionKey;
@@ -37,7 +47,7 @@ export type Section = {
   icon: SectionIcon;
   /** null = every signed-in user */
   roles: Role[] | null;
-  group: "main" | "vendors" | "admin";
+  group: "main" | "procurement" | "vendors" | "admin";
 };
 
 export const SECTIONS: Section[] = [
@@ -47,6 +57,11 @@ export const SECTIONS: Section[] = [
   { key: "vendorQualification", href: "/vendor/qualification", labelKey: "vendorQualification", icon: "clipboardCheck", roles: ["VENDOR"], group: "main" },
   { key: "vendorCategories", href: "/vendor/categories", labelKey: "vendorCategories", icon: "tags", roles: ["VENDOR"], group: "main" },
   { key: "vendorProfile", href: "/vendor/profile", labelKey: "vendorProfile", icon: "building", roles: ["VENDOR"], group: "main" },
+  // "View the plan" = Requester, Approver, PS, Admin; only the Admin adds, edits or closes lines.
+  { key: "plan", href: "/plan", labelKey: "plan", icon: "wallet", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
+  // PRs: the Requester creates own PRs, the Approver decides, the PS sources approved ones (Slice 4),
+  // the Admin reads. RLS shows other users' PRs only once submitted.
+  { key: "requisitions", href: "/requisitions", labelKey: "requisitions", icon: "shoppingCart", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
   // Vendor cards: PS, CM, Admin ("View a vendor card"); only PS decides on registrations.
   { key: "vendors", href: "/vendors", labelKey: "vendors", icon: "building", roles: ["PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "vendors" },
   // "Review answers, adjust points, confirm the grade or return" = PS
@@ -58,9 +73,12 @@ export const SECTIONS: Section[] = [
   // "Build the qualification questionnaire" = Admin only.
   { key: "adminUsers", href: "/admin/users", labelKey: "adminUsers", icon: "users", roles: ["ADMIN"], group: "admin" },
   { key: "adminQuestionnaire", href: "/admin/questionnaire", labelKey: "adminQuestionnaire", icon: "clipboardList", roles: ["ADMIN"], group: "admin" },
+  { key: "adminDictionaries", href: "/admin/dictionaries", labelKey: "adminDictionaries", icon: "bookOpen", roles: ["ADMIN"], group: "admin" },
+  { key: "adminCategories", href: "/admin/categories", labelKey: "adminCategories", icon: "folderTree", roles: ["ADMIN"], group: "admin" },
+  { key: "adminItems", href: "/admin/items", labelKey: "adminItems", icon: "package", roles: ["ADMIN"], group: "admin" },
 ];
 
-export const SECTION_GROUPS = ["main", "vendors", "admin"] as const;
+export const SECTION_GROUPS = ["main", "procurement", "vendors", "admin"] as const;
 
 export function canAccess(roles: readonly Role[], key: SectionKey): boolean {
   const section = SECTIONS.find((s) => s.key === key);

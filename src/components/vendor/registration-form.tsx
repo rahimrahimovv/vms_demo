@@ -34,12 +34,14 @@ export function RegistrationForm({
   mode,
   action,
   initial,
+  currencies,
   files = {},
   readOnly = false,
 }: {
   mode: "register" | "edit";
   action: (prev: RegistrationFormState, formData: FormData) => Promise<RegistrationFormState>;
   initial: RegistrationFormState;
+  currencies: string[];
   files?: CurrentFiles;
   readOnly?: boolean;
 }) {
@@ -216,7 +218,7 @@ export function RegistrationForm({
             <CardTitle className="text-base">{t("registration.sections.bank")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <BankAccountsEditor initial={v.bankAccounts} readOnly={readOnly} error={err("bankAccounts")} />
+            <BankAccountsEditor initial={v.bankAccounts} currencies={currencies} readOnly={readOnly} error={err("bankAccounts")} />
           </CardContent>
         </Card>
 

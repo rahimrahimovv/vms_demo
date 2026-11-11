@@ -61,6 +61,11 @@ describe("messages/en.json", () => {
       "category.rejected",
       "certificate.expiring",
       "certificate.expired",
+      "pr.submitted",
+      "pr.approved",
+      "pr.returned",
+      "pr.rejected",
+      "pr.readyForSourcing",
     ]) {
       expect(get(`notifications.events.${event}`), event).toBeTypeOf("string");
     }
@@ -86,5 +91,12 @@ describe("messages/en.json", () => {
     expect(get("errors.mainAccountOne")).toBe("Mark exactly one account as main");
     expect(get("qualification.applyAgainOn")).toBe("You can apply again on {date}");
     expect(get("vendorCard.sharesOwner")).toBe("Shares an owner with");
+    // Slice 3 (MDM-01, MDM-02, PLN-01, PR-01, PR-02)
+    expect(get("errors.nameExists")).toBe("This name already exists");
+    expect(get("errors.categoryHasChildren")).toBe("Remove or move its child categories first");
+    expect(get("errors.deliveryDateFuture")).toBe("Delivery date must be in the future");
+    expect(get("errors.lineRequired")).toBe("Add at least one line");
+    expect(get("errors.ownRequest")).toBe("You cannot approve your own request");
+    expect(get("requisitions.planWarning")).toBe("This PR exceeds the remaining plan amount by {amount}");
   });
 });

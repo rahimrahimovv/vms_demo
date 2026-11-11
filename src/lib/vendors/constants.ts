@@ -36,10 +36,4 @@ export const COUNTRIES = [
   "DE", "NL", "FR", "IT", "ES", "PL", "GB", "US", "IL", "EG", "BY", "TM",
 ] as const;
 
-/** Currencies for the bank guarantee amount (the vendor's own capacity; purchases stay in AZN). */
-export const GUARANTEE_CURRENCIES = ["AZN", "USD", "EUR"] as const;
-
-/** Currencies of the vendor's bank accounts (REG-01 AC4); same list as the guarantee. */
-export const ACCOUNT_CURRENCIES = GUARANTEE_CURRENCIES;
-
 export const MAX_MAIN_GOODS = 20;

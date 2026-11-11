@@ -3,13 +3,26 @@ import { canAccess, sectionForPath, sectionsFor } from "@/lib/auth/sections";
 
 // PLT-01 AC4/AC5: the menu and the guard come from the same Role Matrix config.
 describe("Role Matrix sections", () => {
-  it("Admin: users, questionnaire builder, vendor cards and AVL (view)", () => {
-    expect(sectionsFor(["ADMIN"]).map((s) => s.key)).toEqual(["home", "vendors", "avl", "adminUsers", "adminQuestionnaire"]);
+  it("Admin: plan, PRs (read), vendor cards, AVL (view), users, questionnaire, dictionaries, categories, items", () => {
+    expect(sectionsFor(["ADMIN"]).map((s) => s.key)).toEqual([
+      "home",
+      "plan",
+      "requisitions",
+      "vendors",
+      "avl",
+      "adminUsers",
+      "adminQuestionnaire",
+      "adminDictionaries",
+      "adminCategories",
+      "adminItems",
+    ]);
   });
 
-  it("Procurement Specialist: vendor cards, questionnaires, category applications, AVL", () => {
+  it("Procurement Specialist: plan, PRs, vendor cards, questionnaires, category applications, AVL", () => {
     expect(sectionsFor(["PROCUREMENT_SPECIALIST"]).map((s) => s.key)).toEqual([
       "home",
+      "plan",
+      "requisitions",
       "vendors",
       "questionnaires",
       "categoryApplications",
@@ -17,10 +30,11 @@ describe("Role Matrix sections", () => {
     ]);
   });
 
-  it("Committee Member: vendor cards only (REG-06 AC7)", () => {
+  it("Committee Member: vendor cards only (REG-06 AC7); no plan, no PRs", () => {
     expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "vendors"]);
     expect(canAccess(["COMMITTEE_MEMBER"], "questionnaires")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "avl")).toBe(false);
+    expect(canAccess(["COMMITTEE_MEMBER"], "plan")).toBe(false);
   });
 
   it("Vendor: own registration, qualification, categories and profile; no internal screens", () => {
@@ -31,13 +45,14 @@ describe("Role Matrix sections", () => {
       "vendorCategories",
       "vendorProfile",
     ]);
-    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers"] as const) {
+    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "adminItems"] as const) {
       expect(canAccess(["VENDOR"], key)).toBe(false);
     }
   });
 
-  it.each(["REQUESTER", "APPROVER"] as const)("%s sees no vendor or admin screens in Slice 2", (role) => {
-    expect(sectionsFor([role]).map((s) => s.key)).toEqual(["home"]);
+  it.each(["REQUESTER", "APPROVER"] as const)("%s: plan and PRs, no vendor or admin screens", (role) => {
+    expect(sectionsFor([role]).map((s) => s.key)).toEqual(["home", "plan", "requisitions"]);
+    expect(canAccess([role], "adminDictionaries")).toBe(false);
     expect(canAccess([role], "adminUsers")).toBe(false);
     expect(canAccess([role], "vendors")).toBe(false);
   });

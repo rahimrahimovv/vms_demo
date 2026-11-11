@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
-import { ACCOUNT_CURRENCIES } from "@/lib/vendors/constants";
 import type { BankAccount } from "@/lib/vendors/validate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +18,13 @@ const EMPTY: BankAccount = { bankName: "", iban: "", swift: "", currency: "AZN",
  */
 export function BankAccountsEditor({
   initial,
+  currencies,
   readOnly = false,
   error,
 }: {
   initial: BankAccount[];
+  /** Codes from the Currencies dictionary (MDM-01 AC4) */
+  currencies: string[];
   readOnly?: boolean;
   error?: string;
 }) {
@@ -88,7 +90,7 @@ export function BankAccountsEditor({
             disabled={readOnly}
             onChange={(e) => update(i, { currency: e.target.value })}
           >
-            {ACCOUNT_CURRENCIES.map((c) => (
+            {currencies.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>

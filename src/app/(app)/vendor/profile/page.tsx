@@ -2,6 +2,7 @@ import { Trash2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
+import { currencyOptions } from "@/lib/currencies";
 import { formatDate } from "@/lib/format";
 import { bakuToday, certificateStatus } from "@/lib/vendors/rules";
 import { NoAccess } from "@/components/no-access";
@@ -59,6 +60,8 @@ export default async function VendorProfilePage() {
     loadBankAccounts(supabase, user.vendorId),
   ]);
   if (!vendor) return <NoAccess />;
+  const accountCurrencies = await currencyOptions(supabase, bankAccounts.map((a) => a.currency));
+  const guaranteeCurrencies = await currencyOptions(supabase, [vendor.bank_guarantee_currency]);
 
   const ownerIds = [...(brands ?? []).map((b) => b.id), ...(certificates ?? []).map((c) => c.id)];
   const { data: files } = ownerIds.length
@@ -89,6 +92,7 @@ export default async function VendorProfilePage() {
               bankGuaranteeMax: vendor.bank_guarantee_max ? String(Number(vendor.bank_guarantee_max)) : "",
               bankGuaranteeCurrency: vendor.bank_guarantee_currency ?? "",
             }}
+            currencies={guaranteeCurrencies}
           />
         </CardContent>
       </Card>
@@ -98,7 +102,7 @@ export default async function VendorProfilePage() {
           <CardTitle className="text-base">{t("bankAccounts.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <BankAccountsForm action={saveBankAccounts} initial={toBankAccounts(bankAccounts)} />
+          <BankAccountsForm action={saveBankAccounts} initial={toBankAccounts(bankAccounts)} currencies={accountCurrencies} />
         </CardContent>
       </Card>
 

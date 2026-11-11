@@ -1,4 +1,4 @@
-import { ACCOUNT_CURRENCIES, COUNTRIES, OWNER_ROLES, VENDOR_TYPES, type OwnerRole, type VendorType } from "./constants";
+import { COUNTRIES, OWNER_ROLES, VENDOR_TYPES, type OwnerRole, type VendorType } from "./constants";
 
 /**
  * REG-01 / REG-06 registration rules. Returns message keys (messages/en.json) per field;
@@ -96,7 +96,7 @@ export const IBAN_PATTERN = /^[A-Z0-9]{1,34}$/;
 /** REG-01 AC4 / REG-06 AC3: at least one complete account, IBAN up to 34 letters and digits, exactly one main. */
 export function validateBankAccounts(accounts: BankAccount[]): string | undefined {
   if (accounts.length === 0) return "errors.bankAccountRequired";
-  if (accounts.some((a) => !a.bankName || !a.iban || !a.swift || !(ACCOUNT_CURRENCIES as readonly string[]).includes(a.currency))) {
+  if (accounts.some((a) => !a.bankName || !a.iban || !a.swift || !/^[A-Z]{3}$/.test(a.currency))) {
     return "errors.bankAccountIncomplete";
   }
   if (accounts.some((a) => !IBAN_PATTERN.test(a.iban))) return "errors.ibanFormat";

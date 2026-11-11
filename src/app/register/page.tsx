@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { Boxes } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth/session";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { currencyOptions } from "@/lib/currencies";
 import { RegistrationForm, type RegistrationFormState } from "@/components/vendor/registration-form";
 import { registerVendor } from "./actions";
 
@@ -50,7 +52,7 @@ export default async function RegisterPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t("registration.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("registration.subtitle")}</p>
         </div>
-        <RegistrationForm mode="register" action={registerVendor} initial={EMPTY} />
+        <RegistrationForm mode="register" action={registerVendor} initial={EMPTY} currencies={await currencyOptions(createAdminClient())} />
       </div>
     </main>
   );

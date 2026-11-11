@@ -3,15 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BookOpen,
   Building2,
   ClipboardCheck,
   ClipboardList,
   FileText,
+  FolderTree,
   House,
   ListChecks,
+  Package,
   ShieldCheck,
+  ShoppingCart,
   Tags,
   Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +32,11 @@ const ICONS: Record<Section["icon"], LucideIcon> = {
   building: Building2,
   listChecks: ListChecks,
   shieldCheck: ShieldCheck,
+  wallet: Wallet,
+  shoppingCart: ShoppingCart,
+  bookOpen: BookOpen,
+  folderTree: FolderTree,
+  package: Package,
 };
 
 type NavGroup = {

@@ -8,7 +8,7 @@ import { isUpload } from "@/lib/files/rules";
 import { removeFiles, storeFile, validateUpload } from "@/lib/files/server";
 import { errorKey } from "@/lib/db-errors";
 import { parseBankAccounts, toBankAccountRows, validateBankAccounts, type BankAccount } from "@/lib/vendors/validate";
-import { ACTIVITIES, CERTIFICATE_TYPES, GUARANTEE_CURRENCIES, GUARANTEE_TYPES, MAX_MAIN_GOODS } from "@/lib/vendors/constants";
+import { ACTIVITIES, CERTIFICATE_TYPES, GUARANTEE_TYPES, MAX_MAIN_GOODS } from "@/lib/vendors/constants";
 
 export type FormState = {
   errors: Record<string, string>;
@@ -51,7 +51,7 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   if (goods.length > MAX_MAIN_GOODS) errors.mainGoods = "errors.goodsMax";
   if (available) {
     if (max && !(Number(max) > 0)) errors.bankGuaranteeMax = "errors.amountPositive";
-    if (max && !(GUARANTEE_CURRENCIES as readonly string[]).includes(currency)) errors.bankGuaranteeCurrency = "errors.required";
+    if (max && !/^[A-Z]{3}$/.test(currency)) errors.bankGuaranteeCurrency = "errors.required";
   }
   if (Object.keys(errors).length > 0) return done(errors);
 

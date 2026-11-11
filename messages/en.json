@@ -18,8 +18,14 @@
     "groups": {
       "main": "Work",
       "vendors": "Vendors",
-      "admin": "Administration"
-    }
+      "admin": "Administration",
+      "procurement": "Procurement"
+    },
+    "plan": "Plan",
+    "requisitions": "Purchase requisitions",
+    "adminDictionaries": "Dictionaries",
+    "adminCategories": "Categories",
+    "adminItems": "Items"
   },
   "roles": {
     "REQUESTER": "Requester",
@@ -44,7 +50,11 @@
     "EXPIRED": "Expired",
     "GRADED": "Graded",
     "VALID": "Valid",
-    "EXPIRING": "Expiring"
+    "EXPIRING": "Expiring",
+    "PENDING_APPROVAL": "Pending approval",
+    "IN_SOURCING": "In sourcing",
+    "COMPLETED": "Completed",
+    "CLOSED": "Closed"
   },
   "common": {
     "none": "—",
@@ -58,7 +68,13 @@
     "no": "No",
     "savedNote": "Saved.",
     "genericError": "Something went wrong, try again",
-    "sortBy": "Sort by {column}"
+    "sortBy": "Sort by {column}",
+    "add": "Add",
+    "edit": "Edit",
+    "actions": "Actions",
+    "deleteTitle": "Delete {name}?",
+    "deleteConfirm": "This cannot be undone.",
+    "active": "Active"
   },
   "signIn": {
     "title": "Sign in",
@@ -108,6 +124,13 @@
       "certificate": {
         "expiring": "{type} certificate of {vendor} expires on {expiresOn}",
         "expired": "{type} certificate of {vendor} has expired"
+      },
+      "pr": {
+        "submitted": "{number} was submitted for approval",
+        "approved": "{number} was approved",
+        "returned": "{number} was returned for correction: {comment}",
+        "rejected": "{number} was rejected: {comment}",
+        "readyForSourcing": "{number} was approved and is ready for sourcing"
       }
     }
   },
@@ -119,8 +142,12 @@
     "cards": {
       "registrations": "{count, plural, =0 {No registrations to review} one {# registration to review} other {# registrations to review}}",
       "questionnaires": "{count, plural, =0 {No questionnaires to review} one {# questionnaire to review} other {# questionnaires to review}}",
-      "applications": "{count, plural, =0 {No category applications to decide} one {# category application to decide} other {# category applications to decide}}"
-    }
+      "applications": "{count, plural, =0 {No category applications to decide} one {# category application to decide} other {# category applications to decide}}",
+      "prsToApprove": "{count, plural, =0 {No PRs to approve} one {# PR to approve} other {# PRs to approve}}",
+      "prsReturned": "{count, plural, =0 {No PRs returned to you} one {# PR returned to you} other {# PRs returned to you}}",
+      "prsReadyForSourcing": "{count, plural, =0 {No approved PRs ready for sourcing} one {# approved PR ready for sourcing} other {# approved PRs ready for sourcing}}"
+    },
+    "newPr": "New PR"
   },
   "errors": {
     "required": "This field is required",
@@ -171,7 +198,24 @@
     "weightRange": "The weight must be from 1 to 5",
     "optionsMin": "Add at least two answer options",
     "optionLabel": "Give every answer option a label",
-    "pointsRange": "Points must be from 0 to 10"
+    "pointsRange": "Points must be from 0 to 10",
+    "nameExists": "This name already exists",
+    "codeExists": "This code already exists",
+    "inUse": "This entry is in use. Deactivate it instead",
+    "currencyCodeFormat": "Enter a 3-letter ISO code, e.g. AZN",
+    "currencyInvalid": "Pick a currency from the list",
+    "advancePercentRange": "Enter a percentage from 0 to 100",
+    "daysNotNegative": "Enter 0 or more days",
+    "yearInvalid": "Enter a valid year",
+    "planLineClosed": "This plan line is closed",
+    "itemNotInPlanCategory": "Pick an item of the plan line's category",
+    "quantityPositive": "Enter a quantity greater than 0",
+    "pricePositive": "Enter a price greater than 0 with up to 2 decimals",
+    "specificationTooLong": "Use at most 2,000 characters",
+    "deliveryDateFuture": "Delivery date must be in the future",
+    "lineRequired": "Add at least one line",
+    "ownRequest": "You cannot approve your own request",
+    "categoryHasChildren": "Remove or move its child categories first"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -577,6 +621,210 @@
       "from": "From",
       "to": "To",
       "reason": "Reason or comment"
+    }
+  },
+  "placeTypes": {
+    "WAREHOUSE": "Warehouse",
+    "PORT": "Port",
+    "CITY": "City"
+  },
+  "dictionaries": {
+    "tabsLabel": "Dictionaries",
+    "tabs": {
+      "incoterms": "Incoterms",
+      "paymentTerms": "Payment terms",
+      "deliveryPlaces": "Delivery places",
+      "deliveryModes": "Delivery modes",
+      "currencies": "Currencies"
+    },
+    "add": {
+      "paymentTerms": "Add payment term",
+      "deliveryPlaces": "Add delivery place",
+      "deliveryModes": "Add delivery mode",
+      "currencies": "Add currency"
+    },
+    "edit": {
+      "incoterms": "Edit Incoterm",
+      "paymentTerms": "Edit payment term",
+      "deliveryPlaces": "Edit delivery place",
+      "deliveryModes": "Edit delivery mode",
+      "currencies": "Edit currency"
+    },
+    "empty": {
+      "incoterms": "No Incoterms. Run the seed to add the 11 Incoterms 2020 rules.",
+      "paymentTerms": "No payment terms yet. Add the first one.",
+      "deliveryPlaces": "No delivery places yet. Add the first one.",
+      "deliveryModes": "No delivery modes yet. Add the first one.",
+      "currencies": "No currencies yet. Add the first one."
+    },
+    "incotermNote": "The 11 Incoterms 2020 rules are fixed: you can rename or deactivate them, but not add, recode or delete them.",
+    "currencyNote": "Currencies fill the bank-account and bank-guarantee dropdowns. Purchase amounts stay in AZN.",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "advancePercent": "Advance",
+      "daysAfterDelivery": "Days after delivery",
+      "type": "Type",
+      "address": "Address",
+      "status": "Status"
+    },
+    "fields": {
+      "code": "Code",
+      "isoCode": "ISO code",
+      "name": "Name",
+      "advancePercent": "Advance, %",
+      "daysAfterDelivery": "Days after delivery",
+      "type": "Type",
+      "address": "Address"
+    },
+    "hints": {
+      "isoCode": "3 capital letters, e.g. AZN. It cannot be changed later.",
+      "inactive": "Inactive entries leave the dropdowns; records that use them keep them."
+    }
+  },
+  "categoryAdmin": {
+    "add": "Add category",
+    "addChild": "Add child",
+    "addTitle": "Add category",
+    "addChildTitle": "Add a category under {parent}",
+    "editTitle": "Edit category",
+    "empty": "No categories yet. Add the first one.",
+    "licence": "Licence proof required",
+    "licenceInherited": "Licence via parent",
+    "columns": {
+      "name": "Category",
+      "licence": "Licence",
+      "items": "Items",
+      "status": "Status"
+    },
+    "fields": {
+      "name": "Name",
+      "parent": "Parent category",
+      "noParent": "None (top level)",
+      "licence": "Licence proof required"
+    },
+    "hints": {
+      "licence": "Applications to this category and its children need a licence file."
+    }
+  },
+  "items": {
+    "add": "Add item",
+    "addTitle": "Add item",
+    "editTitle": "Edit item",
+    "search": "Search by code or name",
+    "allCategories": "All categories",
+    "filter": "Filter",
+    "clear": "Clear",
+    "empty": "No items match. Add an item or change the filter.",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "unit": "Unit",
+      "category": "Category",
+      "status": "Status"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "unit": "Unit",
+      "category": "Category"
+    },
+    "hints": {
+      "code": "Unique, e.g. FRT-001",
+      "unit": "e.g. bag, litre, piece"
+    }
+  },
+  "plan": {
+    "add": "Add plan line",
+    "addTitle": "Add plan line",
+    "editTitle": "Edit plan line",
+    "close": "Close",
+    "closeTitle": "Close plan line {description}?",
+    "closeConfirm": "It can no longer be picked on a new PR; PRs already linked keep it.",
+    "empty": "No plan lines yet. Add the first one.",
+    "emptyReader": "No plan lines yet.",
+    "columns": {
+      "year": "Year",
+      "category": "Category",
+      "description": "Description",
+      "quarter": "Quarter",
+      "planned": "Planned",
+      "committed": "Committed",
+      "remaining": "Remaining",
+      "status": "Status"
+    },
+    "fields": {
+      "year": "Year",
+      "category": "Category",
+      "description": "Description",
+      "plannedAmount": "Planned amount, AZN",
+      "quarter": "Planned quarter"
+    },
+    "hints": {
+      "categoryFixed": "The category cannot change once a PR uses this line.",
+      "committed": "Committed = PRs pending approval, approved, in sourcing or completed."
+    }
+  },
+  "requisitions": {
+    "new": "New PR",
+    "tabsLabel": "Purchase requisitions",
+    "tabs": {
+      "toApprove": "To approve",
+      "mine": "My PRs",
+      "all": "All"
+    },
+    "empty": {
+      "toApprove": "No PRs are waiting for your approval.",
+      "mine": "You have no PRs yet. Create the first one.",
+      "all": "No submitted PRs yet."
+    },
+    "columns": {
+      "number": "Number",
+      "planLine": "Plan line",
+      "requester": "Requester",
+      "value": "Estimated value",
+      "submitted": "Submitted",
+      "status": "Status",
+      "unitPrice": "Unit price"
+    },
+    "newTitle": "New purchase requisition",
+    "newSubtitle": "Pick a plan line, then add catalogue items with quantity, price and delivery.",
+    "planLineOption": "{year} · {category} · {description} ({remaining} left)",
+    "fields": {
+      "planLine": "Plan line",
+      "item": "Catalogue item",
+      "category": "Category",
+      "unit": "Unit",
+      "quantity": "Quantity",
+      "price": "Est. unit price, AZN excl. VAT",
+      "lineValue": "Line value",
+      "deliveryDate": "Delivery date",
+      "deliveryPlace": "Delivery place",
+      "specification": "Specification"
+    },
+    "lines": "Lines",
+    "line": "Line {n}",
+    "addLine": "Add line",
+    "removeLine": "Remove line {n}",
+    "noLines": "No lines yet. Add a line from the catalogue.",
+    "pickPlanLineFirst": "Pick a plan line first; its items fill the catalogue list.",
+    "specificationHint": "Optional, up to 2,000 characters",
+    "total": "Estimated value",
+    "save": "Save",
+    "submit": "Submit",
+    "saved": "Saved as draft.",
+    "submittedNote": "Submitted. The Approvers are notified.",
+    "planWarning": "This PR exceeds the remaining plan amount by {amount}",
+    "returnedTitle": "Returned for correction",
+    "rejectedTitle": "Rejected",
+    "pendingNote": "Waiting for an Approver's decision.",
+    "ownRequestNote": "This is your own request, so another Approver decides on it.",
+    "details": {
+      "planLine": "Plan line",
+      "requester": "Requester",
+      "submitted": "Submitted",
+      "value": "Estimated value excl. VAT",
+      "created": "Created"
     }
   }
 }

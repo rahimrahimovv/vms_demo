@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { FormState } from "@/app/(app)/vendor/profile/actions";
-import { ACTIVITIES, CERTIFICATE_TYPES, GUARANTEE_CURRENCIES, GUARANTEE_TYPES, MAX_MAIN_GOODS } from "@/lib/vendors/constants";
+import { ACTIVITIES, CERTIFICATE_TYPES, GUARANTEE_TYPES, MAX_MAIN_GOODS } from "@/lib/vendors/constants";
 import { FormField } from "@/components/form-field";
 import { FileField } from "@/components/file-field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -40,12 +40,12 @@ function useForm(action: Action) {
 }
 
 /** REG-06 AC3: add, edit or remove bank accounts; at least one, exactly one main. */
-export function BankAccountsForm({ action, initial }: { action: Action; initial: BankAccount[] }) {
+export function BankAccountsForm({ action, initial, currencies }: { action: Action; initial: BankAccount[]; currencies: string[] }) {
   const { t, state, formAction, pending, err, banner } = useForm(action);
   return (
     <form action={formAction} className="flex flex-col gap-4" data-testid="bank-accounts-form">
       {banner}
-      <BankAccountsEditor key={state.attempt ?? 0} initial={state.values?.bankAccounts ?? initial} error={err("bankAccounts")} />
+      <BankAccountsEditor key={state.attempt ?? 0} initial={state.values?.bankAccounts ?? initial} currencies={currencies} error={err("bankAccounts")} />
       <div className="flex justify-end">
         <Button type="submit" disabled={pending} data-testid="save-bank-accounts">
           {pending ? t("common.saving") : t("common.save")}
@@ -65,7 +65,15 @@ export type ProfileValues = {
 };
 
 /** REG-06 AC3: activity, up to 20 main goods, bank guarantee capacity. */
-export function ProfileDetailsForm({ action, initial }: { action: Action; initial: ProfileValues }) {
+export function ProfileDetailsForm({
+  action,
+  initial,
+  currencies,
+}: {
+  action: Action;
+  initial: ProfileValues;
+  currencies: string[];
+}) {
   const { t, state, formAction, pending, err, banner } = useForm(action);
   const [guarantee, setGuarantee] = useState(initial.bankGuaranteeAvailable);
   return (
@@ -133,7 +141,7 @@ export function ProfileDetailsForm({ action, initial }: { action: Action; initia
               </FormField>
               <FormField id="bankGuaranteeCurrency" label={t("profile.fields.currency")} error={err("bankGuaranteeCurrency")}>
                 <select id="bankGuaranteeCurrency" name="bankGuaranteeCurrency" defaultValue={initial.bankGuaranteeCurrency || "AZN"} className={SELECT_CLASS}>
-                  {GUARANTEE_CURRENCIES.map((c) => (
+                  {currencies.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
+import { currencyOptions } from "@/lib/currencies";
 import { filesByKind, loadVendor, toFormState } from "@/lib/vendors/queries";
 import { NoAccess } from "@/components/no-access";
 import { RecordHeader } from "@/components/record-header";
@@ -69,6 +70,7 @@ export default async function VendorRegistrationPage({ searchParams }: PageProps
             mode="edit"
             action={updateRegistration}
             initial={toFormState(vendor, owners, bankAccounts)}
+            currencies={await currencyOptions(supabase, bankAccounts.map((a) => a.currency))}
             files={filesByKind(files)}
             readOnly={!editable}
           />

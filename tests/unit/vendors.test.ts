@@ -135,9 +135,9 @@ describe("REG-01 AC4 / REG-06 AC3 bank accounts", () => {
     expect(validateBankAccounts([account({ isMain: true, iban: "AZ00-DEMO" })])).toBe("errors.ibanFormat");
   });
 
-  it("every account needs bank name, IBAN, SWIFT and a listed currency", () => {
+  it("every account needs bank name, IBAN, SWIFT and a 3-letter currency code (the database checks the dictionary)", () => {
     expect(validateBankAccounts([account({ isMain: true, swift: "" })])).toBe("errors.bankAccountIncomplete");
-    expect(validateBankAccounts([account({ isMain: true, currency: "XXX" })])).toBe("errors.bankAccountIncomplete");
+    expect(validateBankAccounts([account({ isMain: true, currency: "US" })])).toBe("errors.bankAccountIncomplete");
   });
 
   it("parses the form JSON: spaces removed, upper case, empty rows dropped", () => {
