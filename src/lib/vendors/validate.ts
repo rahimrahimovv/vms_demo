@@ -1,10 +1,13 @@
-import { COUNTRIES, OWNER_ROLES, VENDOR_TYPES, type OwnerRole, type VendorType } from "./constants";
+import { ACCOUNT_CURRENCIES, COUNTRIES, OWNER_ROLES, VENDOR_TYPES, type OwnerRole, type VendorType } from "./constants";
 
 /**
  * REG-01 / REG-06 registration rules. Returns message keys (messages/en.json) per field;
  * the database re-checks the same rules (constraints and functions).
  */
 export type Owner = { fullName: string; idNumber: string; sharePercent: string; role: OwnerRole };
+
+/** REG-01 AC4, REG-06 AC3: one or more accounts, exactly one main. */
+export type BankAccount = { bankName: string; iban: string; swift: string; currency: string; isMain: boolean };
 
 export type RegistrationValues = {
   vendorType: VendorType;
@@ -20,15 +23,14 @@ export type RegistrationValues = {
   contactEmail: string;
   phone: string;
   password: string;
-  bankName: string;
-  iban: string;
-  swift: string;
+  bankAccounts: BankAccount[];
   foundedOn: string;
   owners: Owner[];
 };
 
 export type RegistrationErrors = Partial<Record<keyof RegistrationValues | "form" | "files", string>> & {
   owners?: string;
+  bankAccounts?: string;
 };
 
 const str = (formData: FormData, key: string) => String(formData.get(key) ?? "").trim();
@@ -64,12 +66,47 @@ export function parseRegistration(formData: FormData): RegistrationValues {
     contactEmail: str(formData, "contactEmail").toLowerCase(),
     phone: str(formData, "phone").replace(/[\s-]/g, ""),
     password: String(formData.get("password") ?? ""),
-    bankName: str(formData, "bankName"),
-    iban: str(formData, "iban").replace(/\s/g, "").toUpperCase(),
-    swift: str(formData, "swift").replace(/\s/g, "").toUpperCase(),
+    bankAccounts: parseBankAccounts(formData.get("bankAccounts")),
     foundedOn: str(formData, "foundedOn"),
     owners: owners.filter((o) => o.fullName || o.idNumber || o.sharePercent),
   };
+}
+
+/** Bank accounts sent by the form as JSON; rows left completely empty are dropped. */
+export function parseBankAccounts(raw: FormDataEntryValue | null): BankAccount[] {
+  try {
+    const list = JSON.parse(String(raw ?? "[]"));
+    if (!Array.isArray(list)) return [];
+    return list
+      .map((a) => ({
+        bankName: String(a?.bankName ?? "").trim(),
+        iban: String(a?.iban ?? "").replace(/\s/g, "").toUpperCase(),
+        swift: String(a?.swift ?? "").replace(/\s/g, "").toUpperCase(),
+        currency: String(a?.currency ?? "").trim().toUpperCase(),
+        isMain: a?.isMain === true,
+      }))
+      .filter((a) => a.bankName || a.iban || a.swift);
+  } catch {
+    return [];
+  }
+}
+
+export const IBAN_PATTERN = /^[A-Z0-9]{1,34}$/;
+
+/** REG-01 AC4 / REG-06 AC3: at least one complete account, IBAN up to 34 letters and digits, exactly one main. */
+export function validateBankAccounts(accounts: BankAccount[]): string | undefined {
+  if (accounts.length === 0) return "errors.bankAccountRequired";
+  if (accounts.some((a) => !a.bankName || !a.iban || !a.swift || !(ACCOUNT_CURRENCIES as readonly string[]).includes(a.currency))) {
+    return "errors.bankAccountIncomplete";
+  }
+  if (accounts.some((a) => !IBAN_PATTERN.test(a.iban))) return "errors.ibanFormat";
+  if (accounts.filter((a) => a.isMain).length !== 1) return "errors.mainAccountOne";
+  return undefined;
+}
+
+/** Rows for public.register_vendor / public.bank_accounts_save. */
+export function toBankAccountRows(accounts: BankAccount[]) {
+  return accounts.map((a) => ({ bank_name: a.bankName, iban: a.iban, swift: a.swift, currency: a.currency, is_main: a.isMain }));
 }
 
 export const PHONE_PATTERN = /^\+[0-9]{8,15}$/;
@@ -124,9 +161,8 @@ export function validateRegistration(
   // REG-01 AC4, AC5
   req("contactPerson", v.contactPerson);
   if (!PHONE_PATTERN.test(v.phone)) e.phone = "errors.phoneFormat";
-  req("bankName", v.bankName);
-  req("iban", v.iban);
-  req("swift", v.swift);
+  const accountError = validateBankAccounts(v.bankAccounts);
+  if (accountError) e.bankAccounts = accountError;
   if (options.withAccount) {
     if (!EMAIL_PATTERN.test(v.contactEmail)) e.contactEmail = "errors.emailInvalid";
     if (v.password.length < 8) e.password = "errors.passwordShort";
@@ -170,9 +206,6 @@ export function toVendorColumns(v: RegistrationValues) {
     is_vat_payer: v.isVatPayer === "" ? null : v.isVatPayer === "yes",
     contact_person: v.contactPerson,
     phone: v.phone,
-    bank_name: v.bankName,
-    iban: v.iban,
-    swift: v.swift,
     founded_on: isIndividual ? null : v.foundedOn || null,
   };
 }

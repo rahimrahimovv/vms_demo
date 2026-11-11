@@ -7,6 +7,7 @@ import { COUNTRIES, OWNER_ROLES, VENDOR_TYPES, type VendorType } from "@/lib/ven
 import type { Owner, RegistrationValues } from "@/lib/vendors/validate";
 import { FormField } from "@/components/form-field";
 import { FileField } from "@/components/file-field";
+import { BankAccountsEditor } from "@/components/vendor/bank-accounts-editor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -214,10 +215,8 @@ export function RegistrationForm({
           <CardHeader>
             <CardTitle className="text-base">{t("registration.sections.bank")}</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-x-6 gap-y-5">
-            {text("bankName", t("registration.fields.bankName"), { required: true })}
-            {text("iban", t("registration.fields.iban"), { required: true })}
-            {text("swift", t("registration.fields.swift"), { required: true })}
+          <CardContent>
+            <BankAccountsEditor initial={v.bankAccounts} readOnly={readOnly} error={err("bankAccounts")} />
           </CardContent>
         </Card>
 

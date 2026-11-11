@@ -128,18 +128,16 @@ on conflict (id) do nothing;
 ------------------------------------------------------------------
 insert into public.vendor (id, company_id, vendor_type, legal_name, voen, foreign_tax_number, country_code,
                            legal_address, director_name, is_vat_payer, contact_person, contact_email, phone,
-                           bank_name, iban, swift, status, standing, founded_on, main_activity, main_goods,
+                           status, standing, founded_on, main_activity, main_goods,
                            bank_guarantee_available, bank_guarantee_types, bank_guarantee_max,
                            bank_guarantee_currency, submitted_at) values
   ('00000000-0000-4000-8000-000000000502', '00000000-0000-4000-8000-000000000001', 'FOREIGN_COMPANY',
    'Beta Trade Ltd', null, 'TR-DEMO-0000002', 'TR', 'Demo Cad. 2, Izmir, Türkiye', 'Selin Demir', false,
-   'Selin Demir', 'sales@beta-trade.test', '+905550000002', 'Demo Bank Türkiye', 'TR000000000000000000000002',
-   'DEMOTRIS', 'APPROVED', 'ACTIVE', '2009-04-20', 'OFFICIAL_DEALER',
+   'Selin Demir', 'sales@beta-trade.test', '+905550000002', 'APPROVED', 'ACTIVE', '2009-04-20', 'OFFICIAL_DEALER',
    array['Ammonium nitrate', 'Urea', 'Foliar fertiliser'], true, array['BID', 'PERFORMANCE'], 100000.00, 'USD', now()),
   ('00000000-0000-4000-8000-000000000503', '00000000-0000-4000-8000-000000000001', 'LOCAL_COMPANY',
    'Gamma Supply LLC', '9900000003', null, 'AZ', 'Demo street 3, Ganja', 'Orkhan Valiyev', true,
-   'Orkhan Valiyev', 'office@gamma-supply.test', '+994500000003', 'Demo Bank Azerbaijan', 'AZ00DEMO00000000000000000003',
-   'DEMOAZ22', 'APPROVED', 'ACTIVE', '2018-09-01', 'TRADER',
+   'Orkhan Valiyev', 'office@gamma-supply.test', '+994500000003', 'APPROVED', 'ACTIVE', '2018-09-01', 'TRADER',
    array['Ammonium nitrate', 'Seeds'], false, '{}', null, null, now())
 on conflict (id) do nothing;
 
@@ -148,6 +146,16 @@ insert into public.vendor_owner (id, vendor_id, full_name, id_number, share_perc
   ('00000000-0000-4000-8000-000000005022', '00000000-0000-4000-8000-000000000502', 'Rauf Mammadov', 'AZE-DEMO-0001', 35, 'SHAREHOLDER'),
   ('00000000-0000-4000-8000-000000005031', '00000000-0000-4000-8000-000000000503', 'Orkhan Valiyev', 'AZE-DEMO-0031', 50, 'HEAD'),
   ('00000000-0000-4000-8000-000000005032', '00000000-0000-4000-8000-000000000503', 'Rauf Mammadov', 'AZE-DEMO-0001', 50, 'FOUNDER')
+on conflict (id) do nothing;
+
+-- REG-01 AC4: Beta Trade keeps two accounts (USD main, EUR), Gamma Supply one.
+insert into public.vendor_bank_account (id, vendor_id, bank_name, iban, swift, currency, is_main) values
+  ('00000000-0000-4000-8000-000000005023', '00000000-0000-4000-8000-000000000502', 'Demo Bank Türkiye',
+   'TR000000000000000000000002', 'DEMOTRIS', 'USD', true),
+  ('00000000-0000-4000-8000-000000005024', '00000000-0000-4000-8000-000000000502', 'Demo Euro Bank',
+   'TR000000000000000000000012', 'DEMOEUIS', 'EUR', false),
+  ('00000000-0000-4000-8000-000000005033', '00000000-0000-4000-8000-000000000503', 'Demo Bank Azerbaijan',
+   'AZ00DEMO00000000000000000003', 'DEMOAZ22', 'AZN', true)
 on conflict (id) do nothing;
 
 insert into public.vendor_brand (id, vendor_id, brand, is_official_dealer) values

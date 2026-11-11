@@ -7,9 +7,15 @@ import { createClient } from "@/lib/supabase/server";
 import { isUpload } from "@/lib/files/rules";
 import { removeFiles, storeFile, validateUpload } from "@/lib/files/server";
 import { errorKey } from "@/lib/db-errors";
+import { parseBankAccounts, toBankAccountRows, validateBankAccounts, type BankAccount } from "@/lib/vendors/validate";
 import { ACTIVITIES, CERTIFICATE_TYPES, GUARANTEE_CURRENCIES, GUARANTEE_TYPES, MAX_MAIN_GOODS } from "@/lib/vendors/constants";
 
-export type FormState = { errors: Record<string, string>; attempt?: number; saved?: boolean };
+export type FormState = {
+  errors: Record<string, string>;
+  attempt?: number;
+  saved?: boolean;
+  values?: { bankAccounts: BankAccount[] };
+};
 
 const done = (errors: Record<string, string> = {}, saved = false): FormState => ({ errors, attempt: Date.now(), saved });
 const str = (fd: FormData, key: string) => String(fd.get(key) ?? "").trim();
@@ -62,6 +68,22 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
     })
     .eq("id", user.vendorId);
   if (error) return done({ form: errorKey(error) ?? "common.genericError" });
+  refresh();
+  return done({}, true);
+}
+
+/** REG-06 AC3: the vendor replaces its bank accounts at any time (at least one, exactly one main). */
+export async function saveBankAccounts(_prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await vendorUser();
+  if (!user) return done({ form: "access.denied" });
+  const accounts = parseBankAccounts(formData.get("bankAccounts"));
+  const keep = (errors: Record<string, string>) => ({ ...done(errors), values: { bankAccounts: accounts } });
+  const invalid = validateBankAccounts(accounts);
+  if (invalid) return keep({ bankAccounts: invalid });
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("bank_accounts_save", { p_accounts: toBankAccountRows(accounts) });
+  if (error) return keep({ bankAccounts: errorKey(error) ?? "common.genericError" });
   refresh();
   return done({}, true);
 }

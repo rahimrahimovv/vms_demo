@@ -73,15 +73,13 @@ async function vendor(key: "vendorA" | "vendorB") {
       contact_person: "Test Contact",
       contact_email: email,
       phone: "+994500000000",
-      bank_name: "Test Bank",
-      iban: "AZ00TEST",
-      swift: "TESTAZ22",
       founded_on: "2015-05-01",
     },
     p_owners: [
       { full_name: "Head Person", id_number: `HEAD-${key}-${RUN}`, share_percent: 60, role: "HEAD" },
       { full_name: "Shared Owner", id_number: SHARED_OWNER, share_percent: 40, role: "SHAREHOLDER" },
     ],
+    p_accounts: [{ bank_name: "Test Bank", iban: "AZ00 test 0001", swift: "TESTAZ22", currency: "AZN", is_main: true }],
   });
   if (regError) throw regError;
   recordIds.push(vendorId);
@@ -630,6 +628,108 @@ describe("REG-06 profile, certificates and the vendor card", () => {
     expect(goods).not.toBeNull();
     const { error: spoof } = await actors.vendorB.client.from("vendor_brand").insert({ vendor_id: actors.vendorA.vendorId, brand: "Spoof" });
     expect(spoof).not.toBeNull();
+  });
+});
+
+describe("REG-01 AC4 / REG-06 AC3 / AC7 bank accounts", () => {
+  const account = (overrides: Record<string, unknown> = {}) => ({
+    bank_name: "Test Bank",
+    iban: "AZ00TEST0001",
+    swift: "TESTAZ22",
+    currency: "AZN",
+    is_main: false,
+    ...overrides,
+  });
+  const accountsOf = async (vendorId: string) =>
+    (
+      await db.query(
+        "select iban, currency, is_main from public.vendor_bank_account where vendor_id = $1 order by is_main desc, iban",
+        [vendorId],
+      )
+    ).rows;
+
+  it("REG-01 AC4: registration stores the account as main (IBAN without spaces, upper case)", async () => {
+    expect(await accountsOf(actors.vendorB.vendorId!)).toEqual([{ iban: "AZ00TEST0001", currency: "AZN", is_main: true }]);
+  });
+
+  it("REG-01 AC4: no registration without a bank account", async () => {
+    const { error } = await service.rpc("register_vendor", {
+      p_user_id: randomUUID(),
+      p_vendor: {
+        vendor_type: "INDIVIDUAL",
+        legal_name: `RLS no account ${RUN}`,
+        id_card_number: `ID-${RUN}`,
+        country_code: "AZ",
+        contact_person: "Test",
+        contact_email: `rls2-noaccount-${RUN}@rls.test`,
+        phone: "+994500000000",
+      },
+      p_owners: [],
+      p_accounts: [],
+    });
+    expect(error?.message).toBe("errors.bankAccountRequired");
+    const { rows } = await db.query("select 1 from public.vendor where legal_name = $1", [`RLS no account ${RUN}`]);
+    expect(rows).toHaveLength(0);
+  });
+
+  it("REG-06 AC3: the vendor adds, edits and removes accounts after submit, keeping one main", async () => {
+    const id = actors.vendorA.vendorId!;
+    const two = [account({ iban: "AZ00TEST0001", is_main: true }), account({ iban: "AZ00TEST0002", currency: "USD" })];
+    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: two })).error).toBeNull();
+    expect(await accountsOf(id)).toEqual([
+      { iban: "AZ00TEST0001", currency: "AZN", is_main: true },
+      { iban: "AZ00TEST0002", currency: "USD", is_main: false },
+    ]);
+    // move "main" to the USD account, then remove the AZN one
+    const moved = [account({ iban: "AZ00TEST0001" }), account({ iban: "AZ00TEST0002", currency: "USD", is_main: true })];
+    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: moved })).error).toBeNull();
+    const one = [account({ iban: "AZ00TEST0002", currency: "USD", is_main: true })];
+    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: one })).error).toBeNull();
+    expect(await accountsOf(id)).toEqual([{ iban: "AZ00TEST0002", currency: "USD", is_main: true }]);
+  });
+
+  it("REG-06 AC3: at least one account, exactly one main, IBAN up to 34 letters and digits", async () => {
+    const save = async (accounts: unknown[]) =>
+      (await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: accounts })).error?.message;
+    expect(await save([])).toBe("errors.bankAccountRequired");
+    expect(await save([account(), account({ iban: "AZ00TEST0003" })])).toBe("errors.mainAccountOne");
+    expect(await save([account({ is_main: true }), account({ iban: "AZ00TEST0003", is_main: true })])).toBe("errors.mainAccountOne");
+    expect(await save([account({ is_main: true, iban: "A".repeat(35) })])).toBe("errors.ibanFormat");
+    expect(await save([account({ is_main: true, swift: " " })])).toBe("errors.bankAccountIncomplete");
+    // the refused saves changed nothing
+    expect(await accountsOf(actors.vendorA.vendorId!)).toEqual([{ iban: "AZ00TEST0002", currency: "USD", is_main: true }]);
+  });
+
+  it("the last account cannot be deleted, even directly in the database", async () => {
+    await expect(db.query("delete from public.vendor_bank_account where vendor_id = $1", [actors.vendorA.vendorId])).rejects.toThrow(
+      "errors.bankAccountRequired",
+    );
+  });
+
+  it("accounts are written only through the functions, and only for the own vendor", async () => {
+    const { error: insert } = await actors.vendorA.client
+      .from("vendor_bank_account")
+      .insert(account({ vendor_id: actors.vendorA.vendorId }));
+    expect(insert).not.toBeNull();
+    await actors.vendorB.client.from("vendor_bank_account").delete().eq("vendor_id", actors.vendorA.vendorId!);
+    expect(await accountsOf(actors.vendorA.vendorId!)).toHaveLength(1);
+    const { error: anonymous } = await anon().rpc("bank_accounts_save", { p_accounts: [account({ is_main: true })] });
+    expect(anonymous).not.toBeNull();
+    const { error: internalUser } = await actors.specialist.client.rpc("bank_accounts_save", {
+      p_accounts: [account({ is_main: true })],
+    });
+    expect(internalUser?.message).toBe("errors.noAccess");
+  });
+
+  it("NFR-001 / REG-06 AC7: a vendor reads only its own accounts; PS and Admin read all, Requesters none", async () => {
+    const { data: own } = await actors.vendorB.client.from("vendor_bank_account").select("vendor_id");
+    expect(new Set((own ?? []).map((a) => a.vendor_id))).toEqual(new Set([actors.vendorB.vendorId]));
+    const { data: ps } = await actors.specialist.client.from("vendor_bank_account").select("is_main").eq("vendor_id", BETA);
+    expect(ps?.map((a) => a.is_main).sort()).toEqual([false, true]);
+    const { data: admin } = await actors.admin.client.from("vendor_bank_account").select("id").eq("vendor_id", GAMMA);
+    expect(admin).toHaveLength(1);
+    const { data: requester } = await actors.requester.client.from("vendor_bank_account").select("id");
+    expect(requester).toEqual([]);
   });
 });
 

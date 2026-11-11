@@ -21,15 +21,18 @@ Updated after each slice (CLAUDE.md "How to work").
 Backlog export of 11 Nov 2026 (30 stories, 41-table ERD), with three fixes agreed on 11 Nov:
 REG-06 AC5 (EXPIRED from the day after the expiry date), REG-05 AC8 (new questionnaire allowed in the
 last 30 days of a grade; the new grade replaces the old one), ERD (voting period only on `committee`).
+Change of 11 Nov before production: several bank accounts per vendor (`vendor_bank_account`, exactly one
+main; bank name, IBAN and SWIFT removed from `vendor`), REG-01 AC4 and REG-06 AC3 / AC7. vms-prod was not
+migrated yet, so the table is part of the Slice 2 migration (42 tables).
 
 | Story | Status | Notes |
 | --- | --- | --- |
-| REG-01 Vendor registers (local, individual, foreign) | done | AC1-AC10; account created confirmed by the server, no e-mail (CLAUDE.md rule 1) |
+| REG-01 Vendor registers (local, individual, foreign) | done | AC1-AC10; account created confirmed by the server, no e-mail (CLAUDE.md rule 1); one or more bank accounts, one main |
 | REG-02 Specialist approves, returns or rejects | done | AC1-AC6 |
 | REG-03 Vendor applies for categories | done | AC1-AC5; licence required on Fertilisers and its children |
 | REG-04 Specialist qualifies; AVL | done | AC1-AC4; expiry applied on read and by the daily job |
 | REG-05 Questionnaire and A–D grade | done | AC1-AC9 incl. the D rule and the 30-day early retake |
-| REG-06 Profile, certificates, vendor card | done | AC1-AC10; certificate reminders at once on save and daily |
+| REG-06 Profile, certificates, vendor card | done | AC1-AC10; certificate reminders at once on save and daily; bank accounts kept on Profile, listed on the card |
 | MDM-01, MDM-02 | data only | Dictionaries and category tree seeded; Admin screens in Slice 3 |
 
 Data model for Slices 3-7 is in place (`20261111130000_procurement_model.sql`): tables, constraints,
@@ -39,16 +42,18 @@ with each slice.
 
 ### Verified
 
-- `npm test`: 51 unit tests (Calculation Rules with the backlog's worked examples: score 76.0, grades,
+- `npm test`: 57 unit tests (Calculation Rules with the backlog's worked examples: score 76.0, grades,
   certificate status, years in business; registration rules; file type/size incl. a renamed .exe;
-  category tree; Role Matrix menus; every error key and notification event has a text).
-- `npm run test:rls`: 66 RLS tests on vms-dev (24 Slice 1 + 42 Slice 2) with two throwaway vendor accounts:
+  category tree; bank account rules; Role Matrix menus; every error key and notification event has a text).
+- `npm run test:rls`: 73 RLS tests on vms-dev (24 Slice 1 + 49 Slice 2) with two throwaway vendor accounts:
   isolation of every vendor table, no points or scores visible to vendors, transitions and required
   comments, D rule and HOLD, licence check, AVL parent/child, expiry by date, shared-owner flag,
-  certificate notices, audit entries, document numbers.
-- Click-through in Edge at 1280 px on the dev server (vms-dev), 34 checks: registration with field errors,
+  certificate notices, bank accounts (at least one, exactly one main, IBAN format, written only through
+  functions, last account cannot be deleted), audit entries, document numbers.
+- Click-through in Edge at 1280 px on the dev server (vms-dev), 39 checks: registration with field errors,
   return / resubmit / approve, questionnaire 78.0 -> B (backlog Scenario A answers), licence message,
-  qualify, AVL with brand filter, EXPIRING certificate warning, shared-owner flag on Beta Trade.
+  qualify, AVL with brand filter, two bank accounts on the card, main moved and an account removed on
+  Profile, EXPIRING certificate warning, shared-owner flag on Beta Trade.
 
 ### Additions to the ERD (agreed 11 Nov 2026)
 

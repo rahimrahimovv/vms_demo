@@ -186,10 +186,7 @@ create table public.vendor (
   contact_person           text not null check (btrim(contact_person) <> ''),
   contact_email            text not null,
   phone                    text not null check (phone ~ '^\+[0-9]{8,15}$'),
-  bank_name                text not null check (btrim(bank_name) <> ''),
-  iban                     text not null check (btrim(iban) <> ''),
-  swift                    text not null check (btrim(swift) <> ''),
-  status                   text not null default 'DRAFT'
+  status                  text not null default 'DRAFT'
                            check (status in ('DRAFT', 'SUBMITTED', 'RETURNED', 'APPROVED', 'REJECTED')),
   standing                 text check (standing in ('ACTIVE', 'HOLD', 'BLACKLISTED')),
   standing_until           date,
@@ -250,12 +247,10 @@ begin
   -- Only direct API writes are guarded; SECURITY DEFINER functions run as the owner.
   if current_user = 'authenticated' and old.status not in ('DRAFT', 'RETURNED') and
      (new.vendor_type, new.legal_name, new.voen, new.foreign_tax_number, new.country_code, new.id_card_number,
-      new.legal_address, new.director_name, new.is_vat_payer, new.contact_person, new.phone,
-      new.bank_name, new.iban, new.swift, new.founded_on)
+      new.legal_address, new.director_name, new.is_vat_payer, new.contact_person, new.phone, new.founded_on)
      is distinct from
      (old.vendor_type, old.legal_name, old.voen, old.foreign_tax_number, old.country_code, old.id_card_number,
-      old.legal_address, old.director_name, old.is_vat_payer, old.contact_person, old.phone,
-      old.bank_name, old.iban, old.swift, old.founded_on) then
+      old.legal_address, old.director_name, old.is_vat_payer, old.contact_person, old.phone, old.founded_on) then
     perform app.fail('errors.registrationReadOnly');
   end if;
   return new;
@@ -285,6 +280,39 @@ begin
 end $$;
 create constraint trigger vendor_owner_shares after insert or update on public.vendor_owner
   deferrable initially deferred for each row execute function app.check_owner_shares();
+
+-- REG-01 AC4, REG-06 AC3: one or more bank accounts, exactly one of them main.
+create table public.vendor_bank_account (
+  id         uuid primary key default gen_random_uuid(),
+  vendor_id  uuid not null references public.vendor (id) on delete cascade,
+  bank_name  text not null check (btrim(bank_name) <> ''),
+  iban       text not null check (iban ~ '^[A-Z0-9]{1,34}$'),
+  swift      text not null check (btrim(swift) <> ''),
+  currency   text not null check (currency ~ '^[A-Z]{3}$'),
+  is_main    boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index vendor_bank_account_vendor_idx on public.vendor_bank_account (vendor_id);
+create unique index vendor_bank_account_main_key on public.vendor_bank_account (vendor_id) where is_main;
+
+-- Checked at commit, so the accounts can be replaced in one transaction. Skipped when the vendor
+-- itself is deleted (cascade).
+create function app.check_bank_accounts() returns trigger
+language plpgsql security definer set search_path = '' as $$
+declare v_vendor uuid := coalesce(new.vendor_id, old.vendor_id);
+begin
+  if exists (select 1 from public.vendor v where v.id = v_vendor) then
+    if not exists (select 1 from public.vendor_bank_account a where a.vendor_id = v_vendor) then
+      perform app.fail('errors.bankAccountRequired');
+    end if;
+    if (select count(*) from public.vendor_bank_account a where a.vendor_id = v_vendor and a.is_main) <> 1 then
+      perform app.fail('errors.mainAccountOne');
+    end if;
+  end if;
+  return null;
+end $$;
+create constraint trigger vendor_bank_account_rules after insert or update or delete on public.vendor_bank_account
+  deferrable initially deferred for each row execute function app.check_bank_accounts();
 
 create table public.vendor_brand (
   id                 uuid primary key default gen_random_uuid(),
@@ -528,7 +556,7 @@ create policy vendor_update_own on public.vendor for update to authenticated
   using (id = (select app.current_vendor_id())) with check (id = (select app.current_vendor_id()));
 revoke insert, update, delete on public.vendor from authenticated;
 grant update (vendor_type, legal_name, voen, foreign_tax_number, country_code, id_card_number, legal_address,
-              director_name, is_vat_payer, contact_person, phone, bank_name, iban, swift, founded_on,
+              director_name, is_vat_payer, contact_person, phone, founded_on,
               main_activity, main_goods, bank_guarantee_available, bank_guarantee_types,
               bank_guarantee_max, bank_guarantee_currency)
   on public.vendor to authenticated;  -- contact_email stays equal to the sign-in e-mail
@@ -542,6 +570,16 @@ create policy vendor_owner_select on public.vendor_owner for select to authentic
 create policy vendor_owner_write_own on public.vendor_owner for all to authenticated
   using (vendor_id = (select app.current_vendor_id()) and app.vendor_registration_editable(vendor_id))
   with check (vendor_id = (select app.current_vendor_id()) and app.vendor_registration_editable(vendor_id));
+
+-- Bank accounts: read like owners; written only through public.register_vendor and
+-- public.bank_accounts_save, which replace the whole list in one transaction.
+alter table public.vendor_bank_account enable row level security;
+create policy vendor_bank_account_select on public.vendor_bank_account for select to authenticated
+  using (vendor_id = (select app.current_vendor_id())
+         or ((select app.can_view_vendors()) and exists (
+              select 1 from public.vendor v where v.id = vendor_bank_account.vendor_id
+                and v.company_id = (select app.current_company_id()))));
+revoke insert, update, delete on public.vendor_bank_account from authenticated;
 
 -- Brands and certificates: the vendor keeps them at any time (REG-06 AC3, AC4).
 do $$
@@ -656,7 +694,37 @@ $$;
 
 -- REG-01: called by the server with the secret key after it created the Auth user with
 -- email_confirm = true (no confirmation e-mail). The single buying company owns the vendor.
-create function public.register_vendor(p_user_id uuid, p_vendor jsonb, p_owners jsonb default '[]')
+-- REG-01 AC4, REG-06 AC3: replaces the vendor's bank accounts; the constraint trigger checks
+-- "at least one" and "exactly one main" at commit.
+create function app.replace_bank_accounts(p_vendor uuid, p_accounts jsonb) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if jsonb_typeof(coalesce(p_accounts, 'null')) <> 'array' or jsonb_array_length(p_accounts) = 0 then
+    perform app.fail('errors.bankAccountRequired');
+  end if;
+  -- the same messages as the form, instead of a unique or check violation
+  if exists (select 1 from jsonb_populate_recordset(null::public.vendor_bank_account, p_accounts) a
+             where coalesce(btrim(a.bank_name), '') = '' or coalesce(btrim(a.swift), '') = ''
+                or coalesce(a.currency, '') !~ '^[A-Za-z]{3}$') then
+    perform app.fail('errors.bankAccountIncomplete');
+  end if;
+  if exists (select 1 from jsonb_populate_recordset(null::public.vendor_bank_account, p_accounts) a
+             where upper(regexp_replace(coalesce(a.iban, ''), '\s', '', 'g')) !~ '^[A-Z0-9]{1,34}$') then
+    perform app.fail('errors.ibanFormat');
+  end if;
+  if (select count(*) from jsonb_populate_recordset(null::public.vendor_bank_account, p_accounts) a
+      where a.is_main) <> 1 then
+    perform app.fail('errors.mainAccountOne');
+  end if;
+  delete from public.vendor_bank_account where vendor_id = p_vendor;
+  insert into public.vendor_bank_account (vendor_id, bank_name, iban, swift, currency, is_main)
+  select p_vendor, btrim(a.bank_name), upper(regexp_replace(a.iban, '\s', '', 'g')),
+         upper(regexp_replace(a.swift, '\s', '', 'g')), upper(a.currency), coalesce(a.is_main, false)
+  from jsonb_populate_recordset(null::public.vendor_bank_account, p_accounts) a;
+end $$;
+
+create function public.register_vendor(p_user_id uuid, p_vendor jsonb, p_owners jsonb default '[]',
+                                       p_accounts jsonb default '[]')
 returns uuid language plpgsql security definer set search_path = '' as $$
 declare
   v_company uuid;
@@ -667,16 +735,18 @@ begin
   v_row := jsonb_populate_record(null::public.vendor, p_vendor);
   insert into public.vendor (company_id, vendor_type, legal_name, voen, foreign_tax_number, country_code,
                              id_card_number, legal_address, director_name, is_vat_payer, contact_person,
-                             contact_email, phone, bank_name, iban, swift, founded_on)
+                             contact_email, phone, founded_on)
   values (v_company, v_row.vendor_type, v_row.legal_name, v_row.voen, v_row.foreign_tax_number,
           v_row.country_code, v_row.id_card_number, v_row.legal_address, v_row.director_name,
           v_row.is_vat_payer, v_row.contact_person, lower(v_row.contact_email), v_row.phone,
-          v_row.bank_name, v_row.iban, v_row.swift, v_row.founded_on)
+          v_row.founded_on)
   returning id into v_id;
 
   insert into public.vendor_owner (vendor_id, full_name, id_number, share_percent, role)
   select v_id, o.full_name, o.id_number, o.share_percent, o.role
   from jsonb_populate_recordset(null::public.vendor_owner, coalesce(p_owners, '[]')) o;
+
+  perform app.replace_bank_accounts(v_id, p_accounts);
 
   insert into public.app_user (id, company_id, vendor_id, full_name, email)
   values (p_user_id, v_company, v_id, v_row.contact_person, lower(v_row.contact_email));
@@ -730,6 +800,15 @@ begin
   update public.vendor set status = 'SUBMITTED', submitted_at = now() where id = v.id;
   perform app.notify(app.active_user_ids(v.company_id, 'PROCUREMENT_SPECIALIST'), 'registration.submitted',
                      'vendor', v.id, v.legal_name, jsonb_build_object('vendorType', v.vendor_type));
+end $$;
+
+-- REG-01 AC4 (registration form) and REG-06 AC3 (Profile, at any time): the vendor's own accounts.
+create function public.bank_accounts_save(p_accounts jsonb) returns void
+language plpgsql security definer set search_path = '' as $$
+declare v_vendor uuid := app.current_vendor_id();
+begin
+  if v_vendor is null then perform app.fail('errors.noAccess'); end if;
+  perform app.replace_bank_accounts(v_vendor, p_accounts);
 end $$;
 
 -- REG-02 AC2, AC3, AC5: SUBMITTED -> APPROVED | RETURNED | REJECTED
@@ -1116,8 +1195,8 @@ select cron.schedule('vms-daily', '5 20 * * *', 'select app.run_daily_jobs()');
 -- 12. Grants. New public functions are executable by anon by default: revoke, then grant.
 ------------------------------------------------------------------
 revoke all on public.incoterm, public.payment_term, public.delivery_place, public.delivery_mode, public.category,
-              public.item, public.vendor, public.vendor_owner, public.vendor_brand, public.vendor_certificate,
-              public.file, public.questionnaire_question, public.questionnaire_option, public.questionnaire_response,
+              public.item, public.vendor, public.vendor_owner, public.vendor_bank_account, public.vendor_brand,
+              public.vendor_certificate, public.file, public.questionnaire_question, public.questionnaire_option, public.questionnaire_response,
               public.questionnaire_answer, public.category_application from anon;
 
 revoke execute on all functions in schema app from public, anon, authenticated, service_role;
@@ -1129,12 +1208,13 @@ grant execute on function app.current_company_id(), app.has_role(public.app_role
 -- app.fail only raises an error key; triggers that run as the signed-in user (vendor guard) call it.
 grant execute on function app.fail(text) to authenticated;
 
-revoke execute on function public.register_vendor(uuid, jsonb, jsonb), public.vendor_tax_number_taken(text, text, uuid),
-  public.registration_submit(), public.registration_decide(uuid, text, text), public.questionnaire_start(),
+revoke execute on function public.register_vendor(uuid, jsonb, jsonb, jsonb), public.vendor_tax_number_taken(text, text, uuid),
+  public.registration_submit(), public.bank_accounts_save(jsonb), public.registration_decide(uuid, text, text),
+  public.questionnaire_start(),
   public.vendor_questionnaire(uuid), public.questionnaire_save(uuid, jsonb), public.questionnaire_submit(uuid),
   public.questionnaire_adjust(uuid, integer, text), public.questionnaire_decide(uuid, text, text),
   public.category_apply(uuid, uuid), public.category_decide(uuid, text, text), public.avl_list(uuid),
   public.vendor_shared_owners(uuid)
   from public, anon;
-revoke execute on function public.register_vendor(uuid, jsonb, jsonb), public.vendor_tax_number_taken(text, text, uuid)
+revoke execute on function public.register_vendor(uuid, jsonb, jsonb, jsonb), public.vendor_tax_number_taken(text, text, uuid)
   from authenticated;  -- server only (secret key)

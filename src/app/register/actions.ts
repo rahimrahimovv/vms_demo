@@ -8,6 +8,7 @@ import { errorKey } from "@/lib/db-errors";
 import { bakuToday } from "@/lib/vendors/rules";
 import {
   parseRegistration,
+  toBankAccountRows,
   toOwnerRows,
   toVendorColumns,
   validateRegistration,
@@ -65,6 +66,7 @@ export async function registerVendor(_prev: RegistrationFormState, formData: For
     p_user_id: userId,
     p_vendor: { ...vendor, contact_email: values.contactEmail },
     p_owners: toOwnerRows(values),
+    p_accounts: toBankAccountRows(values.bankAccounts),
   });
   if (registerError || !vendorId) {
     await admin.auth.admin.deleteUser(userId);

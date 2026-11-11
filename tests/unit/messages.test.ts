@@ -81,6 +81,9 @@ describe("messages/en.json", () => {
     expect(get("errors.questionnaireFirst")).toBe("Complete the qualification questionnaire first");
     expect(get("errors.licenceRequired")).toBe("This category requires a licence or certificate file");
     expect(get("errors.sharesOver100")).toBe("Shares cannot exceed 100% in total");
+    expect(get("errors.ibanFormat")).toBe("IBAN must be up to 34 letters and digits");
+    expect(get("errors.bankAccountRequired")).toBe("Add at least one bank account");
+    expect(get("errors.mainAccountOne")).toBe("Mark exactly one account as main");
     expect(get("qualification.applyAgainOn")).toBe("You can apply again on {date}");
     expect(get("vendorCard.sharesOwner")).toBe("Shares an owner with");
   });

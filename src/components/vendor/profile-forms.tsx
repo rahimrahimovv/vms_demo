@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { BankAccountsEditor } from "@/components/vendor/bank-accounts-editor";
+import type { BankAccount } from "@/lib/vendors/validate";
 
 export const SELECT_CLASS =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive";
@@ -35,6 +37,22 @@ function useForm(action: Action) {
     </>
   );
   return { t, state, formAction, pending, err, banner };
+}
+
+/** REG-06 AC3: add, edit or remove bank accounts; at least one, exactly one main. */
+export function BankAccountsForm({ action, initial }: { action: Action; initial: BankAccount[] }) {
+  const { t, state, formAction, pending, err, banner } = useForm(action);
+  return (
+    <form action={formAction} className="flex flex-col gap-4" data-testid="bank-accounts-form">
+      {banner}
+      <BankAccountsEditor key={state.attempt ?? 0} initial={state.values?.bankAccounts ?? initial} error={err("bankAccounts")} />
+      <div className="flex justify-end">
+        <Button type="submit" disabled={pending} data-testid="save-bank-accounts">
+          {pending ? t("common.saving") : t("common.save")}
+        </Button>
+      </div>
+    </form>
+  );
 }
 
 export type ProfileValues = {

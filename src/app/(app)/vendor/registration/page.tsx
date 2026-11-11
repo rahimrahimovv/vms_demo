@@ -17,7 +17,7 @@ export default async function VendorRegistrationPage({ searchParams }: PageProps
 
   const t = await getTranslations();
   const supabase = await createClient();
-  const { vendor, owners, files } = await loadVendor(supabase, user.vendorId);
+  const { vendor, owners, files, bankAccounts } = await loadVendor(supabase, user.vendorId);
   if (!vendor) return <NoAccess />;
   const params = await searchParams;
   const error = typeof params.error === "string" && /^errors\.[A-Za-z]+$/.test(params.error) ? params.error : null;
@@ -68,7 +68,7 @@ export default async function VendorRegistrationPage({ searchParams }: PageProps
           <RegistrationForm
             mode="edit"
             action={updateRegistration}
-            initial={toFormState(vendor, owners)}
+            initial={toFormState(vendor, owners, bankAccounts)}
             files={filesByKind(files)}
             readOnly={!editable}
           />

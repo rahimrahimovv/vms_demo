@@ -7,7 +7,8 @@ import { bakuToday, certificateStatus } from "@/lib/vendors/rules";
 import { NoAccess } from "@/components/no-access";
 import { StatusBadge } from "@/components/status-badge";
 import { FileList } from "@/components/file-list";
-import { BrandForm, CertificateForm, ProfileDetailsForm, RenewForm } from "@/components/vendor/profile-forms";
+import { BankAccountsForm, BrandForm, CertificateForm, ProfileDetailsForm, RenewForm } from "@/components/vendor/profile-forms";
+import { loadBankAccounts, toBankAccounts } from "@/lib/vendors/queries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,6 +18,7 @@ import {
   deleteBrand,
   deleteCertificate,
   renewCertificate,
+  saveBankAccounts,
   updateProfile,
 } from "./actions";
 
@@ -40,7 +42,7 @@ export default async function VendorProfilePage() {
   const supabase = await createClient();
   const today = bakuToday();
 
-  const [{ data: vendor }, { data: brands }, { data: certificates }, { data: owners }] = await Promise.all([
+  const [{ data: vendor }, { data: brands }, { data: certificates }, { data: owners }, bankAccounts] = await Promise.all([
     supabase
       .from("vendor")
       .select("main_activity, main_goods, bank_guarantee_available, bank_guarantee_types, bank_guarantee_max, bank_guarantee_currency")
@@ -54,6 +56,7 @@ export default async function VendorProfilePage() {
       .order("created_at")
       .returns<Certificate[]>(),
     supabase.from("vendor_owner").select("id, full_name, share_percent, role").eq("vendor_id", user.vendorId),
+    loadBankAccounts(supabase, user.vendorId),
   ]);
   if (!vendor) return <NoAccess />;
 
@@ -87,6 +90,15 @@ export default async function VendorProfilePage() {
               bankGuaranteeCurrency: vendor.bank_guarantee_currency ?? "",
             }}
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("bankAccounts.title")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BankAccountsForm action={saveBankAccounts} initial={toBankAccounts(bankAccounts)} />
         </CardContent>
       </Card>
 

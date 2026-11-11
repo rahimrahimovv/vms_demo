@@ -7,7 +7,14 @@ import {
   questionnaireScore,
   yearsInBusiness,
 } from "@/lib/vendors/rules";
-import { sharesExceed100, validateRegistration, type RegistrationValues } from "@/lib/vendors/validate";
+import {
+  parseBankAccounts,
+  sharesExceed100,
+  validateBankAccounts,
+  validateRegistration,
+  type BankAccount,
+  type RegistrationValues,
+} from "@/lib/vendors/validate";
 import { checkFile, MAX_FILE_BYTES } from "@/lib/files/rules";
 import { ancestorsOf, flattenTree } from "@/lib/categories";
 import { validateQuestion } from "@/lib/questionnaire/validate";
@@ -29,9 +36,7 @@ function local(overrides: Partial<RegistrationValues> = {}): RegistrationValues 
     contactEmail: "info@alpha-agro.test",
     phone: "+994501234567",
     password: "long-enough",
-    bankName: "Demo Bank",
-    iban: "AZ00DEMO0000000000000001",
-    swift: "DEMOAZ22",
+    bankAccounts: [{ bankName: "Demo Bank", iban: "AZ00DEMO0000000000000001", swift: "DEMOAZ22", currency: "AZN", isMain: true }],
     foundedOn: "2012-03-15",
     owners: [
       { fullName: "Kamran Aliyev", idNumber: "AZE-1", sharePercent: "60", role: "HEAD" },
@@ -96,6 +101,54 @@ describe("REG-01 registration rules", () => {
     expect(sharesExceed100(owners)).toBe(true);
     expect(check(local({ owners })).owners).toBe("errors.sharesOver100");
     expect(sharesExceed100(local().owners)).toBe(false);
+  });
+});
+
+describe("REG-01 AC4 / REG-06 AC3 bank accounts", () => {
+  const account = (overrides: Partial<BankAccount> = {}): BankAccount => ({
+    bankName: "Demo Bank",
+    iban: "AZ00DEMO0000000000000001",
+    swift: "DEMOAZ22",
+    currency: "AZN",
+    isMain: false,
+    ...overrides,
+  });
+
+  it("accepts one main account, or several with exactly one main", () => {
+    expect(validateBankAccounts([account({ isMain: true })])).toBeUndefined();
+    expect(validateBankAccounts([account({ isMain: true }), account({ currency: "USD" })])).toBeUndefined();
+  });
+
+  it("needs at least one account", () => {
+    expect(validateBankAccounts([])).toBe("errors.bankAccountRequired");
+    expect(check(local({ bankAccounts: [] })).bankAccounts).toBe("errors.bankAccountRequired");
+  });
+
+  it("needs exactly one main account", () => {
+    expect(validateBankAccounts([account(), account()])).toBe("errors.mainAccountOne");
+    expect(validateBankAccounts([account({ isMain: true }), account({ isMain: true })])).toBe("errors.mainAccountOne");
+  });
+
+  it("IBAN is up to 34 letters and digits", () => {
+    expect(validateBankAccounts([account({ isMain: true, iban: "A".repeat(34) })])).toBeUndefined();
+    expect(validateBankAccounts([account({ isMain: true, iban: "A".repeat(35) })])).toBe("errors.ibanFormat");
+    expect(validateBankAccounts([account({ isMain: true, iban: "AZ00-DEMO" })])).toBe("errors.ibanFormat");
+  });
+
+  it("every account needs bank name, IBAN, SWIFT and a listed currency", () => {
+    expect(validateBankAccounts([account({ isMain: true, swift: "" })])).toBe("errors.bankAccountIncomplete");
+    expect(validateBankAccounts([account({ isMain: true, currency: "XXX" })])).toBe("errors.bankAccountIncomplete");
+  });
+
+  it("parses the form JSON: spaces removed, upper case, empty rows dropped", () => {
+    const raw = JSON.stringify([
+      { bankName: " Demo Bank ", iban: "az00 demo 0001", swift: "demo az22", currency: "usd", isMain: true },
+      { bankName: "", iban: "", swift: "", currency: "AZN", isMain: false },
+    ]);
+    expect(parseBankAccounts(raw)).toEqual([
+      { bankName: "Demo Bank", iban: "AZ00DEMO0001", swift: "DEMOAZ22", currency: "USD", isMain: true },
+    ]);
+    expect(parseBankAccounts("not json")).toEqual([]);
   });
 });
 

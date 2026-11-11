@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { FileList } from "@/components/file-list";
 import { DecisionPanel } from "@/components/decision-panel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,7 +42,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
   const t = await getTranslations();
   const supabase = await createClient();
   const today = bakuToday();
-  const { vendor, owners, files } = await loadVendor(supabase, id);
+  const { vendor, owners, files, bankAccounts } = await loadVendor(supabase, id);
   if (!vendor) return <NoAccess />;
 
   const [{ data: brands }, { data: certificates }, { data: applications }, { data: responses }, { data: categories }, { data: shared }] =
@@ -181,11 +182,37 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
                 <Field label={t("registration.fields.contactPerson")}>{vendor.contact_person}</Field>
                 <Field label={t("registration.fields.contactEmail")}>{vendor.contact_email}</Field>
                 <Field label={t("registration.fields.phone")}>{vendor.phone}</Field>
-                <Field label={t("registration.fields.bankName")}>{vendor.bank_name}</Field>
-                <Field label={t("registration.fields.iban")}>{vendor.iban}</Field>
-                <Field label={t("registration.fields.swift")}>{vendor.swift}</Field>
                 {vendor.review_comment && <Field label={t("vendorCard.reviewComment")}>{vendor.review_comment}</Field>}
               </dl>
+
+              {/* REG-06 AC7: every bank account, the main one marked. */}
+              <h3 className="mt-6 mb-2 text-sm font-medium">{t("bankAccounts.title")}</h3>
+              <div className="overflow-hidden rounded-md border">
+                <Table data-testid="bank-accounts">
+                  <TableHeader className="bg-muted/60">
+                    <TableRow>
+                      <TableHead>{t("bankAccounts.bankName")}</TableHead>
+                      <TableHead>{t("bankAccounts.iban")}</TableHead>
+                      <TableHead>{t("bankAccounts.swift")}</TableHead>
+                      <TableHead>{t("bankAccounts.currency")}</TableHead>
+                      <TableHead />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bankAccounts.map((a) => (
+                      <TableRow key={a.id} data-testid="bank-account-row">
+                        <TableCell>{a.bank_name}</TableCell>
+                        <TableCell className="font-mono text-xs">{a.iban}</TableCell>
+                        <TableCell>{a.swift}</TableCell>
+                        <TableCell>{a.currency}</TableCell>
+                        <TableCell className="text-right">
+                          {a.is_main && <Badge variant="secondary">{t("bankAccounts.main")}</Badge>}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

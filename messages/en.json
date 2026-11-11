@@ -133,6 +133,10 @@
     "ownerIncomplete": "Give every owner a full name, an ID or registration number and a share between 0 and 100",
     "headOwnerRequired": "Add at least one owner with the role Head",
     "sharesOver100": "Shares cannot exceed 100% in total",
+    "bankAccountRequired": "Add at least one bank account",
+    "bankAccountIncomplete": "Enter bank name, IBAN, SWIFT and currency for every account",
+    "ibanFormat": "IBAN must be up to 34 letters and digits",
+    "mainAccountOne": "Mark exactly one account as main",
     "taxNumberTaken": "A vendor with this tax number is already registered",
     "uploadVatCertificate": "Upload the VAT payer certificate",
     "uploadCharter": "Upload the charter or state-registry extract",
@@ -258,7 +262,7 @@
       "type": "Vendor type",
       "company": "Company data",
       "contact": "Contact and sign-in",
-      "bank": "Bank details",
+      "bank": "Bank accounts",
       "owners": "Owners",
       "documents": "Documents"
     },
@@ -281,10 +285,7 @@
       "contactPerson": "Contact person",
       "phone": "Phone",
       "contactEmail": "Contact e-mail",
-      "password": "Password",
-      "bankName": "Bank name",
-      "iban": "IBAN",
-      "swift": "SWIFT"
+      "password": "Password"
     },
     "hints": {
       "voen": "10 digits",
@@ -293,6 +294,17 @@
       "contactEmail": "You sign in with this e-mail",
       "owners": "The company head is required; add founders and shareholders above 10%."
     }
+  },
+  "bankAccounts": {
+    "title": "Bank accounts",
+    "bankName": "Bank name",
+    "iban": "IBAN",
+    "swift": "SWIFT",
+    "currency": "Currency",
+    "main": "Main",
+    "add": "Add account",
+    "remove": "Remove account",
+    "hint": "Add one or more accounts and mark one as main."
   },
   "owners": {
     "fullName": "Full name",

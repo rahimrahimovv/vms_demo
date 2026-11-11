@@ -10,6 +10,7 @@ import { errorKey } from "@/lib/db-errors";
 import { bakuToday } from "@/lib/vendors/rules";
 import {
   parseRegistration,
+  toBankAccountRows,
   toOwnerRows,
   toVendorColumns,
   validateRegistration,
@@ -77,6 +78,11 @@ export async function updateRegistration(_prev: RegistrationFormState, formData:
     const { error } = await supabase.from("vendor_owner").insert(owners);
     if (error) return answer(values, { owners: errorKey(error) ?? "common.genericError" });
   }
+
+  const { error: accountsError } = await supabase.rpc("bank_accounts_save", {
+    p_accounts: toBankAccountRows(values.bankAccounts),
+  });
+  if (accountsError) return answer(values, { bankAccounts: errorKey(accountsError) ?? "common.genericError" });
 
   for (const upload of uploads.files) {
     await removeFiles("vendor", current.id, upload.kind);

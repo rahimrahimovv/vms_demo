@@ -235,7 +235,7 @@ TBD
 1. **Given** the public Register page, **When** the vendor picks Local company, **Then** the form requires legal name, VÖEN, legal address, director's name, "VAT payer: Yes / No" and a charter or state-registry extract file (#86).
 2. **Given** the vendor picks Individual, **When** the form renders, **Then** it requires full name, ID card number and an ID card file, and shows VÖEN as optional (#86).
 3. **Given** the vendor picks Foreign company, **When** the form renders, **Then** it requires legal name, country, home tax or registration number (3 to 30 characters), legal address and a registration certificate file, and does not ask for a VÖEN (#90).
-4. **Given** any type, **When** the form renders, **Then** it also requires contact person, contact e-mail (used to sign in), phone, password of at least 8 characters, bank name, IBAN and SWIFT.
+4. **Given** any type, **When** the form renders, **Then** it also requires contact person, contact e-mail (used to sign in), phone, password of at least 8 characters, and at least one bank account (bank name, IBAN of up to 34 letters and digits, SWIFT, currency); the vendor can add more accounts and marks exactly one as main. Messages: "Add at least one bank account", "IBAN must be up to 34 letters and digits", "Mark exactly one account as main".
 5. **Given** a phone number that is not "+" followed by 8 to 15 digits, **When** the vendor submits, **Then** "Enter the phone with country code, e.g. +994501234567" appears; any country code is accepted (#90).
 6. **Given** a VÖEN that is not exactly 10 digits, **When** the vendor submits, **Then** "VÖEN must be 10 digits" appears and nothing is saved (#91).
 7. **Given** a VÖEN or foreign tax number already used by another vendor, **When** the vendor submits, **Then** "A vendor with this tax number is already registered" appears and no account is created (#91).
@@ -368,11 +368,11 @@ TBD
 
 1. **Given** a local or foreign company registering (REG-01), **When** it fills the form, **Then** it must also give the founding date and at least one owner record for the company head, and may add founders and shareholders above 10% (full name, ID or registration number, share %, role Founder, Shareholder or Head); individuals skip this section (#54).
 2. **Given** owner records, **When** their shares add up to more than 100%, **Then** "Shares cannot exceed 100% in total" appears and nothing is saved.
-3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100).
+3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); it can also add, edit or remove bank accounts, keeping at least one and exactly one main (same rules and messages as REG-01 AC4).
 4. **Given** the Certificates section, **When** the vendor adds a certificate with type (ISO 9001, ISO 14001, ISO 45001, HSE policy, Product certificate, Licence, Reference letter, Catalogue, Other), number, issuer, issue date, an optional expiry date and a file, **Then** it shows with the status VALID, EXPIRING or EXPIRED from the Calculation Rules (#106).
 5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); from the day after the expiry date it is EXPIRED and both are notified again.
 6. **Given** the vendor's home page, **When** it loads, **Then** it shows the grade with its valid-until date, the qualified categories, and a warning for every EXPIRING or EXPIRED certificate.
-7. **Given** a Procurement Specialist, Committee Member or Admin, **When** they open a vendor card from the AVL, a registration or a comparison table, **Then** it shows name, type, country, founding date and years in business, standing, grade with valid-until date, qualified categories, activity, brands, main goods, bank guarantee, certificates with status badges, owners and History.
+7. **Given** a Procurement Specialist, Committee Member or Admin, **When** they open a vendor card from the AVL, a registration or a comparison table, **Then** it shows name, type, country, founding date and years in business, standing, grade with valid-until date, qualified categories, activity, brands, main goods, bank guarantee, all bank accounts with the main one marked, certificates with status badges, owners and History.
 8. **Given** two vendors with an owner of the same ID or registration number, **When** either card, or a comparison table with both, is opened, **Then** the flag "Shares an owner with \<vendor>" is shown (#54).
 9. **Given** the AVL page, **When** the specialist filters, **Then** the filters include activity, brand, "Bank guarantee available" and "Valid certificate of type X" (#97, #100).
 10. **Given** a vendor, **When** it uses the portal, **Then** it never sees another vendor's profile, owners or certificates.
@@ -1296,9 +1296,6 @@ Table vendor {
   contact_person varchar [not null]
   contact_email varchar [not null]
   phone varchar [not null]
-  bank_name varchar [not null]
-  iban varchar [not null]
-  swift varchar [not null]
   status varchar [not null, note: 'registration: DRAFT | SUBMITTED | RETURNED | APPROVED | REJECTED']
   standing varchar [note: 'ACTIVE | HOLD | BLACKLISTED; set once APPROVED']
   standing_until date [note: 'end of a HOLD']
@@ -1313,6 +1310,16 @@ Table vendor {
   review_comment text
   submitted_at timestamp
   created_at timestamp
+}
+
+Table vendor_bank_account {
+  id uuid [primary key]
+  vendor_id uuid [ref: > vendor.id, not null]
+  bank_name varchar [not null]
+  iban varchar(34) [not null, note: 'up to 34 letters and digits, stored without spaces']
+  swift varchar [not null]
+  currency varchar(3) [not null]
+  is_main boolean [not null, note: 'exactly one main account per vendor; at least one account']
 }
 
 Table vendor_owner {
