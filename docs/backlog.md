@@ -344,7 +344,7 @@ TBD
 5. **Given** a SUBMITTED questionnaire, **When** the specialist clicks Confirm grade, **Then** it becomes GRADED with grade A (85.0 and above), B (70.0 to 84.9), C (50.0 to 69.9) or D (below 50.0), valid until the confirmation date plus 12 months, and the vendor is notified with the grade and score.
 6. **Given** a SUBMITTED questionnaire, **When** the specialist clicks Return for correction with a comment, **Then** it becomes RETURNED and the vendor can edit and resubmit it.
 7. **Given** a vendor whose first attempt is graded D, **When** they open Qualification, **Then** they may start one new attempt at once; **Given** the second consecutive attempt is also graded D, **Then** the vendor's standing becomes HOLD until 6 months after that confirmation date, it drops out of every AVL, and the page shows "You can apply again on \<date>". \[revised\]
-8. **Given** a grade A, B or C, **When** its valid-until date passes, **Then** the questionnaire becomes EXPIRED, the vendor leaves the AVL in every category, and a new questionnaire is needed (#55).
+8. **Given** a grade A, B or C, **When** its valid-until date passes, **Then** the questionnaire becomes EXPIRED, the vendor leaves the AVL in every category, and a new questionnaire is needed (#55); the vendor may also start a new questionnaire in the last 30 days before the valid-until date, and the new grade replaces the old one when it is confirmed.
 9. **Given** a vendor, **When** they use the portal, **Then** they never see another vendor's grade or score.
 
 ---
@@ -370,7 +370,7 @@ TBD
 2. **Given** owner records, **When** their shares add up to more than 100%, **Then** "Shares cannot exceed 100% in total" appears and nothing is saved.
 3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100).
 4. **Given** the Certificates section, **When** the vendor adds a certificate with type (ISO 9001, ISO 14001, ISO 45001, HSE policy, Product certificate, Licence, Reference letter, Catalogue, Other), number, issuer, issue date, an optional expiry date and a file, **Then** it shows with the status VALID, EXPIRING or EXPIRED from the Calculation Rules (#106).
-5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); on the expiry date it becomes EXPIRED and both are notified again.
+5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); from the day after the expiry date it is EXPIRED and both are notified again.
 6. **Given** the vendor's home page, **When** it loads, **Then** it shows the grade with its valid-until date, the qualified categories, and a warning for every EXPIRING or EXPIRED certificate.
 7. **Given** a Procurement Specialist, Committee Member or Admin, **When** they open a vendor card from the AVL, a registration or a comparison table, **Then** it shows name, type, country, founding date and years in business, standing, grade with valid-until date, qualified categories, activity, brands, main goods, bank guarantee, certificates with status badges, owners and History.
 8. **Given** two vendors with an owner of the same ID or registration number, **When** either card, or a comparison table with both, is opened, **Then** the flag "Shares an owner with \<vendor>" is shown (#54).
@@ -1243,7 +1243,7 @@ Table user_role {
 
 Table setting {
   company_id uuid [ref: > company.id, not null]
-  key varchar [not null, note: 'tender_threshold | rfq_bands | max_extensions | qualification_months | voting_period_days | grade_bands | d_block_months | single_source_limit | rfq_days | tender_days | final_offer_days | final_offer_rounds']
+  key varchar [not null, note: 'tender_threshold | rfq_bands | max_extensions | qualification_months | grade_bands | d_block_months | single_source_limit | rfq_days | tender_days | final_offer_days | final_offer_rounds']
   value text [not null]
   indexes {
     (company_id, key) [pk]

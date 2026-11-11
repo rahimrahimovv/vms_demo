@@ -11,7 +11,7 @@ If this file and the backlog disagree, the backlog wins; ask the BA.
 - Database changes only as SQL migrations in `supabase/migrations/`, RLS policies in the same migration as the table.
 
 ## Non-negotiable rules
-1. No 1C, ERP, e-mail, SMS or OTP integration in this release.
+1. No 1C, ERP, e-mail, SMS or OTP integration in this release. No confirmation e-mails either: the server creates every account (Admin-created users and self-registered vendors) as already confirmed.
 2. English UI only, but every UI string lives in `messages/en.json`; no hard-coded UI text.
 3. Desktop only (1280 px and wider).
 4. Row-level security on every table. A vendor reads only its own records (NFR-001).
@@ -40,7 +40,7 @@ If this file and the backlog disagree, the backlog wins; ask the BA.
 - Forms: two columns, required fields marked, the backlog's exact error
   messages under the field.
 - Vendor portal: same app, simpler menu, with a progress checklist
-  (Registration, Questionnaire, Categories).
+  (Registration, Questionnaire, Categories) and a Profile page.
 - Every empty list shows one sentence and the main action button.
 
 ## Build order (vertical slices)
@@ -50,13 +50,15 @@ Each slice ends deployed and clickable on the Vercel link. Never break an earlie
 | --- | --- | --- |
 | 0 | Setup | Next.js app runs locally and on Vercel; Supabase connected; migrations and seed scripts exist |
 | 1 | PLT-01, PLT-02 | Sign-in, 6 roles, role-based menu, admin user management, audit trail, bell |
-| 2 | REG-01 to REG-05 | Vendor registers, gets approved, fills questionnaire, gets a grade, applies for a category, joins the AVL |
-| 3 | PLN-01, PR-01, PR-02 | Plan lines, PR from catalogue, PR approval |
-| 4 | RFQ-01, RFQ-02, RFQ-04 | Sourcing type by value, invitations, sealed proposals, deadline job and its three actions |
-| 5 | RFQ-03, RFQ-05 | Q&A, technical pass/fail, comparison, proposed winner |
-| 6 | CMT-01 to CMT-03 | Committee setup, winner vote and PO vote, numbered minutes PDF |
+| 2 | REG-01 to REG-06 | Vendor registers, gets approved, fills questionnaire and gets an A–D grade, keeps a profile with certificates, applies for a category, joins the AVL; vendor card (categories seeded as a tree) |
+| 3 | MDM-01, MDM-02, PLN-01, PR-01, PR-02 | Dictionaries as dropdowns, category tree and item catalogue, plan lines, PR from catalogue, PR approval |
+| 4 | RFQ-01, RFQ-02, RFQ-04, RFQ-06 | Sourcing type by value or SSP, invitations, sealed proposals with Incoterm, terms and VAT, deadline job and its three actions |
+| 5 | CMT-01 to CMT-04 | Committee setup, voting engine (opening, winner, PO decisions), numbered minutes PDF, tender opening approved by the committee |
+| 6 | RFQ-03, RFQ-05, RFQ-07, RFQ-08 | Q&A, technical pass/fail (two envelopes), comparison with extra costs and evaluated price, final offer round, proposed winner and winner vote |
 | 7 | PO-01 to PO-03 | PO per winning vendor, Approver then committee, vendor accepts or declines |
 | 8 | DEMO-01, DEMO-02 | Demo bar, Fill sample, seed and reset; full scenario rehearsed |
+
+The data model for every slice is in place from Slice 2 (all ERD tables, RLS and status audit); each slice adds its screens and the functions that change status.
 
 Cut line when late: the "If time allows" list in the backlog's Scope section goes first.
 
