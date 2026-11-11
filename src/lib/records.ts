@@ -9,6 +9,8 @@ const INTERNAL_PATHS: Record<string, (id: string) => string> = {
   vendor_standing: (id) => `/vendors/${id}`,
   questionnaire_response: (id) => `/questionnaires/${id}`,
   category_application: (id) => `/category-applications/${id}`,
+  requisition: (id) => `/requisitions/${id}`,
+  plan_line: () => "/plan",
 };
 
 const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {

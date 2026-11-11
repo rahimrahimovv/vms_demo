@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Building2, ClipboardCheck, ListChecks, UserPlus } from "lucide-react";
+import { Bell, Building2, ClipboardCheck, ListChecks, PackageSearch, ShoppingCart, Undo2, UserPlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { canAccess } from "@/lib/auth/sections";
@@ -54,20 +54,46 @@ export default async function HomePage() {
         supabase.from("category_application").select("id", { count: "exact", head: true }).eq("status", "PENDING"),
       ])
     : [null, null, null];
-  const taskCards = isSpecialist
-    ? [
-        { key: "registrations", href: "/vendors", count: registrations?.count ?? 0, icon: Building2 },
-        { key: "questionnaires", href: "/questionnaires", count: questionnaires?.count ?? 0, icon: ClipboardCheck },
-        { key: "applications", href: "/category-applications", count: applications?.count ?? 0, icon: ListChecks },
-      ]
-    : [];
+  // Slice 3 (PR-01, PR-02): PRs waiting for this user. Approvers never decide on their own PRs (#83).
+  const isApprover = user.roles.includes("APPROVER");
+  const isRequester = user.roles.includes("REQUESTER");
+  const prCount = (status: string, filter?: "own" | "notOwn") => {
+    let q = supabase.from("requisition").select("id", { count: "exact", head: true }).eq("status", status);
+    if (filter === "own") q = q.eq("requester_id", user.id);
+    if (filter === "notOwn") q = q.neq("requester_id", user.id);
+    return q;
+  };
+  const [toApprove, returned, readyForSourcing] = await Promise.all([
+    isApprover ? prCount("PENDING_APPROVAL", "notOwn") : null,
+    isRequester ? prCount("RETURNED", "own") : null,
+    isSpecialist ? prCount("APPROVED") : null,
+  ]);
+  const taskCards = [
+    ...(isApprover ? [{ key: "prsToApprove", href: "/requisitions?tab=toApprove", count: toApprove?.count ?? 0, icon: ShoppingCart }] : []),
+    ...(isRequester ? [{ key: "prsReturned", href: "/requisitions?tab=mine", count: returned?.count ?? 0, icon: Undo2 }] : []),
+    ...(isSpecialist
+      ? [
+          { key: "registrations", href: "/vendors", count: registrations?.count ?? 0, icon: Building2 },
+          { key: "questionnaires", href: "/questionnaires", count: questionnaires?.count ?? 0, icon: ClipboardCheck },
+          { key: "applications", href: "/category-applications", count: applications?.count ?? 0, icon: ListChecks },
+          { key: "prsReadyForSourcing", href: "/requisitions?tab=all", count: readyForSourcing?.count ?? 0, icon: PackageSearch },
+        ]
+      : []),
+  ];
   const text = (row: UnreadRow) => {
     const key = `notifications.events.${row.event}`;
     const values = messageValues(row.params ?? {}, row.record_number, { has: t.has, translate: (k) => t(k) }, formatDate);
     return t.has(key) ? t(key, values) : t("notifications.fallback", values);
   };
 
-  const mainAction = canAccess(user.roles, "adminUsers") ? (
+  const mainAction = isRequester ? (
+    <Button asChild>
+      <Link href="/requisitions/new">
+        <ShoppingCart className="size-4" aria-hidden />
+        {t("home.newPr")}
+      </Link>
+    </Button>
+  ) : canAccess(user.roles, "adminUsers") ? (
     <Button asChild>
       <Link href="/admin/users/new">
         <UserPlus className="size-4" aria-hidden />
