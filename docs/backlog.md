@@ -11,16 +11,20 @@ VMS Core is a generic, 1C-free procurement platform; this backlog covers the MVP
 ### Backlog Hierarchy
 
 ```
-VMS-CORE (Epic) - E2E procurement MVP, 23 stories
+VMS-CORE (Epic) - E2E procurement MVP, 30 stories
 ├── PLT  Platform
 │   ├── PLT-01  Sign in and see only your role's screens
 │   └── PLT-02  Get in-app notifications; keep an audit trail
+├── MDM  Master data
+│   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes
+│   └── MDM-02  Admin maintains the category tree and item catalogue
 ├── REG  Vendor onboarding
 │   ├── REG-01  Vendor registers (local, individual, foreign)
 │   ├── REG-02  Specialist approves, returns or rejects registration
 │   ├── REG-03  Vendor applies for categories
 │   ├── REG-04  Specialist qualifies category; vendor joins AVL
-│   └── REG-05  Vendor fills questionnaire; specialist confirms A–D grade
+│   ├── REG-05  Vendor fills questionnaire; specialist confirms A–D grade
+│   └── REG-06  Vendor keeps a company profile; buyers see the vendor card
 ├── PLN  Planning
 │   └── PLN-01  Admin maintains annual plan lines
 ├── PR   Purchase requisition
@@ -31,11 +35,15 @@ VMS-CORE (Epic) - E2E procurement MVP, 23 stories
 │   ├── RFQ-02  Vendor answers invitation, submits sealed proposal
 │   ├── RFQ-03  Vendors ask, specialist answers to all (Q&A)
 │   ├── RFQ-04  Specialist handles a deadline below minimum
-│   └── RFQ-05  Specialist evaluates and proposes the winner
+│   ├── RFQ-05  Specialist evaluates and proposes the winner
+│   ├── RFQ-06  Specialist runs a Single Source Purchase (SSP)
+│   ├── RFQ-07  Specialist adds extra costs (landed price)
+│   └── RFQ-08  Specialist requests a final (discounted) offer
 ├── CMT  Committee
 │   ├── CMT-01  Admin configures the committee
 │   ├── CMT-02  Committee votes on a winner or a PO decision
-│   └── CMT-03  System generates numbered minutes
+│   ├── CMT-03  System generates numbered minutes
+│   └── CMT-04  Committee approves the opening of tender bids
 ├── PO   Purchase order
 │   ├── PO-01   System creates one PO per winning vendor
 │   ├── PO-02   Approver, then committee, approve the PO
@@ -61,18 +69,18 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 **In scope (this release)**
 
 - Platform: e-mail and password sign-in, 5 internal roles plus Vendor, role-based screens, in-app notifications, audit trail of every status change.
-- Vendor onboarding: self-registration for local companies, individuals and foreign companies; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
+- Vendor onboarding: self-registration for local companies, individuals and foreign companies; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; a company profile with owners, founding date, activity, brands, main goods, bank guarantee and a certificate register with 30-day expiry reminders, shown on one vendor card; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
 - Planning: annual plan lines; every PR is linked to a plan line and shows the remaining amount.
 - Purchase requisition: lines picked from the item catalogue; single-level approval.
-- Sourcing: RFQ or Tender chosen by value against a threshold; invitations to AVL vendors; accept or decline with a reason; sealed proposals; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender technical pass or fail; price comparison; proposed winner.
+- Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner.
 - Committee: configuration, a winner vote and a PO vote, numbered minutes for each decision.
 - Purchase order: one PO per winning vendor; Approver, then committee, then vendor acceptance.
 - Demo mode: role switcher, sample fill, end-deadline-now, reset; one seeded scenario.
-- High-urgency items delivered (18 of 46): #1 (plan lines only), #9, #15, #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #110.
+- High-urgency items delivered (23 of 46): #1 (plan lines only), #9, #15, #16 (limit and justification; the committee approves it in the winner vote), #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #106 (certificate register with 30-day reminders), #110, plus #54 (owners), #97 (bank guarantee) and #100 (activity and brands).
 
 **If time allows (cut first when late)**
 
-- \#54 owners and shareholders, #97 bank guarantee capacity, #100 activity and brands, #106 certificates with expiry, #53 critical supplier flag, #12 lead-time warning per category, #16 single-source limit and justification, #49 non-voting observers, #40 committee returns the evaluation.
+- \#53 critical supplier flag, #12 lead-time warning per category, #49 non-voting observers, #40 committee returns the evaluation.
 
 **Out of scope (non-goals)**
 
@@ -86,7 +94,7 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 
 **Later phases**
 
-- E-mail notifications (#114); Azerbaijani UI; bilingual minutes and chair sign-off (#46).
+- Screens for several PRs in one sourcing, splitting a line's quantity across vendors, the blacklist workflow and department review of the questionnaire (the data model already supports them); e-mail notifications (#114); Azerbaijani UI; bilingual minutes and chair sign-off (#46).
 - Committee approval of method, justifications, strategy, documents and extensions (#18, #17, #21, #25, #35); approval routing by amount (#43).
 - Due diligence (#52), bank-detail change approval (#99), performance actions and blacklist (#57, #59), committee and compliance reports (#81, #82), plan versus actual and method in the plan (#2, #4).
 
@@ -152,6 +160,58 @@ TBD
 4. **Given** any status change on a vendor registration, category application, plan line, PR, sourcing, invitation, proposal, committee decision or PO, **When** it is saved, **Then** an audit entry stores the user, the date and time (Asia/Baku), the previous status, the new status and the reason or comment when one was required.
 5. **Given** a record a user can open, **When** they open its History tab, **Then** its audit entries are listed newest first.
 6. **Given** any audit entry, **When** any user, including the Admin, tries to change or delete it, **Then** the action is refused.
+
+---
+
+### MDM-01 - Admin Maintains Procurement Dictionaries
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | MDM-01 |
+| **Story title** | The Admin keeps the lists of Incoterms, payment terms, delivery places and delivery modes that every dropdown uses. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Admin |
+| **I want to...** | maintain the dictionaries behind the Incoterm, payment term, delivery place and delivery mode dropdowns |
+| **So that...** | buyers and vendors pick the same standard terms and proposals can be compared term by term |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a new system, **When** it is seeded, **Then** the Incoterms dictionary holds the 11 Incoterms 2020 rules (EXW, FCA, CPT, CIP, DAP, DPU, DDP, FAS, FOB, CFR, CIF) with code and name, all active; codes cannot be edited.
+2. **Given** the Admin on Dictionaries, **When** they add or edit a payment term with name, advance % (0 to 100) and days after delivery (0 or more), **Then** it is saved and appears in payment-term dropdowns; the seed holds "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery" and "60 days after delivery".
+3. **Given** the Admin on Dictionaries, **When** they add a delivery place with name, type (Warehouse, Port or City) and address, **Then** it appears in the delivery-place and named-place dropdowns.
+4. **Given** the Admin on Dictionaries, **When** they add a delivery mode with a name, **Then** it appears in delivery-mode dropdowns; the seed holds "Single delivery", "Partial deliveries allowed" and "Per delivery schedule".
+5. **Given** an entry in any dictionary, **When** the Admin deactivates it, **Then** it no longer appears in dropdowns for new records, records that already use it keep showing it, and an entry in use cannot be deleted.
+6. **Given** a dictionary, **When** the Admin saves a name that already exists in it, **Then** "This name already exists" appears and nothing is saved.
+
+---
+
+### MDM-02 - Admin Maintains The Category Tree And Item Catalogue
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | MDM-02 |
+| **Story title** | The Admin keeps categories as a tree and the item catalogue that PRs pick from. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Admin |
+| **I want to...** | maintain parent and child categories, mark the ones that need a licence, and keep the item catalogue |
+| **So that...** | vendors qualify in the right groups and requesters pick standard items |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** the Admin on Categories, **When** they add a category with a name and an optional parent, **Then** it appears in the tree; categories can be nested to any depth.
+2. **Given** a category, **When** the Admin ticks "Licence proof required", **Then** applications to it and to its child categories need a licence file (REG-03).
+3. **Given** a vendor QUALIFIED in a parent category, **When** the AVL of one of its child categories is read, **Then** the vendor is included; a qualification in a child category covers neither its parent nor its siblings.
+4. **Given** the Admin on Items, **When** they add an item with a unique code, name, unit and category, **Then** it can be picked on PR lines whose plan line category is that category or one of its parents.
+5. **Given** a category or item in use, **When** the Admin deactivates it, **Then** it leaves dropdowns for new records, existing records keep it, and it cannot be deleted.
+6. **Given** a category with child categories, **When** the Admin tries to delete it, **Then** "Remove or move its child categories first" appears.
 
 ---
 
@@ -256,7 +316,7 @@ TBD
 1. **Given** a PENDING application, **When** the specialist clicks Qualify, **Then** the status becomes QUALIFIED, "Valid until" is set to the approval date plus 12 months (Admin setting), the vendor appears in the AVL of that category and is notified.
 2. **Given** a PENDING application, **When** the specialist clicks Reject, **Then** a reason is required; on confirm the status becomes REJECTED and the vendor is notified with the reason.
 3. **Given** a QUALIFIED application whose "Valid until" date has passed, **When** the AVL, an invitation list or the vendor's Categories page is read, **Then** the application shows EXPIRED and the vendor is not in that category's AVL (#55).
-4. **Given** the AVL page, **When** the specialist filters by category, **Then** it lists only vendors with a valid grade A, B or C and a QUALIFIED, unexpired application in that category, with vendor name, type, country, grade and "Valid until". \[revised\]
+4. **Given** the AVL page, **When** the specialist filters by category, **Then** it lists only vendors with standing ACTIVE, a valid grade A, B or C and a QUALIFIED, unexpired application in that category or a parent category, with vendor name, type, country, grade and "Valid until". \[revised\]
 
 ---
 
@@ -283,9 +343,39 @@ TBD
 4. **Given** a SUBMITTED questionnaire, **When** the specialist reviews it, **Then** they see each answer with its points and evidence files, and may change an answer's points only with a comment; the score and the proposed grade recalculate at once.
 5. **Given** a SUBMITTED questionnaire, **When** the specialist clicks Confirm grade, **Then** it becomes GRADED with grade A (85.0 and above), B (70.0 to 84.9), C (50.0 to 69.9) or D (below 50.0), valid until the confirmation date plus 12 months, and the vendor is notified with the grade and score.
 6. **Given** a SUBMITTED questionnaire, **When** the specialist clicks Return for correction with a comment, **Then** it becomes RETURNED and the vendor can edit and resubmit it.
-7. **Given** a vendor whose first attempt is graded D, **When** they open Qualification, **Then** they may start one new attempt at once; **Given** the second consecutive attempt is also graded D, **Then** new attempts are blocked for 6 months from that confirmation date and the page shows "You can apply again on \<date>".
+7. **Given** a vendor whose first attempt is graded D, **When** they open Qualification, **Then** they may start one new attempt at once; **Given** the second consecutive attempt is also graded D, **Then** the vendor's standing becomes HOLD until 6 months after that confirmation date, it drops out of every AVL, and the page shows "You can apply again on \<date>". \[revised\]
 8. **Given** a grade A, B or C, **When** its valid-until date passes, **Then** the questionnaire becomes EXPIRED, the vendor leaves the AVL in every category, and a new questionnaire is needed (#55).
 9. **Given** a vendor, **When** they use the portal, **Then** they never see another vendor's grade or score.
+
+---
+
+### REG-06 - Vendor Keeps A Company Profile; Buyers See The Vendor Card
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | REG-06 |
+| **Story title** | The vendor's profile holds owners, founding date, activity, brands, main goods, bank guarantee and certificates with expiry dates, and buyers see it all on one vendor card. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Vendor, and Procurement Specialist |
+| **I want to...** | keep my company profile complete, and see a supplier's full card in one place |
+| **So that...** | buyers know who they buy from and expiring certificates are caught in time (#54, #97, #100, #106) |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a local or foreign company registering (REG-01), **When** it fills the form, **Then** it must also give the founding date and at least one owner record for the company head, and may add founders and shareholders above 10% (full name, ID or registration number, share %, role Founder, Shareholder or Head); individuals skip this section (#54).
+2. **Given** owner records, **When** their shares add up to more than 100%, **Then** "Shares cannot exceed 100% in total" appears and nothing is saved.
+3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100).
+4. **Given** the Certificates section, **When** the vendor adds a certificate with type (ISO 9001, ISO 14001, ISO 45001, HSE policy, Product certificate, Licence, Reference letter, Catalogue, Other), number, issuer, issue date, an optional expiry date and a file, **Then** it shows with the status VALID, EXPIRING or EXPIRED from the Calculation Rules (#106).
+5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); on the expiry date it becomes EXPIRED and both are notified again.
+6. **Given** the vendor's home page, **When** it loads, **Then** it shows the grade with its valid-until date, the qualified categories, and a warning for every EXPIRING or EXPIRED certificate.
+7. **Given** a Procurement Specialist, Committee Member or Admin, **When** they open a vendor card from the AVL, a registration or a comparison table, **Then** it shows name, type, country, founding date and years in business, standing, grade with valid-until date, qualified categories, activity, brands, main goods, bank guarantee, certificates with status badges, owners and History.
+8. **Given** two vendors with an owner of the same ID or registration number, **When** either card, or a comparison table with both, is opened, **Then** the flag "Shares an owner with \<vendor>" is shown (#54).
+9. **Given** the AVL page, **When** the specialist filters, **Then** the filters include activity, brand, "Bank guarantee available" and "Valid certificate of type X" (#97, #100).
+10. **Given** a vendor, **When** it uses the portal, **Then** it never sees another vendor's profile, owners or certificates.
 
 ---
 
@@ -332,7 +422,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** a Requester on New PR, **When** they pick an ACTIVE plan line, **Then** only catalogue items of that plan line's category can be added as lines.
-2. **Given** a PR line, **When** the Requester picks a catalogue item, **Then** item code, name, category and unit fill in from the catalogue and cannot be edited, and the Requester enters quantity (greater than 0), estimated unit price in AZN (greater than 0, 2 decimals), required delivery date, delivery place and an optional specification text of up to 2,000 characters.
+2. **Given** a PR line, **When** the Requester picks a catalogue item, **Then** item code, name, category and unit fill in from the catalogue and cannot be edited, and the Requester enters quantity (greater than 0), estimated unit price in AZN excluding VAT (greater than 0, 2 decimals), required delivery date, a delivery place picked from the Delivery places dictionary and an optional specification text of up to 2,000 characters. \[revised\]
 3. **Given** a required delivery date earlier than tomorrow, **When** the Requester saves, **Then** "Delivery date must be in the future" appears on that line.
 4. **Given** lines with quantity and price, **When** any of them changes, **Then** the estimated value (sum of quantity × estimated unit price) updates on screen, formatted like 60,000.00 AZN.
 5. **Given** a PR with at least one valid line, **When** the Requester clicks Save, **Then** it is stored as DRAFT with a number PR-YYYY-NNNN; **When** they click Submit, **Then** it becomes PENDING\_APPROVAL, read-only for the Requester, and every Approver except the Requester is notified.
@@ -384,10 +474,10 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** an APPROVED PR, **When** the specialist clicks Start sourcing, **Then** a sourcing SRC-YYYY-NNNN is created in DRAFT with the PR lines copied, the specialist recorded as its owner, and the PR becomes IN\_SOURCING.
-2. **Given** a new sourcing, **When** it is created, **Then** its type is TENDER if the PR's estimated value is at or above the threshold (Admin setting, default 50,000.00 AZN) and RFQ otherwise, and the screen shows the reason, e.g. "Value 60,000.00 AZN ≥ threshold 50,000.00 AZN: Tender".
+2. **Given** a new sourcing, **When** it is created, **Then** with the method Competitive bidding (the default; Single Source Purchase is RFQ-06) its type is TENDER if the PR's estimated value is at or above the threshold (Admin setting, default 50,000.00 AZN) and RFQ otherwise, and the screen shows the reason, e.g. "Value 60,000.00 AZN ≥ threshold 50,000.00 AZN: Tender". \[revised\]
 3. **Given** the sourcing type, **When** it is set, **Then** the minimum number of proposals is 3 for a Tender (#26) and, for an RFQ, comes from the Admin value bands: 1 up to 5,000 AZN, 2 above 5,000 up to 15,000 AZN, 3 above 15,000 AZN (#15).
-4. **Given** a DRAFT sourcing, **When** the specialist edits it, **Then** they must set a proposal deadline (date and time, Asia/Baku, later than now), delivery terms and payment terms; a Tender also has "Technical document required: Yes / No", default Yes.
-5. **Given** a DRAFT sourcing, **When** it opens, **Then** the invitation list holds every vendor with a valid grade A, B or C and a QUALIFIED, unexpired application in the PR's category; the specialist may remove vendors, and a warning shows when fewer vendors remain than the minimum number of proposals. \[revised\]
+4. **Given** a DRAFT sourcing, **When** the specialist edits it, **Then** they must set a proposal deadline (date and time, Asia/Baku, later than now; prefilled from the Admin defaults of 3 days for an RFQ or SSP and 14 days for a Tender), and pick from dropdowns the required Incoterm (default DDP), the named place (default: the PR's delivery place), the delivery mode and the payment term (MDM-01); a Tender also has "Technical document required: Yes / No", default Yes. \[revised\]
+5. **Given** a DRAFT sourcing, **When** it opens, **Then** the invitation list holds every vendor with standing ACTIVE, a valid grade A, B or C and a QUALIFIED, unexpired application in the PR's category or one of its parent categories; the specialist may remove vendors, and a warning shows when fewer vendors remain than the minimum number of proposals. \[revised\]
 6. **Given** a category with no qualified vendors, **When** the specialist clicks Publish, **Then** "No qualified vendors in this category" appears and the sourcing stays DRAFT.
 7. **Given** a complete DRAFT, **When** the specialist clicks Publish, **Then** the sourcing becomes OPEN, each listed vendor gets an invitation in INVITED and an in-app notification with the deadline.
 
@@ -410,9 +500,9 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** an invitation in INVITED, **When** the vendor opens it, **Then** they see sourcing number, type, lines (item, quantity, unit, delivery date, delivery place, specification), delivery and payment terms, deadline and time remaining.
+1. **Given** an invitation in INVITED, **When** the vendor opens it, **Then** they see sourcing number, type, lines (item, quantity, unit, delivery date, delivery place, specification), the required Incoterm, named place, delivery mode and payment term, deadline and time remaining. \[revised\]
 2. **Given** an INVITED invitation, **When** the vendor clicks Decline, **Then** a reason is required; on confirm the invitation becomes DECLINED, the specialist sees the reason and the vendor can no longer submit (#110).
-3. **Given** an INVITED invitation, **When** the vendor clicks Accept, **Then** it becomes ACCEPTED and the vendor can fill one proposal: unit price in AZN per line (greater than 0, 2 decimals; a line may be left without an offer), delivery lead time in days, validity in days and a comment.
+3. **Given** an INVITED invitation, **When** the vendor clicks Accept, **Then** it becomes ACCEPTED and the vendor can fill one proposal: unit price in AZN per line (greater than 0, 2 decimals; a line may be left without an offer), Incoterm, named place, delivery mode and payment term (each preset to the required value and changeable from the same dropdowns), "Prices include VAT: Yes / No" with the VAT rate in % (required when Yes), delivery lead time in days, validity in days and a comment. \[revised\]
 4. **Given** a Tender with "Technical document required: Yes", **When** the vendor submits without a technical document file, **Then** "Attach the technical document" appears.
 5. **Given** a proposal with at least one priced line, **When** the vendor clicks Submit before the deadline, **Then** it becomes SUBMITTED and its total (sum of quantity × unit price over priced lines) is shown to the vendor.
 6. **Given** a SUBMITTED proposal before the deadline, **When** the vendor edits and resubmits or clicks Withdraw, **Then** the latest version is kept, or the proposal becomes WITHDRAWN and can be submitted again before the deadline.
@@ -466,7 +556,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** an OPEN sourcing, **When** its deadline passes, **Then** within 1 minute it becomes CLOSED and all proposals are locked.
-2. **Given** a CLOSED sourcing with submitted proposals at or above the minimum, **When** it closes, **Then** a Tender moves to TECHNICAL\_EVALUATION and an RFQ to COMPARISON, the owner is notified, and prices become visible to the owner, the committee members and the Admin.
+2. **Given** a CLOSED sourcing with submitted proposals at or above the minimum, **When** it closes, **Then** a Tender moves to AWAITING\_OPENING (CMT-04) and an RFQ or SSP to COMPARISON, the owner is notified, and for an RFQ or SSP prices become visible to the owner, the committee members and the Admin; a Tender's prices open only after its technical evaluation. \[revised\]
 3. **Given** a CLOSED sourcing below the minimum, **When** the owner opens it, **Then** it shows "Below minimum: N of M proposals" with three actions: Extend, Continue, Cancel.
 4. **Given** Extend, **When** the owner sets a new deadline later than now and a reason, **Then** the sourcing returns to OPEN, invited vendors that have not declined are notified of the new deadline, and the extension count rises by 1; after 2 extensions (Admin setting) Extend is disabled with "Maximum number of extensions reached".
 5. **Given** Continue, **When** the owner enters a reason, **Then** the sourcing moves on as in criterion 2 and the reason is stored for the committee package (#26); with 0 proposals Continue is not offered.
@@ -491,13 +581,92 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a Tender in TECHNICAL\_EVALUATION, **When** the owner marks each submitted proposal PASSED or DISQUALIFIED, **Then** DISQUALIFIED requires a reason (e.g. "Missing certificate"), and once every proposal is marked the sourcing moves to COMPARISON (#33).
+1. **Given** a Tender in TECHNICAL\_EVALUATION, **When** the owner, seeing the technical documents but no prices, marks each submitted proposal PASSED or DISQUALIFIED, **Then** DISQUALIFIED requires a reason (e.g. "Missing certificate"), and once every proposal is marked the sourcing moves to COMPARISON and the prices of PASSED proposals open (#33). \[revised\]
 2. **Given** an RFQ or Tender in COMPARISON, **When** the owner disqualifies a proposal with a reason, **Then** it leaves the comparison and the reason is kept (#33).
-3. **Given** COMPARISON, **When** the owner opens the comparison table, **Then** rows are the lines, columns are the eligible vendors, each cell shows unit price and line total, the lowest unit price per line is highlighted, delivery days, validity and grade show per vendor, and disqualified proposals are listed below with their reasons. \[revised\]
-4. **Given** the comparison table, **When** it loads, **Then** each line's proposed winner defaults to the lowest eligible unit price; choosing another vendor requires a justification, and a line with no eligible offer can only be cancelled with a reason.
+3. **Given** COMPARISON, **When** the owner opens the comparison table, **Then** rows are the lines, columns are the eligible vendors, each cell shows unit price and line total excluding VAT (a price entered with VAT is divided by 1 + VAT rate) and the evaluated unit price with extra costs (RFQ-07), with the vendor's Incoterm, named place, delivery mode and payment term and a "Different terms" warning naming each one that differs from the required value, the lowest evaluated unit price per line is highlighted, delivery days, validity and grade show per vendor, and disqualified proposals are listed below with their reasons. \[revised\]
+4. **Given** the comparison table, **When** it loads, **Then** each line's proposed winner defaults to the lowest eligible evaluated unit price (RFQ-07); choosing another vendor requires a justification, and a line with no eligible offer can only be cancelled with a reason. \[revised\]
 5. **Given** a line with fewer eligible proposals than the minimum and no reason stored yet, **When** the owner clicks Send to committee, **Then** a low-competition reason is required (#26).
 6. **Given** every line has a proposed winner or is cancelled, **When** the owner clicks Send to committee, **Then** the sourcing becomes IN\_COMMITTEE and a winner decision opens (CMT-02) with the comparison table, disqualifications, justifications and any low-competition reason.
 7. **Given** lines sent back after a rejection (winner decision rejected, PO rejected or declined), **When** the owner opens COMPARISON, **Then** the previous winner of those lines is marked and excluded, and the owner proposes the next vendor or cancels the line with a reason.
+
+---
+
+### RFQ-06 - Specialist Runs A Single Source Purchase (SSP)
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-06 |
+| **Story title** | A Procurement Specialist buys from one chosen AVL vendor, with a justification above the single-source limit, and the committee still decides. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Procurement Specialist |
+| **I want to...** | send an approved PR to one vendor I choose from the category's AVL instead of a competition |
+| **So that...** | purchases that only one supplier can serve go through the system with a recorded reason (#16) |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** an APPROVED PR, **When** the specialist clicks Start sourcing and picks the method Single Source Purchase, **Then** they must pick exactly one vendor from the AVL of the PR's category (standing ACTIVE, valid grade A, B or C and a QUALIFIED, unexpired application in the category or a parent category), and the sourcing type is SSP whatever the value.
+2. **Given** an SSP whose PR value is above the single-source limit (Admin setting, default 1,000.00 AZN), **When** the specialist clicks Publish without a justification text and at least one justification file, **Then** "A single source purchase above 1,000.00 AZN needs a justification and a file" appears and the sourcing stays DRAFT (#16).
+3. **Given** an SSP whose value is at or below the limit, **When** the specialist publishes, **Then** the justification is optional.
+4. **Given** a published SSP, **When** it becomes OPEN, **Then** only the chosen vendor gets an invitation and a notification, the minimum number of proposals is 1, and Q&A works as in RFQ-03.
+5. **Given** an OPEN SSP, **When** the deadline passes with the proposal submitted, **Then** it moves straight to COMPARISON with no technical stage; with no proposal, only Extend or Cancel are offered (RFQ-04).
+6. **Given** an SSP in COMPARISON, **When** the specialist opens it, **Then** the vendor is the proposed winner of every line it priced, lines it did not price can only be cancelled with a reason, and Send to committee opens the winner decision (CMT-02).
+7. **Given** the winner decision of an SSP, **When** a committee member opens it, **Then** it carries the label "Single Source Purchase" with the justification and its files, so the vote also approves the single source.
+
+---
+
+### RFQ-07 - Specialist Adds Extra Costs To Compare Landed Prices
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-07 |
+| **Story title** | In the comparison, the specialist adds customs, delivery and other costs per unit so vendors are compared on the evaluated price. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Procurement Specialist |
+| **I want to...** | add extra costs per unit that the company will pay on top of a vendor's price, such as customs or delivery |
+| **So that...** | offers with different Incoterms are compared on what the company will really pay |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a sourcing in COMPARISON, **When** the owner adds an extra cost to a vendor's line with a type (Customs, Delivery, Insurance, Other), an amount per unit in AZN (0 or more) and a note, **Then** it is saved and the line's evaluated unit price becomes the unit price excluding VAT plus all its extra costs per unit.
+2. **Given** extra costs exist, **When** the comparison table renders, **Then** each cell shows the unit price excluding VAT, the extra costs and the evaluated unit price, and the lowest evaluated unit price per line is highlighted.
+3. **Given** extra costs change, **When** they are saved, **Then** the default winner per line is recalculated on the evaluated price; a manually chosen winner keeps its justification and is flagged "No longer the lowest evaluated price" if that is now true.
+4. **Given** a sourcing in IN\_COMMITTEE or later, **When** anyone tries to change its extra costs, **Then** the action is refused.
+5. **Given** the winner and PO decisions, **When** committee members open them, **Then** the extra costs and their notes are shown; the PO keeps the vendor's own prices and does not include the extra costs.
+
+---
+
+### RFQ-08 - Specialist Requests A Final (Discounted) Offer
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-08 |
+| **Story title** | The specialist asks chosen vendors for a final, lower offer, and the comparison is rebuilt on the new prices. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Procurement Specialist and Vendor |
+| **I want to...** | request, and give, a final discounted offer before the winner is proposed |
+| **So that...** | vendors can improve their prices and the company gets a better price (best and final offer) |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a sourcing in COMPARISON with no final-offer round yet, **When** the owner clicks Request final offer, picks one or more eligible vendors (default: all) and sets a deadline (default 2 days, Admin setting) and an optional message, **Then** the sourcing becomes FINAL\_OFFER\_ROUND and the chosen vendors are notified.
+2. **Given** a FINAL\_OFFER\_ROUND, **When** a chosen vendor opens its proposal, **Then** it sees its previous prices and can enter a new unit price per line or confirm the previous prices unchanged; all other fields stay as submitted.
+3. **Given** a final-offer form, **When** the vendor enters a unit price higher than its previous price for that line, **Then** "A final offer cannot be higher than your previous price" appears and nothing is saved.
+4. **Given** an open final-offer round, **When** an internal user opens the sourcing, **Then** they see which chosen vendors have responded, but no new prices until the round closes.
+5. **Given** the final-offer deadline passes, **When** the round closes, **Then** the sourcing returns to COMPARISON, vendors that did not respond keep their previous prices, and each cell shows the previous price next to the final price.
+6. **Given** a sourcing whose final-offer round has been used, **When** the owner looks for Request final offer, **Then** it is disabled with "The final-offer round has been used" (Admin setting: 1 round).
+7. **Given** a vendor not chosen for the round, **When** the round runs, **Then** it is not notified and its prices stay in the comparison unchanged.
 
 ---
 
@@ -541,9 +710,9 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a decision opens (type WINNER or PO), **When** it is created, **Then** its eligible voters are the committee members at that moment except the sourcing owner, each is notified, and it stays VOTING until the voting period ends.
-2. **Given** a WINNER decision, **When** a member opens it, **Then** they see the comparison table, disqualifications with reasons, justifications for non-lowest winners and any low-competition reason.
-3. **Given** a PO decision, **When** a member opens it, **Then** they see the PO and every difference from the approved winner decision in vendor, item, quantity, unit price, total, delivery terms or payment terms, or "Same as the approved winner decision" when there is none.
+1. **Given** a decision opens (type OPENING, WINNER or PO), **When** it is created, **Then** its eligible voters are the committee members at that moment except the sourcing owner, each is notified, and it stays VOTING until the voting period ends. \[revised\]
+2. **Given** a WINNER decision, **When** a member opens it, **Then** they see the comparison table, disqualifications with reasons, justifications for non-lowest winners, any low-competition reason and, for an SSP, the Single Source Purchase label with its justification and files. \[revised\]
+3. **Given** a PO decision, **When** a member opens it, **Then** they see the PO and every difference from the approved winner decision in vendor, item, quantity, unit price, total, Incoterm, named place, delivery mode or payment term, or "Same as the approved winner decision" when there is none. \[revised\]
 4. **Given** a VOTING decision, **When** a member votes Against, **Then** a comment is required; a vote For needs none; a submitted vote cannot be changed.
 5. **Given** a VOTING decision, **When** a member clicks Declare conflict of interest and enters a comment, **Then** they cannot vote on it and are removed from its eligible voters.
 6. **Given** a VOTING decision, **When** a member looks at it, **Then** they see who has voted but not how, until the decision closes.
@@ -579,6 +748,32 @@ TBD
 
 ---
 
+### CMT-04 - Committee Approves The Opening Of Tender Bids
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | CMT-04 |
+| **Story title** | A Tender's bids are opened only after the committee approves, and prices stay sealed until the technical check is done (two envelopes). |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Committee Member |
+| **I want to...** | approve the opening of a closed Tender |
+| **So that...** | no single person opens the bids and every opening is on record |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a Tender that closes with the minimum met, or after Continue, **When** it closes, **Then** it becomes AWAITING\_OPENING and an OPENING decision opens for the committee under the CMT-02 rules (quorum, majority, the Chair on a tie), showing the number of proposals and the bidders' names but no prices.
+2. **Given** the OPENING decision is APPROVED, **When** it closes, **Then** the Tender moves to TECHNICAL\_EVALUATION and the owner and the committee see vendor names and technical documents, still without prices.
+3. **Given** every proposal is marked PASSED or DISQUALIFIED, **When** the technical evaluation ends, **Then** the prices of PASSED proposals become visible (second envelope) and the Tender moves to COMPARISON; prices of disqualified proposals are never shown.
+4. **Given** the OPENING decision is REJECTED or NO\_DECISION, **When** it closes, **Then** the Tender stays AWAITING\_OPENING and the owner can reopen the vote or cancel the Tender with a reason.
+5. **Given** an RFQ or an SSP, **When** it closes, **Then** there is no opening decision: it moves to COMPARISON and its prices open at once.
+6. **Given** an OPENING decision closes, **When** it closes, **Then** numbered minutes are created as in CMT-03.
+
+---
+
 ### PO-01 - System Creates One PO Per Winning Vendor
 
 | Field | Value |
@@ -596,8 +791,8 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a WINNER decision becomes APPROVED, **When** it closes, **Then** one PO PO-YYYY-NNNN is created per winning vendor, holding every line that vendor won.
-2. **Given** a new PO, **When** it is opened, **Then** it shows vendor, lines (item, quantity, unit, unit price, line total, delivery date, delivery place), total in AZN, delivery terms, payment terms and links to the sourcing and the winner decision's minutes.
+1. **Given** a WINNER decision becomes APPROVED, **When** it closes, **Then** one PO PO-YYYY-NNNN is created per winning vendor, holding an award line with its quantity for every line, or part of a line, that vendor won. \[revised\]
+2. **Given** a new PO, **When** it is opened, **Then** it shows vendor, lines (item, quantity, unit, unit price, line total, delivery date, delivery place), total in AZN excluding VAT, VAT amount, total including VAT, Incoterm, named place, delivery mode and payment term from the winning proposal and links to the sourcing and the winner decision's minutes. \[revised\]
 3. **Given** a new PO, **When** it is created, **Then** its status is PENDING\_APPROVAL and every Approver except the PR's Requester is notified.
 4. **Given** any PO, **When** any user tries to edit its lines, prices or vendor, **Then** no edit action exists; a change is made only by rejecting it and re-awarding the lines.
 
@@ -728,15 +923,20 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Approve or reject a PO (not for own PR) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Accept or decline a PO | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Manage users, catalogue, categories, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Approve the opening of tender bids | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
+| Add extra costs; request a final offer | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
+| Submit a final offer | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (if chosen) |
+| Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| View a vendor card, including owners | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
 
 Owner means the Procurement Specialist who started the sourcing; other specialists can read it. Demo tools (DEMO-01) are open to everyone, and only while demo mode is on.
 
 ## Status Transition Model
 
-Nine entities carry a status; the sourcing is the one with loops, so it is drawn, and every entity's allowed transitions are listed below.
+Eleven entities carry a status; the sourcing is the one with loops, so it is drawn, and every entity's allowed transitions are listed below.
 
-&#91;embedded content: sourcing lifecycle · 9 statuses, 4 loops\]
+&#91;embedded content: sourcing lifecycle · 11 statuses, opening and final-offer steps\]
 
 A rejected winner, a rejected PO or a declined PO sends only the affected lines back to COMPARISON; the other lines keep their POs.
 
@@ -744,19 +944,40 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 
 | From | To | Trigger | Allowed roles | Notes |
 | --- | --- | --- | --- | --- |
-| (none) | DRAFT | Start sourcing on an APPROVED PR | Procurement Specialist | Type set by value |
-| DRAFT | OPEN | Publish | Owner | At least one invitee |
-| OPEN | CLOSED | Deadline passes | System | Within 1 minute |
+| (none) | DRAFT | Start sourcing on an APPROVED PR | Procurement Specialist | Method Competitive (type by value) or Single Source (SSP) |
+| DRAFT | OPEN | Publish | Owner | At least one invitee; an SSP above the limit needs a justification and a file |
+| OPEN | CLOSED | Deadline passes | System | Within 1 minute; vendors reminded 24 hours before |
 | CLOSED | OPEN | Extend | Owner | Reason; at most 2 times |
-| CLOSED | TECHNICAL\_EVALUATION | Minimum reached, or Continue | System or Owner | Tender only |
-| CLOSED | COMPARISON | Minimum reached, or Continue | System or Owner | RFQ only; Continue needs a reason |
-| TECHNICAL\_EVALUATION | COMPARISON | Every proposal marked PASSED or DISQUALIFIED | Owner |  |
+| CLOSED | AWAITING\_OPENING | Minimum reached, or Continue | System or Owner | Tender only; an OPENING decision opens |
+| CLOSED | COMPARISON | Minimum reached, or Continue | System or Owner | RFQ and SSP; prices open; Continue needs a reason |
+| AWAITING\_OPENING | TECHNICAL\_EVALUATION | OPENING decision APPROVED | System | Names and technical documents visible, prices still sealed |
+| TECHNICAL\_EVALUATION | COMPARISON | Every proposal marked PASSED or DISQUALIFIED | Owner | Prices of PASSED proposals open |
+| COMPARISON | FINAL\_OFFER\_ROUND | Request final offer | Owner | Once per sourcing |
+| FINAL\_OFFER\_ROUND | COMPARISON | Final-offer deadline passes | System | Each vendor's latest prices are used |
 | COMPARISON | IN\_COMMITTEE | Send to committee | Owner | Every line has a winner or is cancelled |
 | IN\_COMMITTEE | WINNER\_APPROVED | Winner decision APPROVED | System | POs created |
 | IN\_COMMITTEE | COMPARISON | Winner decision REJECTED | System | Rejected winners excluded |
 | WINNER\_APPROVED | COMPARISON | A PO is REJECTED or DECLINED\_BY\_VENDOR | System | Only that PO's lines |
 | WINNER\_APPROVED | COMPLETED | Every line is on an ACCEPTED PO or cancelled | System | PR becomes COMPLETED |
-| DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION, COMPARISON | CANCELLED | Cancel | Owner | Reason; vendors notified; PR back to APPROVED |
+| DRAFT, OPEN, CLOSED, AWAITING\_OPENING, TECHNICAL\_EVALUATION, COMPARISON, FINAL\_OFFER\_ROUND | CANCELLED | Cancel | Owner | Reason; vendors notified; PR back to APPROVED |
+
+**Vendor standing**
+
+| From | To | Trigger | Allowed roles | Notes |
+| --- | --- | --- | --- | --- |
+| (none) | ACTIVE | Registration APPROVED | System |  |
+| ACTIVE | HOLD | Second consecutive D grade | System | Until the confirmation date + 6 months; out of every AVL |
+| HOLD | ACTIVE | Hold period ends | System | The vendor may start a new questionnaire |
+| ACTIVE, HOLD | BLACKLISTED | Committee decision | Committee Member | Data ready now; the workflow comes in a later phase (#59) |
+
+**Vendor certificate** (status computed from dates)
+
+| From | To | Trigger | Allowed roles | Notes |
+| --- | --- | --- | --- | --- |
+| (none) | VALID | Certificate added | Vendor | No expiry date, or more than 30 days away |
+| VALID | EXPIRING | 30 days before the expiry date | System | Vendor and specialists notified once |
+| EXPIRING | EXPIRED | The day after the expiry date | System | Vendor and specialists notified |
+| EXPIRING, EXPIRED | VALID | Vendor uploads a renewed certificate with a later expiry date | Vendor |  |
 
 **Vendor registration**
 
@@ -818,7 +1039,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 
 | From | To | Trigger | Allowed roles | Notes |
 | --- | --- | --- | --- | --- |
-| (none) | VOTING | Send to committee, PO approved by the Approver, or Reopen vote | Owner or System | Type WINNER or PO |
+| (none) | VOTING | Tender closed (opening), Send to committee, PO approved by the Approver, or Reopen vote | Owner or System | Type OPENING, WINNER or PO |
 | VOTING | APPROVED | All voted or period ended; quorum; more For, or tie with the Chair For | System | Minutes created |
 | VOTING | REJECTED | All voted or period ended; quorum; more Against, or tie with the Chair Against | System | Minutes created |
 | VOTING | NO\_DECISION | No quorum, or tie without the Chair's vote | System | Minutes created; owner may reopen |
@@ -860,7 +1081,7 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | Deadline extended | Invited vendors not declined | In-app | New deadline | No |
 | Sourcing closed | Sourcing owner | In-app | Proposals received versus minimum | No |
 | Sourcing cancelled | Invited vendors not declined | In-app | Sourcing number, reason | No |
-| Committee decision opened | Eligible committee members | In-app | Decision type (winner or PO), sourcing, voting deadline | No |
+| Committee decision opened | Eligible committee members | In-app | Decision type (opening, winner or PO), sourcing, voting deadline | No |
 | Committee decision closed | Sourcing owner, committee members | In-app | Result, minutes number | No |
 | PO created | Approvers except the PR's Requester | In-app | PO number, vendor, total | No |
 | PO rejected by the Approver | Sourcing owner | In-app | PO number, reason | No |
@@ -868,6 +1089,11 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | PO accepted | Sourcing owner, Requester | In-app | PO number | No |
 | PO declined by the vendor | Sourcing owner | In-app | PO number, reason | No |
 | Sourcing completed | Every vendor with a submitted proposal | In-app | Lines won, or "Not awarded" (#41) | No |
+| Deadline in 24 hours | Invited vendors that have neither declined nor submitted | In-app | Sourcing number, deadline | No |
+| Final offer requested | Chosen vendors | In-app | Sourcing number, final-offer deadline, message | No |
+| Final-offer round closed | Sourcing owner | In-app | Responses received versus vendors chosen | No |
+| Certificate expires in 30 days | Vendor, all Procurement Specialists | In-app | Vendor, certificate type, expiry date | No |
+| Certificate expired | Vendor, all Procurement Specialists | In-app | Vendor, certificate type | No |
 
 ## Non-Functional Requirements
 
@@ -911,12 +1137,12 @@ Every number the system computes follows one of these rules; the examples are th
 
 | Rule | Formula | Worked example |
 | --- | --- | --- |
-| PR estimated value | Sum over lines of quantity × estimated unit price | 2,000 × 30.00 = 60,000.00 AZN |
+| PR estimated value | Sum over lines of quantity × estimated unit price (excluding VAT) | 2,000 × 30.00 = 60,000.00 AZN |
 | Sourcing type | TENDER if value ≥ threshold, otherwise RFQ (threshold default 50,000.00 AZN) | 60,000.00 → Tender; 50,000.00 → Tender; 49,999.99 → RFQ |
-| Minimum proposals | Tender: 3. RFQ: 1 if value ≤ 5,000.00; 2 if above 5,000.00 and ≤ 15,000.00; 3 if above 15,000.00 | RFQ 3,000.00 → 1; 15,000.00 → 2; 40,000.00 → 3 |
+| Minimum proposals | Tender: 3. SSP: 1. RFQ: 1 if value ≤ 5,000.00; 2 if above 5,000.00 and ≤ 15,000.00; 3 if above 15,000.00 | RFQ 3,000.00 → 1; 15,000.00 → 2; 40,000.00 → 3 |
 | Plan remaining | Planned amount − committed amount (PRs in PENDING\_APPROVAL, APPROVED, IN\_SOURCING, COMPLETED) | 500,000.00 − 60,000.00 = 440,000.00 AZN |
 | Proposal total | Sum over priced lines of quantity × unit price | 2,000 × 28.00 = 56,000.00 AZN |
-| Default winner per line | Lowest unit price among eligible (not disqualified) proposals | C 27.00 disqualified → A 28.00 proposed |
+| Default winner per line | Lowest evaluated unit price (excluding VAT, plus extra costs per unit) among eligible proposals | C 27.00 disqualified → A 28.00 proposed |
 | Eligible voters | Committee members − sourcing owner − members who declared a conflict | 3 members, owner not a member, 0 conflicts → 3 |
 | Quorum | Votes cast > eligible voters ÷ 2 | 3 eligible: 2 votes = quorum; 1 vote = NO\_DECISION |
 | Decision result | More For → APPROVED; more Against → REJECTED; tie → the Chair's vote; tie and no Chair vote → NO\_DECISION | 2 For, 1 Against → APPROVED; 2 For, 2 Against, Chair For → APPROVED |
@@ -927,6 +1153,16 @@ Every number the system computes follows one of these rules; the examples are th
 | Grade | A from 85.0; B 70.0 to 84.9; C 50.0 to 69.9; D below 50.0; only A, B and C may apply for categories | 76.0 → B; 85.0 → A; 49.9 → D |
 | D rule | First D: one new attempt at once; second consecutive D: next attempt 6 months after that confirmation | Second D confirmed 10 Nov 2026 → may apply again on 10 May 2027 |
 | Grade validity | Confirmation date + 12 months; EXPIRED from the next day | Confirmed 10 Nov 2026 → valid until 10 Nov 2027 |
+| Unit price excluding VAT | If "Prices include VAT" is Yes: entered price ÷ (1 + VAT rate ÷ 100), rounded to 2 decimals; otherwise the entered price. Comparison, default winner and threshold all use this value | 33.04 with 18% VAT → 28.00 |
+| PO VAT | VAT amount = total excluding VAT × the vendor's VAT rate ÷ 100; total including VAT = total excluding VAT + VAT amount | 56,000.00 × 18% = 10,080.00 → 66,080.00 AZN |
+| Different terms warning | Shown when a proposal's Incoterm, named place, delivery mode or payment term differs from the sourcing's required value; prices are not adjusted | Required DDP Central warehouse; Beta Trade CIP Baku port → warning on Incoterm and named place |
+| Single-source justification | SSP with PR value above the single-source limit (default 1,000.00 AZN) needs a justification text and at least one file; at or below the limit it is optional | SSP 800.00 → optional; SSP 1,000.00 → optional; SSP 4,000.00 → required |
+| Evaluated unit price | Unit price excluding VAT + sum of the extra costs per unit added by the specialist (RFQ-07); the default winner and the comparison use it, the PO does not | Beta Trade 29.50 + delivery 1.00 = 30.50 |
+| Final offer | New unit price ≤ previous price per line; no response keeps the previous price; one round per sourcing (setting) | Alpha Agro 28.00 → 27.50 allowed; 28.00 → 28.50 refused |
+| Default deadlines | Publish time + 3 days (RFQ, SSP) or + 14 days (Tender); final offer + 2 days; all Admin settings, the specialist may change them | Tender published Mon 16 Nov 2026 10:00 → deadline Mon 30 Nov 2026 10:00 |
+| Deadline reminder | Sent once, 24 hours before the deadline, to invited vendors that have neither declined nor submitted | Deadline Mon 30 Nov 2026 10:00 → reminder Sun 29 Nov 2026 10:00 |
+| Certificate status | VALID when there is no expiry date or it is more than 30 days away; EXPIRING within 30 days; EXPIRED from the day after the expiry date | Today 10 Nov 2026: expiry 30 Nov 2026 → EXPIRING; 15 Jan 2027 → VALID; 09 Nov 2026 → EXPIRED |
+| Years in business | Full years between the founding date and today | Founded 15 Mar 2012, today 10 Nov 2026 → 14 years |
 
 ## Demo Scenario Data
 
@@ -944,28 +1180,34 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 | Committee Member | Tural Ismayilov | tural@demo-agro.test |
 | Admin | Demo Admin | admin@demo-agro.test |
 | Vendor B (foreign, Türkiye) | Beta Trade Ltd, grade A, already QUALIFIED in Fertilisers | sales@beta-trade.test |
-| Vendor C (local) | Gamma Supply LLC, grade C, already QUALIFIED in Fertilisers | office@gamma-supply.test |
+| Vendor C (local) | Gamma Supply LLC, grade C, already QUALIFIED in Fertilisers; shares the owner Rauf Mammadov with Beta Trade, so both cards show the "Shares an owner" flag | office@gamma-supply.test |
 | Vendor A (local) | Alpha Agro LLC, not seeded: registers live | info@alpha-agro.test |
 
 **Master data and settings**
 
-- Buying company: Demo Agro LLC.
+- Buying company: Demo Agro LLC. Dictionaries: the 11 Incoterms 2020; payment terms "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery", "60 days after delivery"; delivery places "Central warehouse" and "North warehouse" (Warehouse) and "Baku port" (Port); delivery modes "Single delivery", "Partial deliveries allowed", "Per delivery schedule".
 - Catalogue: 25 items in 5 categories (Fertilisers, Seeds, Plant protection, Spare parts, Office supplies); Fertilisers is marked "Licence proof required"; demo item "Ammonium nitrate 34.4%, 50 kg bag", unit bag.
 - Plan line: 2026, Fertilisers, "Spring fertiliser programme", 500,000.00 AZN, Q1, ACTIVE.
-- Settings: threshold 50,000.00 AZN; RFQ bands 1 / 2 / 3; at most 2 extensions; grade and category qualification valid 12 months; grade bands A 85+, B 70+, C 50+, D below 50; a 6-month wait after a second D; a 10-question qualification questionnaire with points and weights; voting period 3 business days.
+- Settings: threshold 50,000.00 AZN; single-source limit 1,000.00 AZN; default deadlines 3 days (RFQ, SSP) and 14 days (Tender); one final-offer round with a 2-day default deadline; RFQ bands 1 / 2 / 3; at most 2 extensions; grade and category qualification valid 12 months; grade bands A 85+, B 70+, C 50+, D below 50; a 6-month wait after a second D; a 10-question qualification questionnaire with points and weights; voting period 3 business days.
 
 **Scenario values (Fill sample)**
 
-1. Alpha Agro LLC registers as a local company, VAT payer, with sample charter and VAT certificate PDFs; the specialist approves. Alpha Agro then fills the qualification questionnaire, scores 78.0, and the specialist confirms grade B.
+1. Alpha Agro LLC registers as a local company, VAT payer, founded 15 Mar 2012, owned by Kamran Aliyev (head, 60%) and Sabina Huseynova (40%), with sample charter and VAT certificate PDFs; the specialist approves. Alpha Agro then fills the qualification questionnaire, scores 78.0, and the specialist confirms grade B. Its profile lists the activity Distributor, the fictional brands AgroMax and NitroGrow, and an ISO 9001 certificate that expires in 20 days, so the EXPIRING badge and the reminder show at once.
 2. Alpha Agro applies for Fertilisers with a sample licence PDF; the specialist qualifies it.
 3. Leyla creates a PR on the plan line: 2,000 bags × 30.00 AZN, delivery in 30 days to "Central warehouse"; value 60,000.00 AZN. Rashad approves.
-4. Nigar starts sourcing: Tender (60,000.00 ≥ 50,000.00), minimum 3 proposals, delivery "Delivered to Central warehouse", payment "30 days after delivery", technical document required.
+4. Nigar starts sourcing: Tender (60,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
 5. Beta Trade asks "Can delivery be split into two shipments?"; Nigar answers "Yes, two shipments before the delivery date."
-6. Proposals: Alpha Agro 28.00 AZN/bag (56,000.00, 20 days); Beta Trade 29.50 (59,000.00, 15 days); Gamma Supply 27.00 (54,000.00, 25 days, technical document without the product certificate). The presenter clicks End deadline now.
-7. Nigar disqualifies Gamma Supply ("Missing product certificate"); Alpha Agro is the lowest eligible bid and is sent to the committee.
-8. Winner vote: Elchin For, Sevinj For, Tural Against ("Beta Trade delivers 5 days faster") → APPROVED 2 to 1, minutes MIN-2026-001.
-9. PO-2026-0001 to Alpha Agro, 56,000.00 AZN; Rashad approves; PO vote 3 to 0, "Same as the approved winner decision", minutes MIN-2026-002.
+6. Proposals: Alpha Agro 33.04 AZN/bag including 18% VAT, DDP Central warehouse (28.00 excluding VAT, 56,000.00, 20 days); Beta Trade 29.50 without VAT, CIP Baku port (59,000.00, 15 days, flagged "Different terms: Incoterm, named place"); Gamma Supply 27.00 without VAT, DDP Central warehouse (54,000.00, 25 days, technical document without the product certificate). The presenter clicks End deadline now.
+7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per bag to Beta Trade (port to warehouse), so its evaluated price is 30.50, and requests a final offer from both: Alpha Agro lowers to 27.50 excluding VAT (32.45 with VAT), Beta Trade keeps 29.50. Alpha Agro is the lowest evaluated bid and is sent to the committee.
+8. Winner vote: Elchin For, Sevinj For, Tural Against ("Beta Trade delivers 5 days faster") → APPROVED 2 to 1, minutes MIN-2026-002.
+9. PO-2026-0001 to Alpha Agro, 55,000.00 AZN excluding VAT, 64,900.00 AZN with 18% VAT; Rashad approves; PO vote 3 to 0, "Same as the approved winner decision", minutes MIN-2026-003.
 10. Alpha Agro accepts the PO; the sourcing and the PR become COMPLETED; Beta Trade and Gamma Supply receive "Not awarded".
+
+**Scenario B: Single Source Purchase (optional, about 3 minutes)**
+
+1. Leyla creates a PR on the same plan line: 100 litres of "Foliar fertiliser, 1 L" × 40.00 AZN = 4,000.00 AZN; Rashad approves.
+2. Nigar starts sourcing with the method Single Source Purchase, picks Beta Trade from the Fertilisers AVL and, because 4,000.00 is above 1,000.00, adds the justification "Only official distributor of the registered brand" with a sample dealer letter PDF.
+3. Beta Trade submits 39.00 AZN per litre; the presenter ends the deadline; the committee sees the "Single Source Purchase" label and approves 3 to 0; the PO follows the same path as Scenario A.
 
 ## Figma
 
@@ -973,7 +1215,7 @@ TBD
 
 ## ERD
 
-Thirty-one tables cover the release; every top-level table carries `company_id` so more buying companies can be added later. Paste the block into dbdiagram.io.
+Forty-one tables cover the release; every top-level table carries `company_id` so more buying companies can be added later. Paste the block into dbdiagram.io.
 
 ```dbml
 // VMS Core MVP - paste into https://dbdiagram.io
@@ -1001,11 +1243,42 @@ Table user_role {
 
 Table setting {
   company_id uuid [ref: > company.id, not null]
-  key varchar [not null, note: 'tender_threshold | rfq_bands | max_extensions | qualification_months | voting_period_days | grade_bands | d_block_months']
+  key varchar [not null, note: 'tender_threshold | rfq_bands | max_extensions | qualification_months | voting_period_days | grade_bands | d_block_months | single_source_limit | rfq_days | tender_days | final_offer_days | final_offer_rounds']
   value text [not null]
   indexes {
     (company_id, key) [pk]
   }
+}
+
+Table incoterm {
+  code varchar(3) [primary key, note: 'Incoterms 2020: EXW FCA CPT CIP DAP DPU DDP FAS FOB CFR CIF']
+  name varchar [not null]
+  is_active boolean [default: true]
+}
+
+Table payment_term {
+  id uuid [primary key]
+  company_id uuid [ref: > company.id, not null]
+  name varchar [not null]
+  advance_percent decimal(5,2) [default: 0]
+  days_after_delivery integer [default: 0]
+  is_active boolean [default: true]
+}
+
+Table delivery_place {
+  id uuid [primary key]
+  company_id uuid [ref: > company.id, not null]
+  name varchar [not null]
+  type varchar [not null, note: 'WAREHOUSE | PORT | CITY']
+  address text
+  is_active boolean [default: true]
+}
+
+Table delivery_mode {
+  id uuid [primary key]
+  company_id uuid [ref: > company.id, not null]
+  name varchar [not null, note: 'Single delivery | Partial deliveries allowed | Per delivery schedule']
+  is_active boolean [default: true]
 }
 
 Table vendor {
@@ -1026,18 +1299,56 @@ Table vendor {
   bank_name varchar [not null]
   iban varchar [not null]
   swift varchar [not null]
-  status varchar [not null, note: 'DRAFT | SUBMITTED | RETURNED | APPROVED | REJECTED']
+  status varchar [not null, note: 'registration: DRAFT | SUBMITTED | RETURNED | APPROVED | REJECTED']
+  standing varchar [note: 'ACTIVE | HOLD | BLACKLISTED; set once APPROVED']
+  standing_until date [note: 'end of a HOLD']
+  standing_reason text
+  founded_on date
+  main_activity varchar [note: 'MANUFACTURER | DISTRIBUTOR | OFFICIAL_DEALER | SERVICE_PROVIDER | TRADER | OTHER']
+  main_goods text[] [note: 'up to 20']
+  bank_guarantee_available boolean
+  bank_guarantee_types text[] [note: 'BID | ADVANCE | PERFORMANCE']
+  bank_guarantee_max decimal(14,2)
+  bank_guarantee_currency varchar(3)
   review_comment text
   submitted_at timestamp
+  created_at timestamp
+}
+
+Table vendor_owner {
+  id uuid [primary key]
+  vendor_id uuid [ref: > vendor.id, not null]
+  full_name varchar [not null]
+  id_number varchar [not null, note: 'person ID or company registration number; used for the shared-owner flag']
+  share_percent decimal(5,2)
+  role varchar [not null, note: 'FOUNDER | SHAREHOLDER | HEAD']
+}
+
+Table vendor_brand {
+  id uuid [primary key]
+  vendor_id uuid [ref: > vendor.id, not null]
+  brand varchar [not null]
+  is_official_dealer boolean [default: false]
+}
+
+Table vendor_certificate {
+  id uuid [primary key]
+  vendor_id uuid [ref: > vendor.id, not null]
+  type varchar [not null, note: 'ISO_9001 | ISO_14001 | ISO_45001 | HSE_POLICY | PRODUCT | LICENCE | REFERENCE | CATALOGUE | OTHER']
+  number varchar
+  issuer varchar
+  issued_on date
+  expires_on date [note: 'empty = no expiry']
+  reminder_sent_at timestamp
   created_at timestamp
 }
 
 Table file {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
-  owner_type varchar [not null, note: 'vendor | questionnaire_answer | category_application | requisition | proposal | question | minutes | purchase_order']
+  owner_type varchar [not null, note: 'vendor | vendor_brand | vendor_certificate | questionnaire_answer | category_application | requisition | sourcing | proposal | question | minutes | purchase_order']
   owner_id uuid [not null]
-  kind varchar [note: 'charter | id_card | registration_certificate | vat_certificate | licence | technical_document | attachment | pdf']
+  kind varchar [note: 'charter | id_card | registration_certificate | vat_certificate | licence | technical_document | justification | attachment | pdf']
   file_name varchar [not null]
   mime_type varchar [not null]
   size_bytes integer [not null, note: 'max 10485760']
@@ -1049,6 +1360,8 @@ Table file {
 Table questionnaire_question {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
+  section varchar [note: 'e.g. General, Finance, Quality, HSE']
+  reviewer_role varchar [note: 'department that reviews this section; review screen in a later phase']
   text text [not null]
   answer_type varchar [not null, note: 'SINGLE_CHOICE | YES_NO']
   weight integer [not null, note: '1 to 5']
@@ -1072,7 +1385,6 @@ Table questionnaire_response {
   score decimal(4,1)
   grade varchar(1) [note: 'A | B | C | D']
   valid_until date
-  blocked_until date [note: 'set after a second consecutive D']
   review_comment text
   reviewed_by uuid [ref: > app_user.id]
   reviewed_at timestamp
@@ -1091,8 +1403,10 @@ Table questionnaire_answer {
 Table category {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
+  parent_id uuid [ref: > category.id, note: 'empty for a top-level group']
   name varchar [not null]
   licence_required boolean [default: false]
+  is_active boolean [default: true]
 }
 
 Table item {
@@ -1102,12 +1416,13 @@ Table item {
   code varchar [unique, not null]
   name varchar [not null]
   unit varchar [not null]
+  is_active boolean [default: true]
 }
 
 Table category_application {
   id uuid [primary key]
   vendor_id uuid [ref: > vendor.id, not null]
-  category_id uuid [ref: > category.id, not null]
+  category_id uuid [ref: > category.id, not null, note: 'a parent covers its child categories']
   status varchar [not null, note: 'PENDING | QUALIFIED | REJECTED | EXPIRED']
   valid_until date
   reason text
@@ -1134,7 +1449,7 @@ Table requisition {
   plan_line_id uuid [ref: > plan_line.id, not null]
   requester_id uuid [ref: > app_user.id, not null]
   status varchar [not null, note: 'DRAFT | PENDING_APPROVAL | RETURNED | APPROVED | REJECTED | IN_SOURCING | COMPLETED']
-  estimated_value decimal(14,2) [not null]
+  estimated_value decimal(14,2) [not null, note: 'excluding VAT']
   decision_comment text
   submitted_at timestamp
   created_at timestamp
@@ -1145,27 +1460,32 @@ Table requisition_line {
   requisition_id uuid [ref: > requisition.id, not null]
   item_id uuid [ref: > item.id, not null]
   quantity decimal(14,3) [not null]
-  estimated_unit_price decimal(14,2) [not null]
+  estimated_unit_price decimal(14,2) [not null, note: 'excluding VAT']
   delivery_date date [not null]
-  delivery_place varchar [not null]
+  delivery_place_id uuid [ref: > delivery_place.id, not null]
   specification text
 }
 
 Table sourcing {
-  id uuid [primary key]
+  id uuid [primary key, note: 'PRs are linked through sourcing_line, so one sourcing can hold lines of several PRs']
   company_id uuid [ref: > company.id, not null]
   number varchar [unique, not null, note: 'SRC-YYYY-NNNN']
-  requisition_id uuid [ref: > requisition.id, not null]
   owner_id uuid [ref: > app_user.id, not null]
-  type varchar [not null, note: 'RFQ | TENDER']
-  status varchar [not null, note: 'DRAFT | OPEN | CLOSED | TECHNICAL_EVALUATION | COMPARISON | IN_COMMITTEE | WINNER_APPROVED | COMPLETED | CANCELLED']
+  method varchar [not null, note: 'COMPETITIVE | SINGLE_SOURCE']
+  type varchar [not null, note: 'RFQ | TENDER | SSP']
+  status varchar [not null, note: 'DRAFT | OPEN | CLOSED | AWAITING_OPENING | TECHNICAL_EVALUATION | COMPARISON | FINAL_OFFER_ROUND | IN_COMMITTEE | WINNER_APPROVED | COMPLETED | CANCELLED']
   value decimal(14,2) [not null]
   min_proposals integer [not null]
   deadline timestamp
   extension_count integer [default: 0]
-  delivery_terms text
-  payment_terms text
+  final_offer_deadline timestamp
+  final_offer_rounds_used integer [default: 0]
+  required_incoterm varchar(3) [ref: > incoterm.code, note: 'default DDP']
+  named_place_id uuid [ref: > delivery_place.id]
+  delivery_mode_id uuid [ref: > delivery_mode.id]
+  payment_term_id uuid [ref: > payment_term.id]
   tech_doc_required boolean [default: false]
+  ssp_justification text [note: 'required above single_source_limit, with a file']
   low_competition_reason text
   cancel_reason text
   created_at timestamp
@@ -1176,8 +1496,6 @@ Table sourcing_line {
   sourcing_id uuid [ref: > sourcing.id, not null]
   requisition_line_id uuid [ref: > requisition_line.id, not null]
   status varchar [not null, note: 'ACTIVE | CANCELLED']
-  winner_proposal_line_id uuid [ref: > proposal_line.id]
-  winner_justification text
   cancel_reason text
 }
 
@@ -1194,6 +1512,12 @@ Table proposal {
   sourcing_id uuid [ref: > sourcing.id, not null]
   vendor_id uuid [ref: > vendor.id, not null]
   status varchar [not null, note: 'DRAFT | SUBMITTED | WITHDRAWN | PASSED | DISQUALIFIED | AWARDED | NOT_AWARDED']
+  incoterm varchar(3) [ref: > incoterm.code, not null]
+  named_place_id uuid [ref: > delivery_place.id, not null]
+  delivery_mode_id uuid [ref: > delivery_mode.id, not null]
+  payment_term_id uuid [ref: > payment_term.id, not null]
+  prices_include_vat boolean [not null]
+  vat_rate decimal(5,2) [default: 0]
   delivery_days integer
   validity_days integer
   comment text
@@ -1208,7 +1532,40 @@ Table proposal_line {
   id uuid [primary key]
   proposal_id uuid [ref: > proposal.id, not null]
   sourcing_line_id uuid [ref: > sourcing_line.id, not null]
-  unit_price decimal(14,2) [not null]
+  round integer [not null, default: 1, note: '1 = first offer, 2 = final offer']
+  unit_price decimal(14,2) [not null, note: 'as entered by the vendor']
+  indexes {
+    (proposal_id, sourcing_line_id, round) [unique]
+  }
+}
+
+Table final_offer_request {
+  id uuid [primary key]
+  sourcing_id uuid [ref: > sourcing.id, not null]
+  vendor_id uuid [ref: > vendor.id, not null]
+  message text
+  responded_at timestamp
+}
+
+Table comparison_cost {
+  id uuid [primary key]
+  sourcing_line_id uuid [ref: > sourcing_line.id, not null]
+  proposal_id uuid [ref: > proposal.id, not null]
+  type varchar [not null, note: 'CUSTOMS | DELIVERY | INSURANCE | OTHER']
+  amount_per_unit decimal(14,2) [not null]
+  note text
+  created_by uuid [ref: > app_user.id]
+  created_at timestamp
+}
+
+Table award_line {
+  id uuid [primary key, note: 'a line can be split across vendors; MVP awards the full quantity']
+  sourcing_line_id uuid [ref: > sourcing_line.id, not null]
+  proposal_line_id uuid [ref: > proposal_line.id, not null, note: 'the winning vendor latest round']
+  quantity decimal(14,3) [not null]
+  justification text [note: 'required when not the lowest evaluated price']
+  status varchar [not null, note: 'ACTIVE | REJECTED | CANCELLED']
+  created_at timestamp
 }
 
 Table question {
@@ -1239,7 +1596,7 @@ Table committee_member {
 Table decision {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
-  type varchar [not null, note: 'WINNER | PO']
+  type varchar [not null, note: 'OPENING | WINNER | PO']
   sourcing_id uuid [ref: > sourcing.id, not null]
   purchase_order_id uuid [ref: > purchase_order.id, note: 'set for PO decisions']
   status varchar [not null, note: 'VOTING | APPROVED | REJECTED | NO_DECISION']
@@ -1273,9 +1630,13 @@ Table purchase_order {
   sourcing_id uuid [ref: > sourcing.id, not null]
   vendor_id uuid [ref: > vendor.id, not null]
   status varchar [not null, note: 'PENDING_APPROVAL | PENDING_COMMITTEE | FULLY_APPROVED | ACCEPTED | DECLINED_BY_VENDOR | REJECTED']
-  total decimal(14,2) [not null]
-  delivery_terms text
-  payment_terms text
+  incoterm varchar(3) [ref: > incoterm.code]
+  named_place_id uuid [ref: > delivery_place.id]
+  delivery_mode_id uuid [ref: > delivery_mode.id]
+  payment_term_id uuid [ref: > payment_term.id]
+  total decimal(14,2) [not null, note: 'excluding VAT']
+  vat_amount decimal(14,2)
+  total_incl_vat decimal(14,2)
   reason text
   created_at timestamp
 }
@@ -1283,21 +1644,20 @@ Table purchase_order {
 Table purchase_order_line {
   id uuid [primary key]
   purchase_order_id uuid [ref: > purchase_order.id, not null]
-  sourcing_line_id uuid [ref: > sourcing_line.id, not null]
-  proposal_line_id uuid [ref: > proposal_line.id, not null]
+  award_line_id uuid [ref: > award_line.id, not null]
   quantity decimal(14,3) [not null]
-  unit_price decimal(14,2) [not null]
-  line_total decimal(14,2) [not null]
+  unit_price decimal(14,2) [not null, note: 'excluding VAT, the vendor price without extra costs']
+  line_total decimal(14,2) [not null, note: 'excluding VAT']
 }
 
 Table notification {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
   user_id uuid [ref: > app_user.id, not null]
-  event varchar [not null]
+  event varchar [not null, note: 'message key in messages/en.json, e.g. pr.submitted']
   record_type varchar [not null]
   record_id uuid [not null]
-  text varchar [not null]
+  params jsonb [note: 'values for the message, e.g. PR number; no stored wording']
   is_read boolean [default: false]
   created_at timestamp
 }
