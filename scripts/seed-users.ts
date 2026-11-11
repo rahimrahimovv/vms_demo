@@ -1,5 +1,6 @@
-// Creates (or refreshes) the seeded internal demo users from the backlog's "Seeded accounts".
-// Vendor B and Vendor C are seeded in Slice 2 together with the vendor table.
+// Creates (or refreshes) the seeded demo users from the backlog's "Seeded accounts": the internal
+// users and the Vendor B / Vendor C logins (their vendors come from supabase/seed.sql).
+// Every account is created as already confirmed; no confirmation e-mail is sent.
 // Usage: npm run db:seed (runs seed.sql first). Needs .env.local with
 // NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY and DEMO_SEED_PASSWORD.
 import { config } from "dotenv";
@@ -11,9 +12,9 @@ config({ path: ENV_FILE, quiet: true });
 
 const COMPANY_ID = "00000000-0000-4000-8000-000000000001"; // Demo Agro LLC, see supabase/seed.sql
 
-type Role = "REQUESTER" | "APPROVER" | "PROCUREMENT_SPECIALIST" | "COMMITTEE_MEMBER" | "ADMIN";
+type Role = "REQUESTER" | "APPROVER" | "PROCUREMENT_SPECIALIST" | "COMMITTEE_MEMBER" | "ADMIN" | "VENDOR";
 
-const USERS: { email: string; fullName: string; roles: Role[] }[] = [
+const USERS: { email: string; fullName: string; roles: Role[]; vendorId?: string }[] = [
   { email: "leyla@demo-agro.test", fullName: "Leyla Mammadova", roles: ["REQUESTER"] },
   { email: "rashad@demo-agro.test", fullName: "Rashad Aliyev", roles: ["APPROVER"] },
   { email: "nigar@demo-agro.test", fullName: "Nigar Huseynova", roles: ["PROCUREMENT_SPECIALIST"] },
@@ -21,6 +22,18 @@ const USERS: { email: string; fullName: string; roles: Role[] }[] = [
   { email: "sevinj@demo-agro.test", fullName: "Sevinj Guliyeva", roles: ["COMMITTEE_MEMBER"] },
   { email: "tural@demo-agro.test", fullName: "Tural Ismayilov", roles: ["COMMITTEE_MEMBER"] },
   { email: "admin@demo-agro.test", fullName: "Demo Admin", roles: ["ADMIN"] },
+  {
+    email: "sales@beta-trade.test",
+    fullName: "Selin Demir",
+    roles: ["VENDOR"],
+    vendorId: "00000000-0000-4000-8000-000000000502",
+  },
+  {
+    email: "office@gamma-supply.test",
+    fullName: "Orkhan Valiyev",
+    roles: ["VENDOR"],
+    vendorId: "00000000-0000-4000-8000-000000000503",
+  },
 ];
 
 function requireEnv(name: string): string {
@@ -62,6 +75,7 @@ async function main() {
       full_name: user.fullName,
       email: user.email,
       is_active: true,
+      vendor_id: user.vendorId ?? null,
     });
     if (userError) throw userError;
 
