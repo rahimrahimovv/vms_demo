@@ -16,7 +16,7 @@ VMS-CORE (Epic) - E2E procurement MVP, 30 stories
 │   ├── PLT-01  Sign in and see only your role's screens
 │   └── PLT-02  Get in-app notifications; keep an audit trail
 ├── MDM  Master data
-│   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes
+│   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes, currencies
 │   └── MDM-02  Admin maintains the category tree and item catalogue
 ├── REG  Vendor onboarding
 │   ├── REG-01  Vendor registers (local, individual, foreign)
@@ -168,14 +168,14 @@ TBD
 | Field | Value |
 | --- | --- |
 | **Story ID** | MDM-01 |
-| **Story title** | The Admin keeps the lists of Incoterms, payment terms, delivery places and delivery modes that every dropdown uses. |
+| **Story title** | The Admin keeps the lists of Incoterms, payment terms, delivery places, delivery modes and currencies that every dropdown uses. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
 | **As a...** | Admin |
-| **I want to...** | maintain the dictionaries behind the Incoterm, payment term, delivery place and delivery mode dropdowns |
+| **I want to...** | maintain the dictionaries behind the Incoterm, payment term, delivery place, delivery mode and currency dropdowns |
 | **So that...** | buyers and vendors pick the same standard terms and proposals can be compared term by term |
 
 **Acceptance Criteria** (Given / When / Then)
@@ -183,7 +183,7 @@ TBD
 1. **Given** a new system, **When** it is seeded, **Then** the Incoterms dictionary holds the 11 Incoterms 2020 rules (EXW, FCA, CPT, CIP, DAP, DPU, DDP, FAS, FOB, CFR, CIF) with code and name, all active; codes cannot be edited.
 2. **Given** the Admin on Dictionaries, **When** they add or edit a payment term with name, advance % (0 to 100) and days after delivery (0 or more), **Then** it is saved and appears in payment-term dropdowns; the seed holds "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery" and "60 days after delivery".
 3. **Given** the Admin on Dictionaries, **When** they add a delivery place with name, type (Warehouse, Port or City) and address, **Then** it appears in the delivery-place and named-place dropdowns.
-4. **Given** the Admin on Dictionaries, **When** they add a delivery mode with a name, **Then** it appears in delivery-mode dropdowns; the seed holds "Single delivery", "Partial deliveries allowed" and "Per delivery schedule".
+4. **Given** the Admin on Dictionaries, **When** they add a delivery mode with a name, **Then** it appears in delivery-mode dropdowns; the seed holds "Single delivery", "Partial deliveries allowed" and "Per delivery schedule". **When** they add a currency with ISO code (3 capital letters, cannot be edited later), name and active flag, **Then** it appears in every currency dropdown (vendor bank accounts, bank guarantee capacity) instead of a fixed list; the seed holds AZN, USD, EUR, TRY, RUB, GBP and CNY, all active. PR, proposal and PO amounts stay in AZN (NFR-005).
 5. **Given** an entry in any dictionary, **When** the Admin deactivates it, **Then** it no longer appears in dropdowns for new records, records that already use it keep showing it, and an entry in use cannot be deleted.
 6. **Given** a dictionary, **When** the Admin saves a name that already exists in it, **Then** "This name already exists" appears and nothing is saved.
 
@@ -397,7 +397,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** the Admin on Plan, **When** they add a line with year, category, description, planned amount in AZN greater than 0 and planned quarter (Q1 to Q4), **Then** the line is saved as ACTIVE.
-2. **Given** an ACTIVE line, **When** the Admin closes it, **Then** it becomes CLOSED and can no longer be picked on a new PR; PRs already linked keep the link.
+2. **Given** an ACTIVE line, **When** the Admin closes it, **Then** it becomes CLOSED and can no longer be picked on a new PR; PRs already linked keep the link, and a RETURNED PR stays on its line even if the line was closed meanwhile. The Admin may edit an ACTIVE line, but its category is fixed once a PR is linked to it. Plan lines are never deleted, only closed.
 3. **Given** the Plan page, **When** any internal user opens it, **Then** each line shows planned amount, committed amount and remaining amount, where committed is the sum of estimated values of linked PRs in PENDING\_APPROVAL, APPROVED, IN\_SOURCING or COMPLETED, and remaining is planned minus committed.
 4. **Given** a PR whose estimated value is larger than the remaining amount of its plan line, **When** the Requester submits it, **Then** "This PR exceeds the remaining plan amount by X AZN" appears and the Requester may still submit; the warning is shown to the Approver too.
 5. **Given** a Requester, Approver or Procurement Specialist, **When** they open Plan, **Then** they can read it but see no add, edit or close actions.
@@ -425,8 +425,8 @@ TBD
 2. **Given** a PR line, **When** the Requester picks a catalogue item, **Then** item code, name, category and unit fill in from the catalogue and cannot be edited, and the Requester enters quantity (greater than 0), estimated unit price in AZN excluding VAT (greater than 0, 2 decimals), required delivery date, a delivery place picked from the Delivery places dictionary and an optional specification text of up to 2,000 characters. \[revised\]
 3. **Given** a required delivery date earlier than tomorrow, **When** the Requester saves, **Then** "Delivery date must be in the future" appears on that line.
 4. **Given** lines with quantity and price, **When** any of them changes, **Then** the estimated value (sum of quantity × estimated unit price) updates on screen, formatted like 60,000.00 AZN.
-5. **Given** a PR with at least one valid line, **When** the Requester clicks Save, **Then** it is stored as DRAFT with a number PR-YYYY-NNNN; **When** they click Submit, **Then** it becomes PENDING\_APPROVAL, read-only for the Requester, and every Approver except the Requester is notified.
-6. **Given** a PR with no lines, **When** the Requester clicks Submit, **Then** "Add at least one line" appears.
+5. **Given** a PR, **When** the Requester clicks Save, **Then** it is stored as DRAFT with a number PR-YYYY-NNNN; a draft may be incomplete or have no lines yet, but every line that exists must pass the rules above; **When** they click Submit, **Then** it becomes PENDING\_APPROVAL, read-only for the Requester, and every Approver except the Requester is notified.
+6. **Given** a PR with no lines, **When** the Requester clicks Submit, **Then** "Add at least one line" appears; this check runs on Submit only. PRs are never deleted.
 7. **Given** a RETURNED PR, **When** the Requester edits and submits it, **Then** it becomes PENDING\_APPROVAL again and the Approver's comment stays in History.
 
 ---
@@ -1185,8 +1185,8 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 
 **Master data and settings**
 
-- Buying company: Demo Agro LLC. Dictionaries: the 11 Incoterms 2020; payment terms "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery", "60 days after delivery"; delivery places "Central warehouse" and "North warehouse" (Warehouse) and "Baku port" (Port); delivery modes "Single delivery", "Partial deliveries allowed", "Per delivery schedule".
-- Catalogue: 25 items in 5 categories (Fertilisers, Seeds, Plant protection, Spare parts, Office supplies); Fertilisers is marked "Licence proof required"; demo item "Ammonium nitrate 34.4%, 50 kg bag", unit bag.
+- Buying company: Demo Agro LLC. Dictionaries: the 11 Incoterms 2020; payment terms "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery", "60 days after delivery"; delivery places "Central warehouse" and "North warehouse" (Warehouse) and "Baku port" (Port); delivery modes "Single delivery", "Partial deliveries allowed", "Per delivery schedule"; currencies AZN, USD, EUR, TRY, RUB, GBP, CNY.
+- Catalogue: 25 items in 5 categories (Fertilisers, Seeds, Plant protection, Spare parts, Office supplies) plus 3 items under Irrigation systems; Fertilisers is marked "Licence proof required"; demo item "Ammonium nitrate 34.4%, 50 kg bag", unit bag, under Mineral fertilisers, and "Foliar fertiliser, 1 L", unit litre, under Foliar fertilisers, so the Fertilisers plan line accepts both through the category tree.
 - Plan line: 2026, Fertilisers, "Spring fertiliser programme", 500,000.00 AZN, Q1, ACTIVE.
 - Settings: threshold 50,000.00 AZN; single-source limit 1,000.00 AZN; default deadlines 3 days (RFQ, SSP) and 14 days (Tender); one final-offer round with a 2-day default deadline; RFQ bands 1 / 2 / 3; at most 2 extensions; grade and category qualification valid 12 months; grade bands A 85+, B 70+, C 50+, D below 50; a 6-month wait after a second D; a 10-question qualification questionnaire with points and weights; voting period 3 business days.
 
@@ -1215,7 +1215,7 @@ TBD
 
 ## ERD
 
-Forty-one tables cover the release; every top-level table carries `company_id` so more buying companies can be added later. Paste the block into dbdiagram.io.
+Forty-three tables cover the release; every top-level table carries `company_id` so more buying companies can be added later, except the two global ISO dictionaries `incoterm` and `currency`. Paste the block into dbdiagram.io.
 
 ```dbml
 // VMS Core MVP - paste into https://dbdiagram.io
@@ -1281,6 +1281,12 @@ Table delivery_mode {
   is_active boolean [default: true]
 }
 
+Table currency {
+  code varchar(3) [primary key, note: 'ISO 4217, cannot be edited; seed AZN USD EUR TRY RUB GBP CNY']
+  name varchar [unique, not null]
+  is_active boolean [default: true]
+}
+
 Table vendor {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
@@ -1306,7 +1312,7 @@ Table vendor {
   bank_guarantee_available boolean
   bank_guarantee_types text[] [note: 'BID | ADVANCE | PERFORMANCE']
   bank_guarantee_max decimal(14,2)
-  bank_guarantee_currency varchar(3)
+  bank_guarantee_currency varchar(3) [ref: > currency.code]
   review_comment text
   submitted_at timestamp
   created_at timestamp
@@ -1318,7 +1324,7 @@ Table vendor_bank_account {
   bank_name varchar [not null]
   iban varchar(34) [not null, note: 'up to 34 letters and digits, stored without spaces']
   swift varchar [not null]
-  currency varchar(3) [not null]
+  currency varchar(3) [ref: > currency.code, not null]
   is_main boolean [not null, note: 'exactly one main account per vendor; at least one account']
 }
 
