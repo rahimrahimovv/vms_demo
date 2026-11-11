@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { Boxes } from "lucide-react";
-import type { Section } from "@/lib/auth/sections";
+import { SECTION_GROUPS, type Section } from "@/lib/auth/sections";
 import { SidebarNav } from "./sidebar-nav";
 
 /** Left sidebar: logo "VMS Core" and the menu for the user's roles (PLT-01 AC4). */
 export async function AppSidebar({ sections }: { sections: Section[] }) {
   const t = await getTranslations();
-  const groups = (["main", "admin"] as const)
+  const groups = SECTION_GROUPS
     .map((group) => ({
       group,
       label: t(`nav.groups.${group}`),

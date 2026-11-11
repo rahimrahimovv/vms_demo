@@ -9,6 +9,8 @@ export type CurrentUser = {
   fullName: string;
   email: string;
   roles: Role[];
+  /** Set only for vendor users (REG-01). */
+  vendorId: string | null;
 };
 
 /**
@@ -23,7 +25,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const { data: user } = await supabase
     .from("app_user")
-    .select("id, company_id, full_name, email, is_active, user_role(role)")
+    .select("id, company_id, full_name, email, is_active, vendor_id, user_role(role)")
     .eq("id", userId)
     .maybeSingle();
 
@@ -38,5 +40,6 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     fullName: user.full_name,
     email: user.email,
     roles,
+    vendorId: user.vendor_id ?? null,
   };
 });

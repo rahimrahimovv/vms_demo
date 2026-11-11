@@ -28,6 +28,9 @@ const TONES: Record<string, StatusTone> = {
   UNANSWERED: "amber",
   FULLY_APPROVED: "amber", // waiting for the vendor's decision
   NO_DECISION: "amber",
+  HOLD: "amber", // vendor standing after a second D grade
+  EXPIRING: "amber", // certificate within 30 days of expiry
+  VALID: "green",
   // approved or completed
   APPROVED: "green",
   ACCEPTED: "green",
@@ -44,6 +47,7 @@ const TONES: Record<string, StatusTone> = {
   DECLINED: "red",
   DECLINED_BY_VENDOR: "red",
   DISQUALIFIED: "red",
+  BLACKLISTED: "red",
   // closed without an outcome
   WITHDRAWN: "grey",
   EXPIRED: "grey",

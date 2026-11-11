@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Boxes } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -27,6 +28,12 @@ export default async function SignInPage() {
             <SignInForm />
           </CardContent>
         </Card>
+        <p className="text-sm text-muted-foreground">
+          {t("signIn.vendorPrompt")}{" "}
+          <Link href="/register" className="font-medium text-primary hover:underline" data-testid="register-link">
+            {t("signIn.registerLink")}
+          </Link>
+        </p>
       </div>
     </main>
   );

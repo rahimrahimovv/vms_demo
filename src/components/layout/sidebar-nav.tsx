@@ -2,11 +2,32 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Users, type LucideIcon } from "lucide-react";
+import {
+  Building2,
+  ClipboardCheck,
+  ClipboardList,
+  FileText,
+  House,
+  ListChecks,
+  ShieldCheck,
+  Tags,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { sectionForPath, type Section } from "@/lib/auth/sections";
 
-const ICONS: Record<Section["icon"], LucideIcon> = { home: House, users: Users };
+const ICONS: Record<Section["icon"], LucideIcon> = {
+  home: House,
+  users: Users,
+  fileText: FileText,
+  clipboardCheck: ClipboardCheck,
+  clipboardList: ClipboardList,
+  tags: Tags,
+  building: Building2,
+  listChecks: ListChecks,
+  shieldCheck: ShieldCheck,
+};
 
 type NavGroup = {
   group: string;

@@ -10,14 +10,14 @@ import { recordHref } from "@/lib/records";
  * Runs as the user: RLS + the column grant allow only flipping is_read on their own rows.
  */
 export async function openNotification(id: string) {
-  await requireUser();
+  const user = await requireUser();
   const supabase = await createClient();
   const { data } = await supabase
     .from("notification")
     .update({ is_read: true })
     .eq("id", id)
-    .select("record_type, record_id")
+    .select("event, record_type, record_id")
     .maybeSingle();
 
-  redirect(data ? recordHref(data.record_type, data.record_id) : "/");
+  redirect(data ? recordHref(data.record_type, data.record_id, user.vendorId ? "vendor" : "internal", data.event) : "/");
 }

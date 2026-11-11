@@ -16,9 +16,15 @@ and in Vercel. Every `.env*` file except `.env.example` is gitignored.
 npm install
 cp .env.example .env.local      # fill in the vms-dev values
 npm run db:push                 # apply supabase/migrations
-npm run db:seed                 # seed.sql (company, settings) + demo users (DEMO_SEED_PASSWORD)
-npm run dev                     # http://localhost:3000
+npm run db:seed                 # seed.sql (company, settings, dictionaries, categories, questionnaire,
+                                #   Vendor B and C) + demo users (DEMO_SEED_PASSWORD)
+npm run dev                     # http://localhost:3000 (uses .env.local = vms-dev)
 ```
+
+`db:seed` runs `seed.sql` every time; it is idempotent (`on conflict do nothing`).
+
+Careful: `npm run build && npm start` also loads `.env.production.local` when that file exists, so a local
+production build talks to **vms-prod**. Use `npm run dev` for local work and tests.
 
 Docker is not needed: migrations go straight to the hosted database through `SUPABASE_DB_URL`
 (the Supabase CLI is a dev dependency).
@@ -75,4 +81,9 @@ Run `db:push` after every new migration, before or together with the deploy that
   Users are created by the Admin (and from Slice 2 by vendor registration) through the server, which
   still works with public sign-up off.
 - Realtime needs nothing extra: the migration adds `notification` to the `supabase_realtime` publication.
+- Storage needs nothing extra: the Slice 2 migration creates the private bucket `files` (10 MB, PDF, JPG,
+  PNG, DOCX, XLSX). Only the server reads and writes it.
+- pg_cron: the Slice 2 migration enables it and schedules `vms-daily` (00:05 Asia/Baku) for expiry and
+  certificate reminders.
+- Vendor self-registration works with public sign-up off: the server creates the account already confirmed.
 - NFR-014: the free project pauses after about a week without use; open it the day before the demo.

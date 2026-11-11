@@ -5,24 +5,62 @@ import type { Role } from "./roles";
  * Single source of truth for the menu (PLT-01 AC4), the page guard (AC5) and the API 403 (NFR-003).
  * Each slice adds its sections here.
  */
-export type SectionKey = "home" | "adminUsers";
+export type SectionKey =
+  | "home"
+  | "vendorRegistration"
+  | "vendorQualification"
+  | "vendorCategories"
+  | "vendorProfile"
+  | "vendors"
+  | "questionnaires"
+  | "categoryApplications"
+  | "avl"
+  | "adminUsers"
+  | "adminQuestionnaire";
+
+export type SectionIcon =
+  | "home"
+  | "users"
+  | "fileText"
+  | "clipboardCheck"
+  | "tags"
+  | "building"
+  | "listChecks"
+  | "shieldCheck"
+  | "clipboardList";
 
 export type Section = {
   key: SectionKey;
   href: string;
   /** Key under "nav" in messages/en.json */
   labelKey: SectionKey;
-  icon: "home" | "users";
+  icon: SectionIcon;
   /** null = every signed-in user */
   roles: Role[] | null;
-  group: "main" | "admin";
+  group: "main" | "vendors" | "admin";
 };
 
 export const SECTIONS: Section[] = [
   { key: "home", href: "/", labelKey: "home", icon: "home", roles: null, group: "main" },
-  // Role Matrix: "Manage users, catalogue, categories, settings, committee" = Admin only.
+  // Vendor portal (Role Matrix: register, questionnaire, apply for categories, keep own profile)
+  { key: "vendorRegistration", href: "/vendor/registration", labelKey: "vendorRegistration", icon: "fileText", roles: ["VENDOR"], group: "main" },
+  { key: "vendorQualification", href: "/vendor/qualification", labelKey: "vendorQualification", icon: "clipboardCheck", roles: ["VENDOR"], group: "main" },
+  { key: "vendorCategories", href: "/vendor/categories", labelKey: "vendorCategories", icon: "tags", roles: ["VENDOR"], group: "main" },
+  { key: "vendorProfile", href: "/vendor/profile", labelKey: "vendorProfile", icon: "building", roles: ["VENDOR"], group: "main" },
+  // Vendor cards: PS, CM, Admin ("View a vendor card"); only PS decides on registrations.
+  { key: "vendors", href: "/vendors", labelKey: "vendors", icon: "building", roles: ["PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "vendors" },
+  // "Review answers, adjust points, confirm the grade or return" = PS
+  { key: "questionnaires", href: "/questionnaires", labelKey: "questionnaires", icon: "clipboardCheck", roles: ["PROCUREMENT_SPECIALIST"], group: "vendors" },
+  // "Qualify or reject a category application; view the AVL" = PS, Admin (view)
+  { key: "categoryApplications", href: "/category-applications", labelKey: "categoryApplications", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST"], group: "vendors" },
+  { key: "avl", href: "/avl", labelKey: "avl", icon: "shieldCheck", roles: ["PROCUREMENT_SPECIALIST", "ADMIN"], group: "vendors" },
+  // "Manage users, catalogue, categories, dictionaries, settings, committee" and
+  // "Build the qualification questionnaire" = Admin only.
   { key: "adminUsers", href: "/admin/users", labelKey: "adminUsers", icon: "users", roles: ["ADMIN"], group: "admin" },
+  { key: "adminQuestionnaire", href: "/admin/questionnaire", labelKey: "adminQuestionnaire", icon: "clipboardList", roles: ["ADMIN"], group: "admin" },
 ];
+
+export const SECTION_GROUPS = ["main", "vendors", "admin"] as const;
 
 export function canAccess(roles: readonly Role[], key: SectionKey): boolean {
   const section = SECTIONS.find((s) => s.key === key);

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { openNotification } from "@/app/actions/notifications";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { BELL_MAX_ITEMS, toBellItem, type BellItem, type NotificationRow } from "@/lib/notifications";
+import { BELL_MAX_ITEMS, messageValues, toBellItem, type BellItem, type NotificationRow } from "@/lib/notifications";
 
 /**
  * PLT-02 AC1-2: bell with unread counter, pushed live via Supabase Realtime (RLS limits the
@@ -74,7 +74,7 @@ export function NotificationBell({
 
   function text(item: BellItem) {
     const key = `notifications.events.${item.event}`;
-    const values = { ...item.params, number: item.recordNumber ?? "" };
+    const values = messageValues(item.params, item.recordNumber, { has: t.has, translate: (k) => t(k) }, formatDate);
     return t.has(key) ? t(key, values) : t("notifications.fallback", values);
   }
 

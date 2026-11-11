@@ -28,6 +28,7 @@ export default async function UsersPage() {
   const { data } = await supabase
     .from("app_user")
     .select("id, full_name, email, is_active, created_at, user_role(role)")
+    .is("vendor_id", null) // vendor accounts come from registration (REG-01), not from Users
     .order("full_name")
     .returns<UserRow[]>();
   const users = data ?? [];

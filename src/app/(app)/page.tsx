@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { Bell, UserPlus } from "lucide-react";
+import { Bell, Building2, ClipboardCheck, ListChecks, UserPlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { canAccess } from "@/lib/auth/sections";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
+import { messageValues } from "@/lib/notifications";
 import { recordHref } from "@/lib/records";
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
+import { VendorHome } from "@/components/vendor/vendor-home";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -29,6 +31,7 @@ type UnreadRow = {
 export default async function HomePage() {
   const { user, allowed } = await checkSection("home");
   if (!allowed) return <NoAccess />;
+  if (user.vendorId) return <VendorHome vendorId={user.vendorId} />;
 
   const t = await getTranslations();
   const supabase = await createClient();
@@ -41,9 +44,26 @@ export default async function HomePage() {
     .returns<UnreadRow[]>();
 
   const unread = data ?? [];
+
+  // Slice 2 task cards for the Procurement Specialist (items waiting for a decision).
+  const isSpecialist = user.roles.includes("PROCUREMENT_SPECIALIST");
+  const [registrations, questionnaires, applications] = isSpecialist
+    ? await Promise.all([
+        supabase.from("vendor").select("id", { count: "exact", head: true }).eq("status", "SUBMITTED"),
+        supabase.from("questionnaire_response").select("id", { count: "exact", head: true }).eq("status", "SUBMITTED"),
+        supabase.from("category_application").select("id", { count: "exact", head: true }).eq("status", "PENDING"),
+      ])
+    : [null, null, null];
+  const taskCards = isSpecialist
+    ? [
+        { key: "registrations", href: "/vendors", count: registrations?.count ?? 0, icon: Building2 },
+        { key: "questionnaires", href: "/questionnaires", count: questionnaires?.count ?? 0, icon: ClipboardCheck },
+        { key: "applications", href: "/category-applications", count: applications?.count ?? 0, icon: ListChecks },
+      ]
+    : [];
   const text = (row: UnreadRow) => {
     const key = `notifications.events.${row.event}`;
-    const values = { ...(row.params ?? {}), number: row.record_number ?? "" };
+    const values = messageValues(row.params ?? {}, row.record_number, { has: t.has, translate: (k) => t(k) }, formatDate);
     return t.has(key) ? t(key, values) : t("notifications.fallback", values);
   };
 
@@ -67,6 +87,18 @@ export default async function HomePage() {
             <span className="text-sm font-medium">{t("home.unreadCard", { count: count ?? 0 })}</span>
           </CardContent>
         </Card>
+        {taskCards.map((card) => (
+          <Link key={card.key} href={card.href} data-testid={`task-card-${card.key}`}>
+            <Card className="h-full hover:bg-muted/60">
+              <CardContent className="flex items-center gap-4">
+                <span className="flex size-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                  <card.icon className="size-5" aria-hidden />
+                </span>
+                <span className="text-sm font-medium">{t(`home.cards.${card.key}`, { count: card.count })}</span>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
 
       <section className="flex flex-col gap-3">
@@ -78,7 +110,7 @@ export default async function HomePage() {
             {unread.map((row) => (
               <li key={row.id}>
                 <Link
-                  href={recordHref(row.record_type, row.record_id)}
+                  href={recordHref(row.record_type, row.record_id, "internal", row.event)}
                   className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/60"
                 >
                   <span className="text-sm">{text(row)}</span>

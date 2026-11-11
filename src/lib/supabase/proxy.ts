@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /** Paths reachable without a session. */
-const PUBLIC_PATHS = ["/sign-in"];
+const PUBLIC_PATHS = ["/sign-in", "/register"];
 
 /**
  * Refreshes the Supabase session cookie on every request and sends signed-out users to /sign-in.

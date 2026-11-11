@@ -5,9 +5,19 @@
   },
   "nav": {
     "home": "My tasks",
+    "vendorRegistration": "Registration",
+    "vendorQualification": "Qualification",
+    "vendorCategories": "Categories",
+    "vendorProfile": "Profile",
+    "vendors": "Vendors",
+    "questionnaires": "Questionnaires",
+    "categoryApplications": "Category applications",
+    "avl": "Approved vendors (AVL)",
     "adminUsers": "Users",
+    "adminQuestionnaire": "Questionnaire",
     "groups": {
       "main": "Work",
+      "vendors": "Vendors",
       "admin": "Administration"
     }
   },
@@ -21,7 +31,20 @@
   },
   "status": {
     "ACTIVE": "Active",
-    "INACTIVE": "Inactive"
+    "INACTIVE": "Inactive",
+    "DRAFT": "Draft",
+    "SUBMITTED": "Submitted",
+    "RETURNED": "Returned",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "HOLD": "Hold",
+    "BLACKLISTED": "Blacklisted",
+    "PENDING": "Pending",
+    "QUALIFIED": "Qualified",
+    "EXPIRED": "Expired",
+    "GRADED": "Graded",
+    "VALID": "Valid",
+    "EXPIRING": "Expiring"
   },
   "common": {
     "none": "—",
@@ -29,6 +52,11 @@
     "save": "Save",
     "saving": "Saving…",
     "cancel": "Cancel",
+    "delete": "Delete",
+    "select": "Select…",
+    "yes": "Yes",
+    "no": "No",
+    "savedNote": "Saved.",
     "genericError": "Something went wrong, try again",
     "sortBy": "Sort by {column}"
   },
@@ -39,6 +67,8 @@
     "password": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
+    "vendorPrompt": "A supplier without an account?",
+    "registerLink": "Register as a vendor",
     "errors": {
       "invalid": "Incorrect e-mail or password",
       "unavailable": "Sign-in is unavailable, try again"
@@ -58,13 +88,432 @@
   },
   "notifications": {
     "fallback": "Update on {number}",
-    "events": {}
+    "events": {
+      "registration": {
+        "submitted": "{number} submitted a registration",
+        "approved": "Your registration was approved. You can now fill the qualification questionnaire.",
+        "returned": "Your registration was returned for correction: {comment}",
+        "rejected": "Your registration was rejected: {comment}"
+      },
+      "questionnaire": {
+        "submitted": "{number} submitted the qualification questionnaire",
+        "graded": "Your grade is {grade} (score {score}), valid until {validUntil}",
+        "returned": "Your questionnaire was returned for correction: {comment}"
+      },
+      "category": {
+        "applied": "{number} applied for {category}",
+        "qualified": "You are qualified in {category} until {validUntil}",
+        "rejected": "Your application for {category} was rejected: {reason}"
+      },
+      "certificate": {
+        "expiring": "{type} certificate of {vendor} expires on {expiresOn}",
+        "expired": "{type} certificate of {vendor} has expired"
+      }
+    }
   },
   "home": {
     "unreadCard": "{count, plural, =0 {No unread notifications} one {# unread notification} other {# unread notifications}}",
     "listTitle": "Waiting for you",
     "empty": "Nothing is waiting for you.",
-    "addUser": "Add user"
+    "addUser": "Add user",
+    "cards": {
+      "registrations": "{count, plural, =0 {No registrations to review} one {# registration to review} other {# registrations to review}}",
+      "questionnaires": "{count, plural, =0 {No questionnaires to review} one {# questionnaire to review} other {# questionnaires to review}}",
+      "applications": "{count, plural, =0 {No category applications to decide} one {# category application to decide} other {# category applications to decide}}"
+    }
+  },
+  "errors": {
+    "required": "This field is required",
+    "voenFormat": "VÖEN must be 10 digits",
+    "foreignTaxFormat": "Enter 3 to 30 characters",
+    "phoneFormat": "Enter the phone with country code, e.g. +994501234567",
+    "emailInvalid": "Enter a valid e-mail",
+    "passwordShort": "The password must have at least 8 characters",
+    "dateInvalid": "Enter a valid date that is not in the future",
+    "ownerIncomplete": "Give every owner a full name, an ID or registration number and a share between 0 and 100",
+    "headOwnerRequired": "Add at least one owner with the role Head",
+    "sharesOver100": "Shares cannot exceed 100% in total",
+    "taxNumberTaken": "A vendor with this tax number is already registered",
+    "uploadVatCertificate": "Upload the VAT payer certificate",
+    "uploadCharter": "Upload the charter or state-registry extract",
+    "uploadIdCard": "Upload the ID card",
+    "uploadRegistrationCertificate": "Upload the registration certificate",
+    "fileType": "Use PDF, JPG, PNG, DOCX or XLSX up to 10 MB",
+    "fileRequired": "Attach the file",
+    "foundedOnRequired": "Enter the founding date",
+    "registrationReadOnly": "This registration can no longer be edited",
+    "noAccess": "You do not have access to this page",
+    "statusChanged": "This record has changed. Reload the page and try again",
+    "commentRequired": "Enter a comment",
+    "reasonRequired": "Enter a reason",
+    "registrationNotApproved": "Your registration must be approved first",
+    "questionnaireFirst": "Complete the qualification questionnaire first",
+    "vendorOnHold": "You cannot start a new questionnaire yet",
+    "gradeStillValid": "Your grade is still valid. A new questionnaire can start in the last 30 days before it expires",
+    "questionnaireEmpty": "The questionnaire has no questions yet",
+    "questionnaireReadOnly": "This questionnaire can no longer be edited",
+    "answerEveryQuestion": "Answer every question",
+    "attachEvidence": "Attach the evidence file where it is required",
+    "pointsOutOfRange": "Points must be between 0 and the question's maximum",
+    "licenceRequired": "This category requires a licence or certificate file",
+    "alreadyApplied": "You already have a pending or qualified application in this category",
+    "selectCategory": "Select at least one category",
+    "categoryParentInvalid": "Pick a valid parent category",
+    "goodsMax": "List up to 20 main goods",
+    "amountPositive": "Enter an amount greater than 0",
+    "brandExists": "This brand is already listed",
+    "expiryBeforeIssue": "The expiry date cannot be before the issue date",
+    "laterExpiry": "Enter an expiry date later than the current one",
+    "weightRange": "The weight must be from 1 to 5",
+    "optionsMin": "Add at least two answer options",
+    "optionLabel": "Give every answer option a label",
+    "pointsRange": "Points must be from 0 to 10"
+  },
+  "vendorTypes": {
+    "LOCAL_COMPANY": "Local company",
+    "INDIVIDUAL": "Individual",
+    "FOREIGN_COMPANY": "Foreign company"
+  },
+  "ownerRoles": {
+    "HEAD": "Head",
+    "FOUNDER": "Founder",
+    "SHAREHOLDER": "Shareholder"
+  },
+  "activities": {
+    "MANUFACTURER": "Manufacturer",
+    "DISTRIBUTOR": "Distributor",
+    "OFFICIAL_DEALER": "Official dealer",
+    "SERVICE_PROVIDER": "Service provider",
+    "TRADER": "Trader",
+    "OTHER": "Other"
+  },
+  "guaranteeTypes": {
+    "BID": "Bid",
+    "ADVANCE": "Advance payment",
+    "PERFORMANCE": "Performance"
+  },
+  "certificateTypes": {
+    "ISO_9001": "ISO 9001",
+    "ISO_14001": "ISO 14001",
+    "ISO_45001": "ISO 45001",
+    "HSE_POLICY": "HSE policy",
+    "PRODUCT": "Product certificate",
+    "LICENCE": "Licence",
+    "REFERENCE": "Reference letter",
+    "CATALOGUE": "Catalogue",
+    "OTHER": "Other"
+  },
+  "countries": {
+    "AZ": "Azerbaijan",
+    "TR": "Türkiye",
+    "GE": "Georgia",
+    "KZ": "Kazakhstan",
+    "UZ": "Uzbekistan",
+    "RU": "Russia",
+    "UA": "Ukraine",
+    "IR": "Iran",
+    "AE": "United Arab Emirates",
+    "SA": "Saudi Arabia",
+    "CN": "China",
+    "IN": "India",
+    "DE": "Germany",
+    "NL": "Netherlands",
+    "FR": "France",
+    "IT": "Italy",
+    "ES": "Spain",
+    "PL": "Poland",
+    "GB": "United Kingdom",
+    "US": "United States",
+    "IL": "Israel",
+    "EG": "Egypt",
+    "BY": "Belarus",
+    "TM": "Turkmenistan"
+  },
+  "files": {
+    "none": "No files.",
+    "hint": "PDF, JPG, PNG, DOCX or XLSX, up to 10 MB",
+    "kinds": {
+      "charter": "Charter or state-registry extract",
+      "id_card": "ID card",
+      "registration_certificate": "Registration certificate",
+      "vat_certificate": "VAT payer certificate",
+      "licence": "Licence or certificate",
+      "technical_document": "Technical document",
+      "justification": "Justification",
+      "attachment": "Attachment",
+      "pdf": "PDF"
+    }
+  },
+  "registration": {
+    "title": "Register as a vendor",
+    "subtitle": "Create your account, fill in your company data and attach the documents for your type.",
+    "haveAccount": "Already registered? Sign in",
+    "submit": "Submit for review",
+    "saved": "Your registration is saved.",
+    "savedDraft": "Your registration is saved as a draft. Complete it and click Submit for review.",
+    "returnedTitle": "Returned for correction",
+    "rejectedTitle": "Registration rejected",
+    "submittedNote": "Your registration is under review. You will be notified of the decision.",
+    "sections": {
+      "type": "Vendor type",
+      "company": "Company data",
+      "contact": "Contact and sign-in",
+      "bank": "Bank details",
+      "owners": "Owners",
+      "documents": "Documents"
+    },
+    "typeHints": {
+      "LOCAL_COMPANY": "Registered in Azerbaijan, with a VÖEN",
+      "INDIVIDUAL": "A person supplying in their own name",
+      "FOREIGN_COMPANY": "Registered outside Azerbaijan"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "legalName": "Legal name",
+      "voen": "VÖEN",
+      "country": "Country",
+      "foreignTaxNumber": "Tax or registration number",
+      "idCardNumber": "ID card number",
+      "legalAddress": "Legal address",
+      "directorName": "Director's name",
+      "foundedOn": "Founding date",
+      "vatPayer": "VAT payer",
+      "contactPerson": "Contact person",
+      "phone": "Phone",
+      "contactEmail": "Contact e-mail",
+      "password": "Password",
+      "bankName": "Bank name",
+      "iban": "IBAN",
+      "swift": "SWIFT"
+    },
+    "hints": {
+      "voen": "10 digits",
+      "foreignTaxNumber": "Home tax or registration number, 3 to 30 characters",
+      "phone": "With country code, e.g. +994501234567",
+      "contactEmail": "You sign in with this e-mail",
+      "owners": "The company head is required; add founders and shareholders above 10%."
+    }
+  },
+  "owners": {
+    "fullName": "Full name",
+    "idNumber": "ID or registration number",
+    "share": "Share %",
+    "role": "Role",
+    "add": "Add owner",
+    "remove": "Remove owner"
+  },
+  "decision": {
+    "approve": "Approve",
+    "return": "Return for correction",
+    "returnForCorrection": "Return for correction",
+    "reject": "Reject",
+    "qualify": "Qualify",
+    "comment": "Comment",
+    "reason": "Reason",
+    "confirm": "Confirm"
+  },
+  "qualification": {
+    "start": "Start questionnaire",
+    "startNew": "Start a new questionnaire",
+    "attempt": "Attempt {number}",
+    "attempts": "Attempts",
+    "grade": "Grade",
+    "score": "Score",
+    "validUntil": "Valid until",
+    "dRetry": "You may start one new attempt now.",
+    "applyAgainOn": "You can apply again on {date}",
+    "returnedTitle": "Returned for correction",
+    "submittedNote": "Submitted. A Procurement Specialist will confirm your grade.",
+    "empty": "Answer the qualification questionnaire to receive your grade.",
+    "evidence": "Evidence file",
+    "saveDraft": "Save draft",
+    "submit": "Submit",
+    "saved": "Your answers are saved."
+  },
+  "categories": {
+    "intro": "Select the categories you can supply and click Apply. A qualification in a category also covers its child categories.",
+    "apply": "Apply",
+    "applied": "{count, plural, one {# application sent} other {# applications sent}}",
+    "allApplications": "All applications",
+    "licenceFor": "Licence for {name}",
+    "licenceRequired": "Licence proof required",
+    "validUntil": "Valid until {date}",
+    "columns": {
+      "category": "Category",
+      "licence": "Licence or certificate",
+      "status": "Status",
+      "applied": "Applied"
+    }
+  },
+  "profile": {
+    "addBrand": "Add brand",
+    "addCertificate": "Add certificate",
+    "renew": "Upload renewal",
+    "noExpiry": "No expiry",
+    "noOwners": "No owners recorded.",
+    "ownersHint": "Owners are part of the registration and can change only while it is a draft or returned.",
+    "sections": {
+      "company": "Company profile",
+      "brands": "Brands",
+      "certificates": "Certificates",
+      "owners": "Owners"
+    },
+    "fields": {
+      "mainActivity": "Main activity",
+      "mainGoods": "Main goods",
+      "bankGuarantee": "Bank guarantee available",
+      "guaranteeTypes": "Guarantee types",
+      "guaranteeMax": "Maximum amount",
+      "currency": "Currency",
+      "brand": "Brand",
+      "officialDealer": "Official dealer",
+      "dealerLetter": "Dealer letter",
+      "certificateType": "Type",
+      "number": "Number",
+      "issuer": "Issuer",
+      "issuedOn": "Issue date",
+      "expiresOn": "Expiry date",
+      "certificateFile": "Certificate file",
+      "status": "Status",
+      "newExpiry": "New expiry date"
+    },
+    "hints": {
+      "mainGoods": "One per line, up to {max}",
+      "expiresOn": "Leave empty if it does not expire"
+    }
+  },
+  "vendorHome": {
+    "checklist": "Your progress",
+    "noGrade": "No valid grade yet.",
+    "qualifiedCategories": "Qualified categories",
+    "noCategories": "No qualified categories yet.",
+    "certificateExpiring": "Your {type} certificate expires on {date}.",
+    "certificateExpired": "Your {type} certificate expired on {date}.",
+    "openProfile": "Open profile",
+    "steps": {
+      "registration": "Registration",
+      "questionnaire": "Questionnaire",
+      "categories": "Categories"
+    },
+    "stepHints": {
+      "registration": "Company data and documents, approved by procurement",
+      "questionnaire": "Qualification questions and an A–D grade",
+      "categories": "Apply for the categories you supply"
+    }
+  },
+  "vendors": {
+    "tabsLabel": "Vendor lists",
+    "emptyReview": "No registrations are waiting for review.",
+    "emptyAll": "No vendors have registered yet.",
+    "tabs": {
+      "review": "To review",
+      "all": "All vendors"
+    },
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "taxNumber": "Tax number",
+      "submitted": "Submitted",
+      "country": "Country",
+      "status": "Registration",
+      "standing": "Standing",
+      "grade": "Grade"
+    }
+  },
+  "vendorCard": {
+    "sharesOwner": "Shares an owner with",
+    "founded": "Founding date",
+    "foundedValue": "{date} ({years, plural, one {# year} other {# years}} in business)",
+    "holdUntil": "until {date}",
+    "qualifiedCategories": "Qualified categories",
+    "reviewComment": "Review comment",
+    "noCertificates": "No certificates.",
+    "noApplications": "No category applications.",
+    "standingHistory": "Standing",
+    "tabs": {
+      "owners": "Owners",
+      "certificates": "Certificates",
+      "categories": "Categories"
+    }
+  },
+  "questionnaires": {
+    "emptyReview": "No questionnaires are waiting for review.",
+    "emptyAll": "No questionnaires have been submitted yet.",
+    "adjust": "Adjust points",
+    "confirmGrade": "Confirm grade",
+    "confirmTitle": "Confirm grade {grade} (score {score})",
+    "proposedGrade": "Proposed grade",
+    "vendorCard": "Vendor",
+    "tabs": {
+      "review": "To review",
+      "all": "All"
+    },
+    "columns": {
+      "vendor": "Vendor",
+      "attempt": "Attempt",
+      "submitted": "Submitted",
+      "status": "Status",
+      "grade": "Grade",
+      "question": "Question",
+      "answer": "Answer",
+      "weight": "Weight",
+      "points": "Points",
+      "evidence": "Evidence"
+    }
+  },
+  "applications": {
+    "emptyReview": "No category applications are waiting for a decision.",
+    "emptyAll": "No category applications yet.",
+    "licence": "Licence proof",
+    "tabs": {
+      "review": "To decide",
+      "all": "All"
+    },
+    "columns": {
+      "vendor": "Vendor",
+      "category": "Category",
+      "applied": "Applied",
+      "status": "Status"
+    }
+  },
+  "avl": {
+    "pickCategory": "Pick a category to see its approved vendors.",
+    "empty": "No approved vendors in this category match the filters.",
+    "filters": {
+      "category": "Category",
+      "activity": "Activity",
+      "brand": "Brand",
+      "certificate": "Valid certificate",
+      "guarantee": "Bank guarantee available",
+      "any": "Any",
+      "apply": "Show"
+    }
+  },
+  "adminQuestionnaire": {
+    "newQuestion": "New question",
+    "addQuestion": "Add question",
+    "addOption": "Add option",
+    "added": "Question added. It applies to questionnaires started from now on.",
+    "empty": "No questions yet. Add the first question below.",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "fields": {
+      "text": "Question",
+      "section": "Section",
+      "answerType": "Answer type",
+      "weight": "Weight",
+      "evidence": "Evidence file required",
+      "options": "Answer options",
+      "optionLabel": "Answer",
+      "points": "Points"
+    },
+    "types": {
+      "SINGLE_CHOICE": "Single choice",
+      "YES_NO": "Yes / No"
+    },
+    "hints": {
+      "weight": "1 to 5"
+    }
   },
   "users": {
     "add": "Add user",
