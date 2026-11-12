@@ -11,20 +11,21 @@ VMS Core is a generic, 1C-free procurement platform; this backlog covers the MVP
 ### Backlog Hierarchy
 
 ```
-VMS-CORE (Epic) - E2E procurement MVP, 30 stories
+VMS-CORE (Epic) - E2E procurement MVP, 31 stories
 ├── PLT  Platform
 │   ├── PLT-01  Sign in and see only your role's screens
 │   └── PLT-02  Get in-app notifications; keep an audit trail
 ├── MDM  Master data
-│   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes, currencies
+│   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes
 │   └── MDM-02  Admin maintains the category tree and item catalogue
 ├── REG  Vendor onboarding
-│   ├── REG-01  Vendor registers (local, individual, foreign)
+│   ├── REG-01  Vendor creates an account (short form)
 │   ├── REG-02  Specialist approves, returns or rejects registration
 │   ├── REG-03  Vendor applies for categories
 │   ├── REG-04  Specialist qualifies category; vendor joins AVL
 │   ├── REG-05  Vendor fills questionnaire; specialist confirms A–D grade
-│   └── REG-06  Vendor keeps a company profile; buyers see the vendor card
+│   ├── REG-06  Vendor keeps a company profile; buyers see the vendor card
+│   └── REG-07  Vendor completes the registration in steps
 ├── PLN  Planning
 │   └── PLN-01  Admin maintains annual plan lines
 ├── PR   Purchase requisition
@@ -69,7 +70,7 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 **In scope (this release)**
 
 - Platform: e-mail and password sign-in, 5 internal roles plus Vendor, role-based screens, in-app notifications, audit trail of every status change.
-- Vendor onboarding: self-registration for local companies, individuals and foreign companies; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; a company profile with owners, founding date, activity, brands, main goods, bank guarantee and a certificate register with 30-day expiry reminders, shown on one vendor card; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
+- Vendor onboarding: a short account form for local companies, individuals and foreign companies, then the vendor completes the registration in steps in its own cabinet (company details, owners, contact persons with at least one legal representative and a proof file, bank accounts, documents) and submits it; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; a company profile with owners, founding date, activity, brands, main goods, bank guarantee and a certificate register with 30-day expiry reminders, shown on one vendor card; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
 - Planning: annual plan lines; every PR is linked to a plan line and shows the remaining amount.
 - Purchase requisition: lines picked from the item catalogue; single-level approval.
 - Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner.
@@ -168,14 +169,14 @@ TBD
 | Field | Value |
 | --- | --- |
 | **Story ID** | MDM-01 |
-| **Story title** | The Admin keeps the lists of Incoterms, payment terms, delivery places, delivery modes and currencies that every dropdown uses. |
+| **Story title** | The Admin keeps the lists of Incoterms, payment terms, delivery places and delivery modes that every dropdown uses. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
 | **As a...** | Admin |
-| **I want to...** | maintain the dictionaries behind the Incoterm, payment term, delivery place, delivery mode and currency dropdowns |
+| **I want to...** | maintain the dictionaries behind the Incoterm, payment term, delivery place and delivery mode dropdowns |
 | **So that...** | buyers and vendors pick the same standard terms and proposals can be compared term by term |
 
 **Acceptance Criteria** (Given / When / Then)
@@ -183,7 +184,7 @@ TBD
 1. **Given** a new system, **When** it is seeded, **Then** the Incoterms dictionary holds the 11 Incoterms 2020 rules (EXW, FCA, CPT, CIP, DAP, DPU, DDP, FAS, FOB, CFR, CIF) with code and name, all active; codes cannot be edited.
 2. **Given** the Admin on Dictionaries, **When** they add or edit a payment term with name, advance % (0 to 100) and days after delivery (0 or more), **Then** it is saved and appears in payment-term dropdowns; the seed holds "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery" and "60 days after delivery".
 3. **Given** the Admin on Dictionaries, **When** they add a delivery place with name, type (Warehouse, Port or City) and address, **Then** it appears in the delivery-place and named-place dropdowns.
-4. **Given** the Admin on Dictionaries, **When** they add a delivery mode with a name, **Then** it appears in delivery-mode dropdowns; the seed holds "Single delivery", "Partial deliveries allowed" and "Per delivery schedule". **When** they add a currency with ISO code (3 capital letters, cannot be edited later), name and active flag, **Then** it appears in every currency dropdown (vendor bank accounts, bank guarantee capacity) instead of a fixed list; the seed holds AZN, USD, EUR, TRY, RUB, GBP and CNY, all active. PR, proposal and PO amounts stay in AZN (NFR-005).
+4. **Given** the Admin on Dictionaries, **When** they add a delivery mode with a name, **Then** it appears in delivery-mode dropdowns; the seed holds "Single delivery", "Partial deliveries allowed" and "Per delivery schedule". The Currencies dictionary works the same way: its seed holds AZN, USD, EUR, TRY, RUB, GBP and CNY, and every currency dropdown (bank accounts, bank guarantee) uses it. \[revised\]
 5. **Given** an entry in any dictionary, **When** the Admin deactivates it, **Then** it no longer appears in dropdowns for new records, records that already use it keep showing it, and an entry in use cannot be deleted.
 6. **Given** a dictionary, **When** the Admin saves a name that already exists in it, **Then** "This name already exists" appears and nothing is saved.
 
@@ -215,33 +216,31 @@ TBD
 
 ---
 
-### REG-01 - Vendor Registers As A Local Company, Individual Or Foreign Company
+### REG-01 - Vendor Creates An Account
 
 | Field | Value |
 | --- | --- |
 | **Story ID** | REG-01 |
-| **Story title** | A vendor creates an account and submits its registration for review. |
+| **Story title** | A vendor creates an account with a short form and is signed in at once to complete the registration. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
 | **As a...** | Vendor (local company, individual or foreign company) |
-| **I want to...** | register on the portal with the data and documents of my type |
-| **So that...** | I can apply for categories and be invited to procurements |
+| **I want to...** | create an account in about two minutes |
+| **So that...** | I can finish the registration later in my own cabinet, in several sittings |
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** the public Register page, **When** the vendor picks Local company, **Then** the form requires legal name, VÖEN, legal address, director's name, "VAT payer: Yes / No" and a charter or state-registry extract file (#86).
-2. **Given** the vendor picks Individual, **When** the form renders, **Then** it requires full name, ID card number and an ID card file, and shows VÖEN as optional (#86).
-3. **Given** the vendor picks Foreign company, **When** the form renders, **Then** it requires legal name, country, home tax or registration number (3 to 30 characters), legal address and a registration certificate file, and does not ask for a VÖEN (#90).
-4. **Given** any type, **When** the form renders, **Then** it also requires contact person, contact e-mail (used to sign in), phone, password of at least 8 characters, and at least one bank account (bank name, IBAN of up to 34 letters and digits, SWIFT, currency); the vendor can add more accounts and marks exactly one as main. Messages: "Add at least one bank account", "IBAN must be up to 34 letters and digits", "Mark exactly one account as main".
-5. **Given** a phone number that is not "+" followed by 8 to 15 digits, **When** the vendor submits, **Then** "Enter the phone with country code, e.g. +994501234567" appears; any country code is accepted (#90).
-6. **Given** a VÖEN that is not exactly 10 digits, **When** the vendor submits, **Then** "VÖEN must be 10 digits" appears and nothing is saved (#91).
-7. **Given** a VÖEN or foreign tax number already used by another vendor, **When** the vendor submits, **Then** "A vendor with this tax number is already registered" appears and no account is created (#91).
-8. **Given** "VAT payer: Yes", **When** the vendor submits without a VAT certificate file, **Then** "Upload the VAT payer certificate" appears (#91).
-9. **Given** a file that is not PDF, JPG, PNG, DOCX or XLSX, or is larger than 10 MB, **When** it is uploaded, **Then** "Use PDF, JPG, PNG, DOCX or XLSX up to 10 MB" appears and the file is not stored.
-10. **Given** a filled form, **When** the vendor clicks Save, **Then** the account exists with registration status DRAFT and the vendor can sign in and continue; **When** they click Submit, **Then** the status becomes SUBMITTED, the form becomes read-only and every Procurement Specialist is notified.
+1. **Given** the public Register page, **When** it opens, **Then** it asks only for the vendor type (Local company, Individual or Foreign company), legal name (full name for an Individual), contact person, phone, contact e-mail (used to sign in), a password of at least 8 characters and the identifier of the type: VÖEN for a Local company, ID card number for an Individual, and country with the home tax or registration number (3 to 30 characters) for a Foreign company (#86, #90).
+2. **Given** a phone number that is not "+" followed by 8 to 15 digits, **When** the vendor clicks Create account, **Then** "Enter the phone with country code, e.g. +994501234567" appears; any country code is accepted (#90).
+3. **Given** a VÖEN that is not exactly 10 digits, **When** the vendor clicks Create account, **Then** "VÖEN must be 10 digits" appears and nothing is saved (#91).
+4. **Given** a VÖEN, foreign tax number or ID card number already used by another vendor, **When** the vendor clicks Create account, **Then** "A vendor with this tax number is already registered" appears and no account is created (#91).
+5. **Given** an e-mail that already belongs to a user, **When** the vendor clicks Create account, **Then** "This e-mail is already in use" appears and no account is created.
+6. **Given** valid values, **When** the vendor clicks Create account, **Then** the server creates the account as already confirmed (no confirmation e-mail, A-014) with registration status DRAFT, the vendor is signed in at once and lands on its home page, which shows the warning "Complete your profile and submit it for approval" above the registration checklist (REG-07); creating the account needs no approval; no Procurement Specialist is notified yet.
+7. **Given** a vendor who left after creating the account, **When** it signs in again with its e-mail and password, **Then** it lands on the registration checklist with the first incomplete step marked "Continue".
+8. **Given** accounts in DRAFT, **When** a Procurement Specialist opens Vendors and picks "Incomplete registrations", **Then** the list shows name, type, tax number and creation date, read-only, with no approve, return or reject action; a DRAFT account never appears in the review queue of REG-02.
 
 ---
 
@@ -344,7 +343,7 @@ TBD
 5. **Given** a SUBMITTED questionnaire, **When** the specialist clicks Confirm grade, **Then** it becomes GRADED with grade A (85.0 and above), B (70.0 to 84.9), C (50.0 to 69.9) or D (below 50.0), valid until the confirmation date plus 12 months, and the vendor is notified with the grade and score.
 6. **Given** a SUBMITTED questionnaire, **When** the specialist clicks Return for correction with a comment, **Then** it becomes RETURNED and the vendor can edit and resubmit it.
 7. **Given** a vendor whose first attempt is graded D, **When** they open Qualification, **Then** they may start one new attempt at once; **Given** the second consecutive attempt is also graded D, **Then** the vendor's standing becomes HOLD until 6 months after that confirmation date, it drops out of every AVL, and the page shows "You can apply again on \<date>". \[revised\]
-8. **Given** a grade A, B or C, **When** its valid-until date passes, **Then** the questionnaire becomes EXPIRED, the vendor leaves the AVL in every category, and a new questionnaire is needed (#55); the vendor may also start a new questionnaire in the last 30 days before the valid-until date, and the new grade replaces the old one when it is confirmed.
+8. **Given** a grade A, B or C, **When** its valid-until date passes, **Then** the questionnaire becomes EXPIRED, the vendor leaves the AVL in every category, and a new questionnaire is needed (#55); a new questionnaire can be started only when there is no valid A, B or C grade, or in the last 30 days before that grade expires, and the new grade replaces the old one once confirmed. \[revised\]
 9. **Given** a vendor, **When** they use the portal, **Then** they never see another vendor's grade or score.
 
 ---
@@ -366,16 +365,47 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a local or foreign company registering (REG-01), **When** it fills the form, **Then** it must also give the founding date and at least one owner record for the company head, and may add founders and shareholders above 10% (full name, ID or registration number, share %, role Founder, Shareholder or Head); individuals skip this section (#54).
+1. **Given** a local or foreign company completing its registration (REG-07), **When** it fills the form, **Then** it must also give the founding date and at least one owner record for the company head, and may add founders and shareholders above 10% (full name, ID or registration number, share %, role Founder, Shareholder or Head); individuals skip this section (#54).
 2. **Given** owner records, **When** their shares add up to more than 100%, **Then** "Shares cannot exceed 100% in total" appears and nothing is saved.
-3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); it can also add, edit or remove bank accounts, keeping at least one and exactly one main (same rules and messages as REG-01 AC4).
+3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); it can also add, edit or remove bank accounts, keeping at least one and exactly one marked as main, and it can manage its contact persons, keeping at least one legal representative with a proof file. \[revised\]
 4. **Given** the Certificates section, **When** the vendor adds a certificate with type (ISO 9001, ISO 14001, ISO 45001, HSE policy, Product certificate, Licence, Reference letter, Catalogue, Other), number, issuer, issue date, an optional expiry date and a file, **Then** it shows with the status VALID, EXPIRING or EXPIRED from the Calculation Rules (#106).
-5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); from the day after the expiry date it is EXPIRED and both are notified again.
+5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); on the day after the expiry date it becomes EXPIRED and both are notified again. \[revised\]
 6. **Given** the vendor's home page, **When** it loads, **Then** it shows the grade with its valid-until date, the qualified categories, and a warning for every EXPIRING or EXPIRED certificate.
-7. **Given** a Procurement Specialist, Committee Member or Admin, **When** they open a vendor card from the AVL, a registration or a comparison table, **Then** it shows name, type, country, founding date and years in business, standing, grade with valid-until date, qualified categories, activity, brands, main goods, bank guarantee, all bank accounts with the main one marked, certificates with status badges, owners and History.
+7. **Given** a Procurement Specialist, Committee Member or Admin, **When** they open a vendor card from the AVL, a registration or a comparison table, **Then** it shows name, type, country, founding date and years in business, standing, grade with valid-until date, qualified categories, activity, brands, main goods, bank guarantee, bank accounts with the main one marked, contact persons with the legal representative and the proof file marked, certificates with status badges, owners and History. \[revised\]
 8. **Given** two vendors with an owner of the same ID or registration number, **When** either card, or a comparison table with both, is opened, **Then** the flag "Shares an owner with \<vendor>" is shown (#54).
 9. **Given** the AVL page, **When** the specialist filters, **Then** the filters include activity, brand, "Bank guarantee available" and "Valid certificate of type X" (#97, #100).
 10. **Given** a vendor, **When** it uses the portal, **Then** it never sees another vendor's profile, owners or certificates.
+
+---
+
+### REG-07 - Vendor Completes The Registration In Steps
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | REG-07 |
+| **Story title** | After creating the account, the vendor fills in the rest of the registration in its own cabinet, step by step, and submits it for review. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Vendor with a DRAFT or RETURNED registration |
+| **I want to...** | complete the registration in short steps, saving as I go and coming back later |
+| **So that...** | the work is not tiring and I submit only when everything is ready (#54, #86, #90, #91) |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a vendor with registration DRAFT or RETURNED, **When** it opens its home page, **Then** a warning "Complete your profile and submit it for approval" shows above a checklist with Account (complete), Company details, Owners, Contact persons, Bank accounts, Documents and Review and submit, each marked Not started, In progress or Complete, with a progress bar and a "Continue" button on the first incomplete step; Qualification and Categories are listed below it as locked until the registration is approved.
+2. **Given** the Company details step, **When** it opens, **Then** a Local company gives legal address, director's name, founding date and "VAT payer: Yes / No"; a Foreign company gives legal address and founding date (director optional); an Individual gives only an optional VÖEN, which must be 10 digits when given and not used by another vendor (#91).
+3. **Given** the Owners step, **When** a company opens it, **Then** it follows REG-06 AC1 and AC2: at least the head, optionally founders and shareholders above 10%, shares not above 100% in total; for an Individual the step is marked "Not needed" and counts as complete (#54).
+4. **Given** the Contact persons step, **When** a company opens it, **Then** the person from the account form is already listed as the first contact person and the vendor can add more (full name, position, phone, e-mail); each contact person has a checkbox "Legal representative", and ticking it requires a proof-of-authority file (power of attorney, charter extract or decision): "Upload the proof of authority"; the step is complete only when at least one contact person is a legal representative with a proof file, otherwise "Mark at least one contact person as a legal representative" appears. For an Individual the main contact is enough and no legal representative is required.
+5. **Given** the Bank accounts step, **When** the vendor adds accounts, **Then** it needs at least one account (bank name, IBAN or account number up to 34 letters and digits, SWIFT, currency from the Currencies dictionary) and exactly one marked as main; otherwise "Add at least one bank account", "Mark exactly one account as main" or "IBAN must be up to 34 letters and digits" appears.
+6. **Given** the Documents step, **When** it opens, **Then** a Local company must upload the charter or state-registry extract, and the VAT payer certificate when VAT payer is Yes ("Upload the VAT payer certificate"); an Individual must upload the ID card file; a Foreign company must upload the registration certificate (#86, #90, #91).
+7. **Given** any file, **When** it is not PDF, JPG, PNG, DOCX or XLSX, or is larger than 10 MB, **Then** "Use PDF, JPG, PNG, DOCX or XLSX up to 10 MB" appears and the file is not stored; several files can be chosen at once and go straight to storage.
+8. **Given** a vendor on any step, **When** it clicks Save and continue, **Then** everything entered is saved even if some fields are empty, the messages of that step's fields are shown, and the next step opens; the step is marked Complete only when all its required fields are valid. Clicking Back loses nothing.
+9. **Given** the Review and submit step, **When** any step is not complete, **Then** Submit is disabled and the incomplete steps are listed with links; **When** all steps are complete and the vendor clicks Submit, **Then** the status becomes SUBMITTED, every step becomes read-only, every Procurement Specialist is notified, and Qualification and Categories stay locked until the registration is approved.
+10. **Given** a RETURNED registration, **When** the vendor opens its home page, **Then** the specialist's comment shows on top, all steps are editable again and Submit works as in criterion 9 (REG-02 AC4).
+11. **Given** a SUBMITTED registration, **When** the vendor opens a step, **Then** it is read-only until the specialist returns the registration.
 
 ---
 
@@ -397,7 +427,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** the Admin on Plan, **When** they add a line with year, category, description, planned amount in AZN greater than 0 and planned quarter (Q1 to Q4), **Then** the line is saved as ACTIVE.
-2. **Given** an ACTIVE line, **When** the Admin closes it, **Then** it becomes CLOSED and can no longer be picked on a new PR; PRs already linked keep the link, and a RETURNED PR stays on its line even if the line was closed meanwhile. The Admin may edit an ACTIVE line, but its category is fixed once a PR is linked to it. Plan lines are never deleted, only closed.
+2. **Given** an ACTIVE line, **When** the Admin closes it, **Then** it becomes CLOSED and can no longer be picked on a new PR; PRs already linked keep the link, and a line's category cannot change once a PR uses it. \[revised\]
 3. **Given** the Plan page, **When** any internal user opens it, **Then** each line shows planned amount, committed amount and remaining amount, where committed is the sum of estimated values of linked PRs in PENDING\_APPROVAL, APPROVED, IN\_SOURCING or COMPLETED, and remaining is planned minus committed.
 4. **Given** a PR whose estimated value is larger than the remaining amount of its plan line, **When** the Requester submits it, **Then** "This PR exceeds the remaining plan amount by X AZN" appears and the Requester may still submit; the warning is shown to the Approver too.
 5. **Given** a Requester, Approver or Procurement Specialist, **When** they open Plan, **Then** they can read it but see no add, edit or close actions.
@@ -425,8 +455,8 @@ TBD
 2. **Given** a PR line, **When** the Requester picks a catalogue item, **Then** item code, name, category and unit fill in from the catalogue and cannot be edited, and the Requester enters quantity (greater than 0), estimated unit price in AZN excluding VAT (greater than 0, 2 decimals), required delivery date, a delivery place picked from the Delivery places dictionary and an optional specification text of up to 2,000 characters. \[revised\]
 3. **Given** a required delivery date earlier than tomorrow, **When** the Requester saves, **Then** "Delivery date must be in the future" appears on that line.
 4. **Given** lines with quantity and price, **When** any of them changes, **Then** the estimated value (sum of quantity × estimated unit price) updates on screen, formatted like 60,000.00 AZN.
-5. **Given** a PR, **When** the Requester clicks Save, **Then** it is stored as DRAFT with a number PR-YYYY-NNNN; a draft may be incomplete or have no lines yet, but every line that exists must pass the rules above; **When** they click Submit, **Then** it becomes PENDING\_APPROVAL, read-only for the Requester, and every Approver except the Requester is notified.
-6. **Given** a PR with no lines, **When** the Requester clicks Submit, **Then** "Add at least one line" appears; this check runs on Submit only. PRs are never deleted.
+5. **Given** a PR whose existing lines are all valid (a draft may have no lines yet), **When** the Requester clicks Save, **Then** it is stored as DRAFT with a number PR-YYYY-NNNN; **When** they click Submit, **Then** it becomes PENDING\_APPROVAL, read-only for the Requester, and every Approver except the Requester is notified. \[revised\]
+6. **Given** a PR with no lines, **When** the Requester clicks Submit, **Then** "Add at least one line" appears.
 7. **Given** a RETURNED PR, **When** the Requester edits and submits it, **Then** it becomes PENDING\_APPROVAL again and the Approver's comment stays in History.
 
 ---
@@ -476,8 +506,8 @@ TBD
 1. **Given** an APPROVED PR, **When** the specialist clicks Start sourcing, **Then** a sourcing SRC-YYYY-NNNN is created in DRAFT with the PR lines copied, the specialist recorded as its owner, and the PR becomes IN\_SOURCING.
 2. **Given** a new sourcing, **When** it is created, **Then** with the method Competitive bidding (the default; Single Source Purchase is RFQ-06) its type is TENDER if the PR's estimated value is at or above the threshold (Admin setting, default 50,000.00 AZN) and RFQ otherwise, and the screen shows the reason, e.g. "Value 60,000.00 AZN ≥ threshold 50,000.00 AZN: Tender". \[revised\]
 3. **Given** the sourcing type, **When** it is set, **Then** the minimum number of proposals is 3 for a Tender (#26) and, for an RFQ, comes from the Admin value bands: 1 up to 5,000 AZN, 2 above 5,000 up to 15,000 AZN, 3 above 15,000 AZN (#15).
-4. **Given** a DRAFT sourcing, **When** the specialist edits it, **Then** they must set a proposal deadline (date and time, Asia/Baku; prefilled at creation from the Admin defaults of 3 days for an RFQ or SSP and 14 days for a Tender; if the specialist did not change the prefilled value it is recalculated at Publish from the publish time, and a deadline the specialist set by hand must be later than now, otherwise "Set a deadline later than now" appears), and pick from dropdowns the required Incoterm (default DDP), the named place (default: the PR's delivery place), the delivery mode and the payment term (MDM-01); a Tender also has "Technical document required: Yes / No", default Yes. \[revised\]
-5. **Given** a DRAFT sourcing, **When** it opens, **Then** the invitation list holds every vendor with standing ACTIVE, a valid grade A, B or C and a QUALIFIED, unexpired application in the PR's category or one of its parent categories; the specialist may remove vendors, and a warning shows when fewer vendors remain than the minimum number of proposals; Publish with no vendor left shows "Invite at least one vendor". \[revised\]
+4. **Given** a DRAFT sourcing, **When** the specialist edits it, **Then** they must set a proposal deadline (date and time, Asia/Baku, later than now; prefilled from the Admin defaults of 3 days for an RFQ or SSP and 14 days for a Tender), and pick from dropdowns the required Incoterm (default DDP), the named place (default: the PR's delivery place), the delivery mode and the payment term (MDM-01); a Tender also has "Technical document required: Yes / No", default Yes; a past deadline shows "Set a deadline later than now". \[revised\]
+5. **Given** a DRAFT sourcing, **When** it opens, **Then** the invitation list holds every vendor with standing ACTIVE, a valid grade A, B or C and a QUALIFIED, unexpired application in the PR's category or one of its parent categories; the specialist may remove vendors, and a warning shows when fewer vendors remain than the minimum number of proposals; with none left, Publish shows "Invite at least one vendor". \[revised\]
 6. **Given** a category with no qualified vendors, **When** the specialist clicks Publish, **Then** "No qualified vendors in this category" appears and the sourcing stays DRAFT.
 7. **Given** a complete DRAFT, **When** the specialist clicks Publish, **Then** the sourcing becomes OPEN, each listed vendor gets an invitation in INVITED and an in-app notification with the deadline.
 
@@ -502,9 +532,9 @@ TBD
 
 1. **Given** an invitation in INVITED, **When** the vendor opens it, **Then** they see sourcing number, type, lines (item, quantity, unit, delivery date, delivery place, specification), the required Incoterm, named place, delivery mode and payment term, deadline and time remaining. \[revised\]
 2. **Given** an INVITED invitation, **When** the vendor clicks Decline, **Then** a reason is required; on confirm the invitation becomes DECLINED, the specialist sees the reason and the vendor can no longer submit (#110).
-3. **Given** an INVITED invitation, **When** the vendor clicks Accept, **Then** it becomes ACCEPTED and the vendor can fill one proposal: unit price in AZN per line (greater than 0, 2 decimals, otherwise "Enter a price greater than 0 with up to 2 decimals"; a line may be left without an offer), Incoterm, named place, delivery mode and payment term (each preset to the required value and changeable from the same dropdowns), "Prices include VAT: Yes / No" with the VAT rate in % (required when Yes, otherwise "Enter the VAT rate when prices include VAT"), delivery lead time in days, validity in days and a comment. \[revised\]
+3. **Given** an INVITED invitation, **When** the vendor clicks Accept, **Then** it becomes ACCEPTED and the vendor can fill one proposal: unit price in AZN per line (greater than 0, 2 decimals; a line may be left without an offer), Incoterm, named place, delivery mode and payment term (each preset to the required value and changeable from the same dropdowns), "Prices include VAT: Yes / No" with the VAT rate in % (required when Yes), delivery lead time in days, validity in days and a comment; the form shows "Enter a price for at least one line", "Enter a price greater than 0 with up to 2 decimals" or "Enter the VAT rate when prices include VAT" when needed. \[revised\]
 4. **Given** a Tender with "Technical document required: Yes", **When** the vendor submits without a technical document file, **Then** "Attach the technical document" appears.
-5. **Given** a proposal with at least one priced line, **When** the vendor clicks Submit before the deadline, **Then** it becomes SUBMITTED and its total (sum of quantity × unit price over priced lines) is shown to the vendor; with no priced line "Enter a price for at least one line" appears.
+5. **Given** a proposal with at least one priced line, **When** the vendor clicks Submit before the deadline, **Then** it becomes SUBMITTED and its total (sum of quantity × unit price over priced lines) is shown to the vendor.
 6. **Given** a SUBMITTED proposal before the deadline, **When** the vendor edits and resubmits or clicks Withdraw, **Then** the latest version is kept, or the proposal becomes WITHDRAWN and can be submitted again before the deadline.
 7. **Given** the deadline has passed, **When** the vendor tries to submit, edit or withdraw, **Then** "The deadline has passed" appears and nothing changes.
 8. **Given** an OPEN sourcing, **When** any internal user opens it, **Then** they see only the number of submitted proposals, with no vendor names, prices or files (#31).
@@ -560,7 +590,7 @@ TBD
 3. **Given** a CLOSED sourcing below the minimum, **When** the owner opens it, **Then** it shows "Below minimum: N of M proposals" with three actions: Extend, Continue, Cancel.
 4. **Given** Extend, **When** the owner sets a new deadline later than now and a reason, **Then** the sourcing returns to OPEN, invited vendors that have not declined are notified of the new deadline, and the extension count rises by 1; after 2 extensions (Admin setting) Extend is disabled with "Maximum number of extensions reached".
 5. **Given** Continue, **When** the owner enters a reason, **Then** the sourcing moves on as in criterion 2 and the reason is stored for the committee package (#26); with 0 proposals Continue is not offered.
-6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision of that sourcing closes as NO\_DECISION with the rule "Sourcing cancelled" and minutes that record the reason (CMT-02, CMT-03). \[revised\]
+6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision closes as NO\_DECISION with the rule "Sourcing cancelled", and its minutes record the cancellation reason. \[revised\]
 
 ---
 
@@ -608,8 +638,8 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** an APPROVED PR, **When** the specialist clicks Start sourcing and picks the method Single Source Purchase, **Then** they must pick exactly one vendor from the AVL of the PR's category (standing ACTIVE, valid grade A, B or C and a QUALIFIED, unexpired application in the category or a parent category), and the sourcing type is SSP whatever the value; with no vendor "Pick one vendor for a single source purchase" appears, and a vendor outside the AVL is refused with "This vendor is not qualified in this category".
-2. **Given** an SSP whose PR value is above the single-source limit (Admin setting, default 1,000.00 AZN), **When** the specialist clicks Publish without a justification text and at least one justification file, **Then** "A single source purchase above 1,000.00 AZN needs a justification and a file" (the limit comes from the setting) appears and the sourcing stays DRAFT (#16).
+1. **Given** an APPROVED PR, **When** the specialist clicks Start sourcing and picks the method Single Source Purchase, **Then** they must pick exactly one vendor from the AVL of the PR's category (standing ACTIVE, valid grade A, B or C and a QUALIFIED, unexpired application in the category or a parent category), and the sourcing type is SSP whatever the value; otherwise "Pick one vendor for a single source purchase" or "This vendor is not qualified in this category" appears.
+2. **Given** an SSP whose PR value is above the single-source limit (Admin setting, default 1,000.00 AZN), **When** the specialist clicks Publish without a justification text and at least one justification file, **Then** "A single source purchase above 1,000.00 AZN needs a justification and a file" appears and the sourcing stays DRAFT (#16).
 3. **Given** an SSP whose value is at or below the limit, **When** the specialist publishes, **Then** the justification is optional.
 4. **Given** a published SSP, **When** it becomes OPEN, **Then** only the chosen vendor gets an invitation and a notification, the minimum number of proposals is 1, and Q&A works as in RFQ-03.
 5. **Given** an OPEN SSP, **When** the deadline passes with the proposal submitted, **Then** it moves straight to COMPARISON with no technical stage; with no proposal, only Extend or Cancel are offered (RFQ-04).
@@ -716,8 +746,8 @@ TBD
 4. **Given** a VOTING decision, **When** a member votes Against, **Then** a comment is required; a vote For needs none; a submitted vote cannot be changed.
 5. **Given** a VOTING decision, **When** a member clicks Declare conflict of interest and enters a comment, **Then** they cannot vote on it and are removed from its eligible voters.
 6. **Given** a VOTING decision, **When** a member looks at it, **Then** they see who has voted but not how, until the decision closes.
-7. **Given** every eligible voter has voted or the voting period has ended, **When** the decision closes, **Then** with votes cast not more than half of eligible voters it becomes NO\_DECISION ("No quorum"); otherwise more For than Against makes it APPROVED, more Against than For makes it REJECTED, and a tie follows the Chair's vote, or becomes NO\_DECISION ("Tie without the Chair's vote") if the Chair has not voted; with no eligible voter left it becomes NO\_DECISION ("No quorum"). A VOTING OPENING decision of a sourcing that is cancelled closes at once as NO\_DECISION with the rule "Sourcing cancelled" and the cancellation reason. \[revised\]
-8. **Given** a NO\_DECISION decision, or a REJECTED OPENING decision, **When** the sourcing owner clicks Reopen vote, **Then** a new VOTING decision with the same package and a new voting period opens; after a REJECTED OPENING decision the owner must enter a reason, and the new decision shows that reason to the members. WINNER and PO decisions reopen only after NO\_DECISION, and a decision closed by a cancelled sourcing cannot be reopened. \[revised\]
+7. **Given** every eligible voter has voted or the voting period has ended, **When** the decision closes, **Then** with votes cast not more than half of eligible voters it becomes NO\_DECISION ("No quorum"), which also covers a decision left with no eligible voters; otherwise more For than Against makes it APPROVED, more Against than For makes it REJECTED, and a tie follows the Chair's vote, or becomes NO\_DECISION ("Tie without the Chair's vote") if the Chair has not voted.
+8. **Given** a NO\_DECISION decision, **When** the sourcing owner clicks Reopen vote, **Then** a new VOTING decision with the same package and a new voting period opens; for an OPENING decision, Reopen vote is also allowed after REJECTED, with a reason that the new decision shows to the members. \[revised\]
 9. **Given** a WINNER decision becomes APPROVED, **When** it closes, **Then** the sourcing becomes WINNER\_APPROVED and POs are created (PO-01); if it becomes REJECTED, the sourcing returns to COMPARISON with the members' comments and the rejected winners excluded.
 10. **Given** a PO decision becomes APPROVED, **When** it closes, **Then** the PO becomes FULLY\_APPROVED and is sent to the vendor; if it becomes REJECTED, the PO becomes REJECTED and its lines return to the sourcing's COMPARISON.
 
@@ -741,7 +771,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** a decision becomes APPROVED, REJECTED or NO\_DECISION, **When** it closes, **Then** minutes are created with a number MIN-YYYY-NNN, sequential within the calendar year and never reused.
-2. **Given** minutes, **When** they are opened, **Then** they show the number, decision type, sourcing and PO numbers, opening and closing time, eligible voters, each member's vote (For, Against, Conflict of interest, Did not vote) with comments, the result and the rule applied (majority, Chair's casting vote, no quorum, tie without the Chair's vote, sourcing cancelled with the cancellation reason). \[revised\]
+2. **Given** minutes, **When** they are opened, **Then** they show the number, decision type, sourcing and PO numbers, opening and closing time, eligible voters, each member's vote (For, Against, Conflict of interest, Did not vote) with comments, the result and the rule applied (majority, Chair's casting vote, no quorum, tie without the Chair's vote, sourcing cancelled). \[revised\]
 3. **Given** minutes on screen, **When** the user clicks Download, **Then** a PDF in English with the same content is downloaded.
 4. **Given** minutes, **When** anyone tries to edit or delete them, **Then** the action is refused.
 5. **Given** a Vendor, **When** they use the portal, **Then** minutes are never visible to them.
@@ -768,7 +798,7 @@ TBD
 1. **Given** a Tender that closes with the minimum met, or after Continue, **When** it closes, **Then** it becomes AWAITING\_OPENING and an OPENING decision opens for the committee under the CMT-02 rules (quorum, majority, the Chair on a tie), showing the number of proposals and the bidders' names but no prices.
 2. **Given** the OPENING decision is APPROVED, **When** it closes, **Then** the Tender moves to TECHNICAL\_EVALUATION and the owner and the committee see vendor names and technical documents, still without prices.
 3. **Given** every proposal is marked PASSED or DISQUALIFIED, **When** the technical evaluation ends, **Then** the prices of PASSED proposals become visible (second envelope) and the Tender moves to COMPARISON; prices of disqualified proposals are never shown.
-4. **Given** the OPENING decision is REJECTED or NO\_DECISION, **When** it closes, **Then** the Tender stays AWAITING\_OPENING and the owner can reopen the vote (after REJECTED with a reason that the members see) or cancel the Tender with a reason. \[revised\]
+4. **Given** the OPENING decision is REJECTED or NO\_DECISION, **When** it closes, **Then** the Tender stays AWAITING\_OPENING and the owner can reopen the vote or cancel the Tender with a reason; reopening after REJECTED also needs a reason. \[revised\]
 5. **Given** an RFQ or an SSP, **When** it closes, **Then** there is no opening decision: it moves to COMPARISON and its prices open at once.
 6. **Given** an OPENING decision closes, **When** it closes, **Then** numbered minutes are created as in CMT-03.
 
@@ -929,7 +959,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Submit a final offer | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (if chosen) |
 | Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | View a vendor card, including owners | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
-| View a sourcing record, read-only | ❌ | ❌ | ✅ | ✅ | ✅ | Only its own invitation |
+| View a sourcing record, read-only (sealed data stays sealed until its opening rule) | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ (own invitation only) |
 
 Owner means the Procurement Specialist who started the sourcing; other specialists can read it. Demo tools (DEMO-01) are open to everyone, and only while demo mode is on.
 
@@ -984,7 +1014,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 
 | From | To | Trigger | Allowed roles | Notes |
 | --- | --- | --- | --- | --- |
-| (none) | DRAFT | Save | Vendor | Account created |
+| (none) | DRAFT | Save | Vendor | Create account (REG-01); the server creates it as confirmed and signs the vendor in; steps in REG-07 keep it DRAFT |
 | DRAFT, RETURNED | SUBMITTED | Submit | Vendor | All required fields and files |
 | SUBMITTED | APPROVED | Approve | Procurement Specialist |  |
 | SUBMITTED | RETURNED | Return for correction | Procurement Specialist | Comment required |
@@ -1043,8 +1073,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | (none) | VOTING | Tender closed (opening), Send to committee, PO approved by the Approver, or Reopen vote | Owner or System | Type OPENING, WINNER or PO |
 | VOTING | APPROVED | All voted or period ended; quorum; more For, or tie with the Chair For | System | Minutes created |
 | VOTING | REJECTED | All voted or period ended; quorum; more Against, or tie with the Chair Against | System | Minutes created |
-| VOTING | NO\_DECISION | No quorum, or tie without the Chair's vote, or the sourcing was cancelled (OPENING only; rule "Sourcing cancelled") | System | Minutes created; owner may reopen, except after a cancellation |
-| REJECTED, NO\_DECISION | (new VOTING decision) | Reopen vote | Owner | REJECTED only for OPENING and with a reason shown to the members; WINNER and PO reopen only after NO\_DECISION |
+| VOTING | NO\_DECISION | No quorum, tie without the Chair's vote, or the sourcing is cancelled | System | Minutes created; owner may reopen |
 
 **Purchase order (PO)**
 
@@ -1161,7 +1190,7 @@ Every number the system computes follows one of these rules; the examples are th
 | Single-source justification | SSP with PR value above the single-source limit (default 1,000.00 AZN) needs a justification text and at least one file; at or below the limit it is optional | SSP 800.00 → optional; SSP 1,000.00 → optional; SSP 4,000.00 → required |
 | Evaluated unit price | Unit price excluding VAT + sum of the extra costs per unit added by the specialist (RFQ-07); the default winner and the comparison use it, the PO does not | Beta Trade 29.50 + delivery 1.00 = 30.50 |
 | Final offer | New unit price ≤ previous price per line; no response keeps the previous price; one round per sourcing (setting) | Alpha Agro 28.00 → 27.50 allowed; 28.00 → 28.50 refused |
-| Default deadlines | Prefilled at creation and recalculated at Publish as publish time + 3 days (RFQ, SSP) or + 14 days (Tender) unless the specialist changed it; final offer + 2 days; all Admin settings, the specialist may change them | Tender published Mon 16 Nov 2026 10:00 → deadline Mon 30 Nov 2026 10:00 |
+| Default deadlines | Publish time + 3 days (RFQ, SSP) or + 14 days (Tender); final offer + 2 days; all Admin settings, the specialist may change them; a prefilled deadline the specialist did not change is recalculated from the publish time | Tender published Mon 16 Nov 2026 10:00 → deadline Mon 30 Nov 2026 10:00 |
 | Deadline reminder | Sent once, 24 hours before the deadline, to invited vendors that have neither declined nor submitted | Deadline Mon 30 Nov 2026 10:00 → reminder Sun 29 Nov 2026 10:00 |
 | Certificate status | VALID when there is no expiry date or it is more than 30 days away; EXPIRING within 30 days; EXPIRED from the day after the expiry date | Today 10 Nov 2026: expiry 30 Nov 2026 → EXPIRING; 15 Jan 2027 → VALID; 09 Nov 2026 → EXPIRED |
 | Years in business | Full years between the founding date and today | Founded 15 Mar 2012, today 10 Nov 2026 → 14 years |
@@ -1188,13 +1217,13 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 **Master data and settings**
 
 - Buying company: Demo Agro LLC. Dictionaries: the 11 Incoterms 2020; payment terms "100% prepayment", "50% advance, 50% after delivery", "30 days after delivery", "60 days after delivery"; delivery places "Central warehouse" and "North warehouse" (Warehouse) and "Baku port" (Port); delivery modes "Single delivery", "Partial deliveries allowed", "Per delivery schedule"; currencies AZN, USD, EUR, TRY, RUB, GBP, CNY.
-- Catalogue: 25 items in 5 categories (Fertilisers, Seeds, Plant protection, Spare parts, Office supplies) plus 3 items under Irrigation systems; Fertilisers is marked "Licence proof required"; demo item "Ammonium nitrate 34.4%, 50 kg bag", unit bag, under Mineral fertilisers, and "Foliar fertiliser, 1 L", unit litre, under Foliar fertilisers, so the Fertilisers plan line accepts both through the category tree.
+- Catalogue: 28 items in a category tree: Agricultural inputs (Fertilisers with the children Mineral fertilisers and Foliar fertilisers, Seeds, Plant protection, Irrigation systems) and Operations (Spare parts, Office supplies); Fertilisers is marked "Licence proof required"; demo items "Ammonium nitrate 34.4%, 50 kg bag" (Mineral fertilisers, unit bag) and "Foliar fertiliser, 1 L" (Foliar fertilisers, unit litre).
 - Plan line: 2026, Fertilisers, "Spring fertiliser programme", 500,000.00 AZN, Q1, ACTIVE.
 - Settings: threshold 50,000.00 AZN; single-source limit 1,000.00 AZN; default deadlines 3 days (RFQ, SSP) and 14 days (Tender); one final-offer round with a 2-day default deadline; RFQ bands 1 / 2 / 3; at most 2 extensions; grade and category qualification valid 12 months; grade bands A 85+, B 70+, C 50+, D below 50; a 6-month wait after a second D; a 10-question qualification questionnaire with points and weights; voting period 3 business days.
 
 **Scenario values (Fill sample)**
 
-1. Alpha Agro LLC registers as a local company, VAT payer, founded 15 Mar 2012, owned by Kamran Aliyev (head, 60%) and Sabina Huseynova (40%), with sample charter and VAT certificate PDFs; the specialist approves. Alpha Agro then fills the qualification questionnaire, scores 78.0, and the specialist confirms grade B. Its profile lists the activity Distributor, the fictional brands AgroMax and NitroGrow, and an ISO 9001 certificate that expires in 20 days, so the EXPIRING badge and the reminder show at once.
+1. Alpha Agro LLC creates an account on the Register page (about 8 fields, 2 minutes), then completes the five registration steps (company details, owners, contact persons, bank accounts, documents) in its own cabinet with Fill sample, with Kamran Aliyev as the legal representative (sample power of attorney PDF) and one AZN main bank account, as a local company, VAT payer, founded 15 Mar 2012, owned by Kamran Aliyev (head, 60%) and Sabina Huseynova (40%), with sample charter and VAT certificate PDFs; the specialist approves. Alpha Agro then fills the qualification questionnaire, scores 78.0, and the specialist confirms grade B. Its profile lists the activity Distributor, the fictional brands AgroMax and NitroGrow, and an ISO 9001 certificate that expires in 20 days, so the EXPIRING badge and the reminder show at once.
 2. Alpha Agro applies for Fertilisers with a sample licence PDF; the specialist qualifies it.
 3. Leyla creates a PR on the plan line: 2,000 bags × 30.00 AZN, delivery in 30 days to "Central warehouse"; value 60,000.00 AZN. Rashad approves.
 4. Nigar starts sourcing: Tender (60,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
@@ -1217,7 +1246,7 @@ TBD
 
 ## ERD
 
-Forty-three tables cover the release; every top-level table carries `company_id` so more buying companies can be added later, except the two global ISO dictionaries `incoterm` and `currency`. Paste the block into dbdiagram.io.
+Forty-four tables cover the release; every top-level table carries `company_id` so more buying companies can be added later. Paste the block into dbdiagram.io.
 
 ```dbml
 // VMS Core MVP - paste into https://dbdiagram.io
@@ -1258,6 +1287,12 @@ Table incoterm {
   is_active boolean [default: true]
 }
 
+Table currency {
+  code varchar(3) [primary key, note: 'ISO 4217']
+  name varchar [not null]
+  is_active boolean [default: true]
+}
+
 Table payment_term {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
@@ -1283,12 +1318,6 @@ Table delivery_mode {
   is_active boolean [default: true]
 }
 
-Table currency {
-  code varchar(3) [primary key, note: 'ISO 4217, cannot be edited; seed AZN USD EUR TRY RUB GBP CNY']
-  name varchar [unique, not null]
-  is_active boolean [default: true]
-}
-
 Table vendor {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
@@ -1304,6 +1333,9 @@ Table vendor {
   contact_person varchar [not null]
   contact_email varchar [not null]
   phone varchar [not null]
+  // bank accounts: see vendor_bank_account
+  
+  
   status varchar [not null, note: 'registration: DRAFT | SUBMITTED | RETURNED | APPROVED | REJECTED']
   standing varchar [note: 'ACTIVE | HOLD | BLACKLISTED; set once APPROVED']
   standing_until date [note: 'end of a HOLD']
@@ -1320,16 +1352,6 @@ Table vendor {
   created_at timestamp
 }
 
-Table vendor_bank_account {
-  id uuid [primary key]
-  vendor_id uuid [ref: > vendor.id, not null]
-  bank_name varchar [not null]
-  iban varchar(34) [not null, note: 'up to 34 letters and digits, stored without spaces']
-  swift varchar [not null]
-  currency varchar(3) [ref: > currency.code, not null]
-  is_main boolean [not null, note: 'exactly one main account per vendor; at least one account']
-}
-
 Table vendor_owner {
   id uuid [primary key]
   vendor_id uuid [ref: > vendor.id, not null]
@@ -1337,6 +1359,29 @@ Table vendor_owner {
   id_number varchar [not null, note: 'person ID or company registration number; used for the shared-owner flag']
   share_percent decimal(5,2)
   role varchar [not null, note: 'FOUNDER | SHAREHOLDER | HEAD']
+}
+
+Table vendor_contact {
+  id uuid [primary key]
+  vendor_id uuid [ref: > vendor.id, not null]
+  full_name varchar [not null]
+  position varchar
+  phone varchar [not null]
+  email varchar [not null]
+  is_primary boolean [default: false, note: 'the person from the account form']
+  is_legal_representative boolean [default: false, note: 'needs a proof_of_authority file; at least one per company']
+  created_at timestamp
+}
+
+Table vendor_bank_account {
+  id uuid [primary key]
+  vendor_id uuid [ref: > vendor.id, not null]
+  bank_name varchar [not null]
+  iban varchar(34) [not null, note: 'IBAN or account number']
+  swift varchar(11) [not null]
+  currency varchar(3) [ref: > currency.code, not null]
+  is_main boolean [not null, default: false, note: 'exactly one main account per vendor']
+  created_at timestamp
 }
 
 Table vendor_brand {
@@ -1361,9 +1406,9 @@ Table vendor_certificate {
 Table file {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
-  owner_type varchar [not null, note: 'vendor | vendor_brand | vendor_certificate | questionnaire_answer | category_application | requisition | sourcing | proposal | question | minutes | purchase_order']
+  owner_type varchar [not null, note: 'vendor | vendor_contact | vendor_brand | vendor_certificate | questionnaire_answer | category_application | requisition | sourcing | proposal | question | minutes | purchase_order']
   owner_id uuid [not null]
-  kind varchar [note: 'charter | id_card | registration_certificate | vat_certificate | licence | technical_document | justification | attachment | pdf']
+  kind varchar [note: 'charter | id_card | registration_certificate | vat_certificate | proof_of_authority | licence | technical_document | justification | attachment | pdf']
   file_name varchar [not null]
   mime_type varchar [not null]
   size_bytes integer [not null, note: 'max 10485760']
@@ -1616,9 +1661,6 @@ Table decision {
   purchase_order_id uuid [ref: > purchase_order.id, note: 'set for PO decisions']
   status varchar [not null, note: 'VOTING | APPROVED | REJECTED | NO_DECISION']
   result_rule varchar [note: 'MAJORITY | CHAIR_CASTING_VOTE | NO_QUORUM | TIE_WITHOUT_CHAIR | SOURCING_CANCELLED']
-  reopened_from_id uuid [ref: > decision.id, note: 'set on a reopened decision']
-  reopen_reason text [note: 'required when reopened after REJECTED; shown to the members']
-  close_reason text [note: 'cancellation reason when result_rule is SOURCING_CANCELLED']
   opened_at timestamp
   deadline timestamp
   closed_at timestamp
