@@ -23,6 +23,8 @@
     },
     "plan": "Plan",
     "requisitions": "Purchase requisitions",
+    "sourcing": "Sourcing",
+    "vendorInvitations": "Invitations",
     "adminDictionaries": "Dictionaries",
     "adminCategories": "Categories",
     "adminItems": "Items"
@@ -54,7 +56,29 @@
     "PENDING_APPROVAL": "Pending approval",
     "IN_SOURCING": "In sourcing",
     "COMPLETED": "Completed",
-    "CLOSED": "Closed"
+    "CLOSED": "Closed",
+    "OPEN": "Open",
+    "AWAITING_OPENING": "Awaiting opening",
+    "TECHNICAL_EVALUATION": "Technical evaluation",
+    "COMPARISON": "Comparison",
+    "FINAL_OFFER_ROUND": "Final offer round",
+    "IN_COMMITTEE": "In committee",
+    "WINNER_APPROVED": "Winner approved",
+    "CANCELLED": "Cancelled",
+    "INVITED": "Invited",
+    "ACCEPTED": "Accepted",
+    "DECLINED": "Declined",
+    "WITHDRAWN": "Withdrawn",
+    "PASSED": "Passed",
+    "DISQUALIFIED": "Disqualified",
+    "AWARDED": "Awarded",
+    "NOT_AWARDED": "Not awarded",
+    "DECLINED_BY_VENDOR": "Declined by vendor",
+    "FULLY_APPROVED": "Fully approved",
+    "VOTING": "Voting",
+    "NO_DECISION": "No decision",
+    "UNANSWERED": "Unanswered",
+    "PUBLISHED": "Published"
   },
   "common": {
     "none": "—",
@@ -152,7 +176,10 @@
       "applications": "{count, plural, =0 {No category applications to decide} one {# category application to decide} other {# category applications to decide}}",
       "prsToApprove": "{count, plural, =0 {No PRs to approve} one {# PR to approve} other {# PRs to approve}}",
       "prsReturned": "{count, plural, =0 {No PRs returned to you} one {# PR returned to you} other {# PRs returned to you}}",
-      "prsReadyForSourcing": "{count, plural, =0 {No approved PRs ready for sourcing} one {# approved PR ready for sourcing} other {# approved PRs ready for sourcing}}"
+      "prsReadyForSourcing": "{count, plural, =0 {No approved PRs ready for sourcing} one {# approved PR ready for sourcing} other {# approved PRs ready for sourcing}}",
+      "sourcingsBelowMinimum": "{count, plural, =0 {No sourcings below the minimum} one {# sourcing below the minimum} other {# sourcings below the minimum}}",
+      "invitationsToAnswer": "{count, plural, =0 {No invitations to answer} one {# invitation to answer} other {# invitations to answer}}",
+      "proposalsToSubmit": "{count, plural, =0 {No proposals to submit} one {# proposal to submit} other {# proposals to submit}}"
     },
     "newPr": "New PR"
   },
@@ -785,6 +812,123 @@
       "categoryFixed": "The category cannot change once a PR uses this line.",
       "committed": "Committed = PRs pending approval, approved, in sourcing or completed."
     }
+  },
+  "sourcing": {
+    "title": "Sourcing",
+    "empty": "No sourcing yet. Start one from an approved PR.",
+    "startFromPr": "Open approved PRs",
+    "start": "Start sourcing",
+    "startHint": "Competitive bidding sets RFQ or Tender by the PR value. A single source purchase goes to one vendor from the category's AVL.",
+    "publish": "Publish",
+    "saved": "Saved.",
+    "deadlineHint": "Asia/Baku time",
+    "justificationHint": "Required above the single-source limit, together with at least one file",
+    "proposalsOf": "{count} of {minimum} proposals",
+    "belowMinimum": "Below minimum: {count} of {minimum} proposals",
+    "belowMinimumHint": "Extend the deadline, continue with a reason, or cancel.",
+    "belowMinimumNone": "No proposals were submitted. Extend the deadline or cancel.",
+    "cancelledTitle": "Cancelled",
+    "continuedTitle": "Continued below the minimum",
+    "columns": {
+      "number": "Number",
+      "type": "Type",
+      "value": "Value",
+      "deadline": "Deadline",
+      "owner": "Owner",
+      "proposals": "Proposals",
+      "status": "Status"
+    },
+    "types": {
+      "RFQ": "RFQ",
+      "TENDER": "Tender",
+      "SSP": "Single Source Purchase"
+    },
+    "methods": {
+      "COMPETITIVE": "Competitive bidding",
+      "SINGLE_SOURCE": "Single Source Purchase"
+    },
+    "reason": {
+      "RFQ": "Value {value} < threshold {threshold}: RFQ",
+      "TENDER": "Value {value} ≥ threshold {threshold}: Tender",
+      "SSP": "Single source purchase from one chosen vendor"
+    },
+    "fields": {
+      "method": "Method",
+      "sspVendor": "Vendor",
+      "deadline": "Proposal deadline",
+      "incoterm": "Incoterm",
+      "namedPlace": "Named place",
+      "deliveryMode": "Delivery mode",
+      "paymentTerm": "Payment term",
+      "techDoc": "Technical document required",
+      "justification": "Justification",
+      "justificationFile": "Justification file",
+      "owner": "Owner",
+      "value": "Value",
+      "minimum": "Minimum proposals",
+      "pr": "Purchase requisition",
+      "extensions": "Extensions",
+      "proposals": "Proposals submitted",
+      "extendReason": "Reason for the extension",
+      "newDeadline": "New deadline",
+      "continueReason": "Reason for continuing"
+    },
+    "actions": {
+      "extend": "Extend",
+      "continue": "Continue",
+      "cancel": "Cancel sourcing"
+    },
+    "tabs": {
+      "invitations": "Invitations"
+    },
+    "invitees": {
+      "title": "Invited vendors",
+      "belowMinimum": "Only {count} vendors remain; the minimum is {minimum} proposals.",
+      "invite": "Invite {name}",
+      "grade": "Grade {grade}",
+      "none": "No vendors invited yet.",
+      "vendor": "Vendor",
+      "declineReason": "Decline reason"
+    }
+  },
+  "proposal": {
+    "fields": {
+      "incoterm": "Incoterm",
+      "namedPlace": "Named place",
+      "deliveryMode": "Delivery mode",
+      "paymentTerm": "Payment term",
+      "unitPrice": "Unit price (AZN)",
+      "includesVat": "Prices include VAT",
+      "vatRate": "VAT rate, %",
+      "deliveryDays": "Delivery lead time, days",
+      "validityDays": "Validity, days",
+      "comment": "Comment",
+      "technicalDocument": "Technical document"
+    },
+    "priceFor": "Unit price for {item}",
+    "total": "Total",
+    "submit": "Submit proposal",
+    "resubmit": "Resubmit proposal",
+    "withdraw": "Withdraw",
+    "saved": {
+      "save": "Draft saved.",
+      "submit": "Proposal submitted.",
+      "withdraw": "Proposal withdrawn. You can submit it again before the deadline."
+    },
+    "submittedNote": "Your proposal is submitted. Total {total}."
+  },
+  "invitations": {
+    "empty": "You have no invitations yet.",
+    "columns": {
+      "invitation": "Invitation",
+      "proposal": "Proposal",
+      "sourcing": "Sourcing"
+    },
+    "accept": "Accept",
+    "decline": "Decline",
+    "remaining": "Time remaining",
+    "remainingValue": "{days} d {hours} h {minutes} min",
+    "declinedNote": "You declined this invitation."
   },
   "requisitions": {
     "new": "New PR",

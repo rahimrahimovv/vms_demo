@@ -3,11 +3,12 @@ import { canAccess, sectionForPath, sectionsFor } from "@/lib/auth/sections";
 
 // PLT-01 AC4/AC5: the menu and the guard come from the same Role Matrix config.
 describe("Role Matrix sections", () => {
-  it("Admin: plan, PRs (read), vendor cards, AVL (view), users, questionnaire, dictionaries, categories, items", () => {
+  it("Admin: plan, PRs (read), sourcing (read), vendor cards, AVL (view), users, questionnaire, dictionaries, categories, items", () => {
     expect(sectionsFor(["ADMIN"]).map((s) => s.key)).toEqual([
       "home",
       "plan",
       "requisitions",
+      "sourcing",
       "vendors",
       "avl",
       "adminUsers",
@@ -18,11 +19,12 @@ describe("Role Matrix sections", () => {
     ]);
   });
 
-  it("Procurement Specialist: plan, PRs, vendor cards, questionnaires, category applications, AVL", () => {
+  it("Procurement Specialist: plan, PRs, sourcing, vendor cards, questionnaires, category applications, AVL", () => {
     expect(sectionsFor(["PROCUREMENT_SPECIALIST"]).map((s) => s.key)).toEqual([
       "home",
       "plan",
       "requisitions",
+      "sourcing",
       "vendors",
       "questionnaires",
       "categoryApplications",
@@ -37,15 +39,16 @@ describe("Role Matrix sections", () => {
     expect(canAccess(["COMMITTEE_MEMBER"], "plan")).toBe(false);
   });
 
-  it("Vendor: own registration, qualification, categories and profile; no internal screens", () => {
+  it("Vendor: own registration, qualification, categories, profile and invitations; no internal screens", () => {
     expect(sectionsFor(["VENDOR"]).map((s) => s.key)).toEqual([
       "home",
       "vendorRegistration",
       "vendorQualification",
       "vendorCategories",
       "vendorProfile",
+      "vendorInvitations",
     ]);
-    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "adminItems"] as const) {
+    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "sourcing", "adminItems"] as const) {
       expect(canAccess(["VENDOR"], key)).toBe(false);
     }
   });

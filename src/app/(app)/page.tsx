@@ -63,6 +63,7 @@ export default async function HomePage() {
     if (filter === "notOwn") q = q.neq("requester_id", user.id);
     return q;
   };
+  const belowMinimum = isSpecialist ? await supabase.from("sourcing").select("id", { count: "exact", head: true }).eq("status", "CLOSED").eq("owner_id", user.id) : null;
   const [toApprove, returned, readyForSourcing] = await Promise.all([
     isApprover ? prCount("PENDING_APPROVAL", "notOwn") : null,
     isRequester ? prCount("RETURNED", "own") : null,
@@ -76,6 +77,7 @@ export default async function HomePage() {
           { key: "registrations", href: "/vendors", count: registrations?.count ?? 0, icon: Building2 },
           { key: "questionnaires", href: "/questionnaires", count: questionnaires?.count ?? 0, icon: ClipboardCheck },
           { key: "applications", href: "/category-applications", count: applications?.count ?? 0, icon: ListChecks },
+          { key: "sourcingsBelowMinimum", href: "/sourcing", count: belowMinimum?.count ?? 0, icon: PackageSearch },
           { key: "prsReadyForSourcing", href: "/requisitions?tab=all", count: readyForSourcing?.count ?? 0, icon: PackageSearch },
         ]
       : []),

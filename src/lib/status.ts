@@ -20,6 +20,7 @@ const TONES: Record<string, StatusTone> = {
   CLOSED: "blue",
   TECHNICAL_EVALUATION: "blue",
   COMPARISON: "blue",
+  FINAL_OFFER_ROUND: "blue",
   INVITED: "blue",
   // returned or waiting for a decision
   RETURNED: "amber",
@@ -28,6 +29,7 @@ const TONES: Record<string, StatusTone> = {
   UNANSWERED: "amber",
   FULLY_APPROVED: "amber", // waiting for the vendor's decision
   NO_DECISION: "amber",
+  AWAITING_OPENING: "amber", // Tender waiting for the committee to open the bids
   HOLD: "amber", // vendor standing after a second D grade
   EXPIRING: "amber", // certificate within 30 days of expiry
   VALID: "green",

@@ -17,6 +17,8 @@ export type SectionKey =
   | "avl"
   | "plan"
   | "requisitions"
+  | "sourcing"
+  | "vendorInvitations"
   | "adminUsers"
   | "adminQuestionnaire"
   | "adminDictionaries"
@@ -58,10 +60,13 @@ export const SECTIONS: Section[] = [
   { key: "vendorCategories", href: "/vendor/categories", labelKey: "vendorCategories", icon: "tags", roles: ["VENDOR"], group: "main" },
   { key: "vendorProfile", href: "/vendor/profile", labelKey: "vendorProfile", icon: "building", roles: ["VENDOR"], group: "main" },
   // "View the plan" = Requester, Approver, PS, Admin; only the Admin adds, edits or closes lines.
+  { key: "vendorInvitations", href: "/vendor/invitations", labelKey: "vendorInvitations", icon: "clipboardList", roles: ["VENDOR"], group: "main" },
   { key: "plan", href: "/plan", labelKey: "plan", icon: "wallet", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
   // PRs: the Requester creates own PRs, the Approver decides, the PS sources approved ones (Slice 4),
   // the Admin reads. RLS shows other users' PRs only once submitted.
   { key: "requisitions", href: "/requisitions", labelKey: "requisitions", icon: "shoppingCart", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
+  // Sourcing (RFQ-01, RFQ-04, RFQ-06): the Procurement Specialist works on it, the Admin reads.
+  { key: "sourcing", href: "/sourcing", labelKey: "sourcing", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
   // Vendor cards: PS, CM, Admin ("View a vendor card"); only PS decides on registrations.
   { key: "vendors", href: "/vendors", labelKey: "vendors", icon: "building", roles: ["PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "vendors" },
   // "Review answers, adjust points, confirm the grade or return" = PS

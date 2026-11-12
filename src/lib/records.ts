@@ -11,6 +11,7 @@ const INTERNAL_PATHS: Record<string, (id: string) => string> = {
   category_application: (id) => `/category-applications/${id}`,
   requisition: (id) => `/requisitions/${id}`,
   plan_line: () => "/plan",
+  sourcing: (id) => `/sourcing/${id}`,
 };
 
 const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {
@@ -18,6 +19,7 @@ const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {
   vendor_standing: () => "/vendor/qualification",
   questionnaire_response: () => "/vendor/qualification",
   category_application: () => "/vendor/categories",
+  sourcing: (id) => `/vendor/invitations/${id}`,
 };
 
 export function recordHref(recordType: string, recordId: string, audience: Audience = "internal", event?: string) {

@@ -20,6 +20,8 @@ export type NotificationRow = {
 export const BELL_COLUMNS = "id, event, params, record_number, is_read, created_at";
 export const BELL_MAX_ITEMS = 10;
 
+import { formatDateTime } from "./format";
+
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
@@ -34,7 +36,8 @@ export function messageValues(
 ): Record<string, string | number> {
   const out: Record<string, string | number> = { number: recordNumber ?? "" };
   for (const [key, value] of Object.entries(params)) {
-    if (typeof value === "string" && ISO_DATE.test(value)) out[key] = formatDate(value);
+    if (key === "deadline" && typeof value === "string") out[key] = formatDateTime(value);
+    else if (typeof value === "string" && ISO_DATE.test(value)) out[key] = formatDate(value);
     else if (key === "score" && value !== null && value !== "") out[key] = Number(value).toFixed(1);
     else if (key === "type" && label.has(`certificateTypes.${value}`)) out[key] = label.translate(`certificateTypes.${value}`);
     else out[key] = value ?? "";

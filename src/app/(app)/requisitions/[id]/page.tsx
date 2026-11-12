@@ -15,6 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StartSourcing } from "@/components/start-sourcing";
+import { startSourcing } from "../../sourcing/actions";
 import { decideRequisition, saveRequisition } from "../actions";
 
 type PrRecord = {
@@ -28,7 +30,7 @@ type PrRecord = {
   requester_id: string;
   plan_line_id: string;
   requester: { full_name: string } | null;
-  plan_line: { year: number; description: string; quarter: string; category: { name: string } | null } | null;
+  plan_line: { year: number; description: string; quarter: string; category_id: string; category: { name: string } | null } | null;
 };
 
 type LineView = RequisitionLineRow & {
@@ -60,7 +62,7 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
   const { data: pr } = await supabase
     .from("requisition")
     .select(
-      "id, number, status, estimated_value, decision_comment, submitted_at, created_at, requester_id, plan_line_id, requester:app_user!requisition_requester_id_fkey(full_name), plan_line(year, description, quarter, category(name))",
+      "id, number, status, estimated_value, decision_comment, submitted_at, created_at, requester_id, plan_line_id, requester:app_user!requisition_requester_id_fkey(full_name), plan_line(year, description, quarter, category_id, category(name))",
     )
     .eq("id", id)
     .returns<PrRecord[]>()
@@ -93,7 +95,16 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
       </Alert>
     ) : null;
 
-  const actions = canDecide ? (
+  // RFQ-01 AC1, RFQ-06 AC1: the Procurement Specialist starts sourcing on an APPROVED PR
+  const canStart = user.roles.includes("PROCUREMENT_SPECIALIST") && pr.status === "APPROVED" && pr.plan_line;
+  const avl = canStart ? ((await supabase.rpc("avl_list", { p_category: pr.plan_line!.category_id })).data ?? []) : [];
+
+  const actions = canStart ? (
+    <StartSourcing
+      action={startSourcing.bind(null, pr.id)}
+      vendors={(avl as { vendor_id: string; legal_name: string }[]).map((v) => ({ id: v.vendor_id, name: v.legal_name }))}
+    />
+  ) : canDecide ? (
     <div className="flex flex-col items-end gap-3">
       {planWarning}
       <DecisionPanel

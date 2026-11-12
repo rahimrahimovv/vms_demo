@@ -11,10 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-export type DecisionState = { error: string | null; attempt?: number };
+export type DecisionState = { error: string | null; errorParams?: Record<string, string>; attempt?: number };
 
 export type DecisionOption = {
   /** Sent as "decision" */
@@ -25,6 +26,8 @@ export type DecisionOption = {
   comment: "required" | "optional" | "none";
   commentLabel?: string;
   confirmTitle?: string;
+  /** An extra input in the dialog, sent under `name` (e.g. the new deadline when extending). */
+  field?: { name: string; label: string; type: "datetime-local" };
 };
 
 /**
@@ -73,7 +76,7 @@ export function DecisionPanel({
       </div>
       {state.error && !open && (
         <p role="alert" className="text-xs font-medium text-destructive" data-testid="decision-error">
-          {t(state.error)}
+          {t(state.error, state.errorParams)}
         </p>
       )}
 
@@ -86,6 +89,17 @@ export function DecisionPanel({
                 <DialogDescription className="sr-only">{open.label}</DialogDescription>
               </DialogHeader>
               <input type="hidden" name="decision" value={open.value} />
+              {open.field && (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="decision-field">
+                    {open.field.label}
+                    <span className="text-destructive" aria-hidden>
+                      *
+                    </span>
+                  </Label>
+                  <Input id="decision-field" name={open.field.name} type={open.field.type} required />
+                </div>
+              )}
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="decision-comment">
                   {open.commentLabel ?? t("decision.comment")}
@@ -98,7 +112,7 @@ export function DecisionPanel({
                 <Textarea id="decision-comment" name="comment" rows={4} required={open.comment === "required"} />
                 {state.error && (
                   <p role="alert" className="text-xs font-medium text-destructive" data-testid="decision-error">
-                    {t(state.error)}
+                    {t(state.error, state.errorParams)}
                   </p>
                 )}
               </div>
