@@ -160,3 +160,52 @@ minute. The reason entered on Continue is stored in `sourcing.low_competition_re
 9. Staged uploads that no action claims stay under `staging/` in the bucket; no cleanup job is built.
 10. vms-prod migrated for Slice 4 on 12 Nov 2026. Run `db:push` with `.env.production.local` before every push that
     brings a new migration.
+
+## Slice 5 (13 Nov 2026)
+
+Answers of 12 Nov 2026 that shaped the slice, and the backlog patched to match (CMT-02 AC7-AC8, CMT-03 AC2, CMT-04 AC4,
+RFQ-04 AC6, committee decision status table, ERD): a sourcing cancelled while its OPENING vote is open closes that decision
+as NO_DECISION with `result_rule` SOURCING_CANCELLED (a rule value, not a status), the cancellation reason kept in
+`decision.close_reason`, minutes created, audit reason "Sourcing cancelled"; no eligible voter left gives NO_DECISION
+"No quorum"; Reopen vote works after NO_DECISION and after a REJECTED OPENING decision (reason required, shown to the
+members, stored in `decision.reopen_reason`); WINNER and PO reopen only after NO_DECISION; a decision closed by a cancelled
+sourcing cannot be reopened. New columns on `decision`: `reopened_from_id`, `reopen_reason`, `close_reason`.
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| CMT-01 Admin configures the committee | done | AC1-AC3; Admin → Committee (members from the Committee Member users, one Chair, voting period in business days); demo committee seeded by `db:seed` (Elchin Karimov Chair, Sevinj Guliyeva, Tural Ismayilov) |
+| CMT-02 Committee votes | done for OPENING, engine ready for WINNER and PO | AC1, AC4-AC8; package for WINNER and PO comes with Slices 6 and 7 (AC2, AC3, AC9, AC10 not started: their triggers and outcomes live there) |
+| CMT-03 Numbered minutes | done | AC1-AC5; MIN-YYYY-NNN on every closed decision, screen, English PDF download |
+| CMT-04 Tender opening | done except AC3 | AC1, AC2, AC4-AC6; AC3 (technical pass/fail, second envelope) is RFQ-05 in Slice 6 |
+
+Decisions page (Committee Member, Procurement Specialist, Approver, Admin), "N decisions waiting for your vote" on the
+Committee Member's home, Minutes list and record, Proposals tab on a Tender once the bids are open (names and technical
+documents, no prices). Notifications `decision.opened` and `decision.closed`; job `vms-decisions` (every minute).
+Outcome hook `app.apply_decision_outcome`: OPENING is real, WINNER and PO do nothing yet (Slices 6 and 7).
+
+### Verified
+
+- `npm test`: 84 unit tests (adds the committee rules with the Calculation Rules examples: eligible voters, quorum 2 of 3 and
+  1 of 3, 2-1 majority, 2-2 with the Chair, tie without the Chair, business-day deadline Thu 12 Nov 10:00 -> Tue 17 Nov 10:00,
+  odd committee size; the PDF builds with Azerbaijani letters and long comments).
+- `npm run test:rls`: 23 new tests on vms-dev (committee_save rules and roles; AC3 voter snapshot; owner never a voter;
+  Against needs a comment; vote cannot change; votes hidden from members, owner, Admin, Approver until close; majority, conflict,
+  Chair's casting vote, tie without the Chair, no quorum at the deadline, no eligible voter; vote after the deadline; Reopen
+  rules; minutes numbers, content, roles, immutability even for the service key; Tender at AWAITING_OPENING with a decision,
+  package without prices, approved opening opens names and documents but not prices, rejected opening reopened with a reason,
+  cancel closes the open vote with minutes, Continue below the minimum, an RFQ never gets an opening decision).
+  The demo committee is backed up before the test run and put back afterwards.
+
+### Open issues
+
+11. **Committee tests touch the live demo committee on vms-dev** (saved and restored in `beforeAll` / `afterAll`). If a run is
+    killed half-way, run `npm run db:seed` to restore Elchin, Sevinj and Tural.
+12. **Cleanup of test decisions** also switches off the minutes immutability trigger for a moment, in the same dev-only helper
+    and under the same guards as the audit trigger (issue 7).
+13. **vms-prod is not migrated for Slice 5 yet.** Before the next push to `main`: `db:push` with `.env.production.local`, then
+    set the committee in Admin → Committee (or run `ENV_FILE=.env.production.local npx tsx scripts/seed-users.ts`). The new job
+    `vms-decisions` must appear next to `vms-sourcing` and `vms-daily`.
+14. WINNER and PO decisions open only from Slices 6 and 7; until then a closed WINNER or PO decision changes nothing else
+    (`app.apply_decision_outcome`).
+15. A Tender already at AWAITING_OPENING from Slice 4 gets its OPENING decision in the CMT-04 migration only where a committee
+    exists at that moment. Without a decision it cannot be opened (Reopen needs a decision); the owner can cancel it.

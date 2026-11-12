@@ -560,7 +560,7 @@ TBD
 3. **Given** a CLOSED sourcing below the minimum, **When** the owner opens it, **Then** it shows "Below minimum: N of M proposals" with three actions: Extend, Continue, Cancel.
 4. **Given** Extend, **When** the owner sets a new deadline later than now and a reason, **Then** the sourcing returns to OPEN, invited vendors that have not declined are notified of the new deadline, and the extension count rises by 1; after 2 extensions (Admin setting) Extend is disabled with "Maximum number of extensions reached".
 5. **Given** Continue, **When** the owner enters a reason, **Then** the sourcing moves on as in criterion 2 and the reason is stored for the committee package (#26); with 0 proposals Continue is not offered.
-6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED.
+6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision of that sourcing closes as NO\_DECISION with the rule "Sourcing cancelled" and minutes that record the reason (CMT-02, CMT-03). \[revised\]
 
 ---
 
@@ -716,8 +716,8 @@ TBD
 4. **Given** a VOTING decision, **When** a member votes Against, **Then** a comment is required; a vote For needs none; a submitted vote cannot be changed.
 5. **Given** a VOTING decision, **When** a member clicks Declare conflict of interest and enters a comment, **Then** they cannot vote on it and are removed from its eligible voters.
 6. **Given** a VOTING decision, **When** a member looks at it, **Then** they see who has voted but not how, until the decision closes.
-7. **Given** every eligible voter has voted or the voting period has ended, **When** the decision closes, **Then** with votes cast not more than half of eligible voters it becomes NO\_DECISION ("No quorum"); otherwise more For than Against makes it APPROVED, more Against than For makes it REJECTED, and a tie follows the Chair's vote, or becomes NO\_DECISION ("Tie without the Chair's vote") if the Chair has not voted.
-8. **Given** a NO\_DECISION decision, **When** the sourcing owner clicks Reopen vote, **Then** a new VOTING decision with the same package and a new voting period opens.
+7. **Given** every eligible voter has voted or the voting period has ended, **When** the decision closes, **Then** with votes cast not more than half of eligible voters it becomes NO\_DECISION ("No quorum"); otherwise more For than Against makes it APPROVED, more Against than For makes it REJECTED, and a tie follows the Chair's vote, or becomes NO\_DECISION ("Tie without the Chair's vote") if the Chair has not voted; with no eligible voter left it becomes NO\_DECISION ("No quorum"). A VOTING OPENING decision of a sourcing that is cancelled closes at once as NO\_DECISION with the rule "Sourcing cancelled" and the cancellation reason. \[revised\]
+8. **Given** a NO\_DECISION decision, or a REJECTED OPENING decision, **When** the sourcing owner clicks Reopen vote, **Then** a new VOTING decision with the same package and a new voting period opens; after a REJECTED OPENING decision the owner must enter a reason, and the new decision shows that reason to the members. WINNER and PO decisions reopen only after NO\_DECISION, and a decision closed by a cancelled sourcing cannot be reopened. \[revised\]
 9. **Given** a WINNER decision becomes APPROVED, **When** it closes, **Then** the sourcing becomes WINNER\_APPROVED and POs are created (PO-01); if it becomes REJECTED, the sourcing returns to COMPARISON with the members' comments and the rejected winners excluded.
 10. **Given** a PO decision becomes APPROVED, **When** it closes, **Then** the PO becomes FULLY\_APPROVED and is sent to the vendor; if it becomes REJECTED, the PO becomes REJECTED and its lines return to the sourcing's COMPARISON.
 
@@ -741,7 +741,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** a decision becomes APPROVED, REJECTED or NO\_DECISION, **When** it closes, **Then** minutes are created with a number MIN-YYYY-NNN, sequential within the calendar year and never reused.
-2. **Given** minutes, **When** they are opened, **Then** they show the number, decision type, sourcing and PO numbers, opening and closing time, eligible voters, each member's vote (For, Against, Conflict of interest, Did not vote) with comments, the result and the rule applied (majority, Chair's casting vote, no quorum, tie without the Chair's vote).
+2. **Given** minutes, **When** they are opened, **Then** they show the number, decision type, sourcing and PO numbers, opening and closing time, eligible voters, each member's vote (For, Against, Conflict of interest, Did not vote) with comments, the result and the rule applied (majority, Chair's casting vote, no quorum, tie without the Chair's vote, sourcing cancelled with the cancellation reason). \[revised\]
 3. **Given** minutes on screen, **When** the user clicks Download, **Then** a PDF in English with the same content is downloaded.
 4. **Given** minutes, **When** anyone tries to edit or delete them, **Then** the action is refused.
 5. **Given** a Vendor, **When** they use the portal, **Then** minutes are never visible to them.
@@ -768,7 +768,7 @@ TBD
 1. **Given** a Tender that closes with the minimum met, or after Continue, **When** it closes, **Then** it becomes AWAITING\_OPENING and an OPENING decision opens for the committee under the CMT-02 rules (quorum, majority, the Chair on a tie), showing the number of proposals and the bidders' names but no prices.
 2. **Given** the OPENING decision is APPROVED, **When** it closes, **Then** the Tender moves to TECHNICAL\_EVALUATION and the owner and the committee see vendor names and technical documents, still without prices.
 3. **Given** every proposal is marked PASSED or DISQUALIFIED, **When** the technical evaluation ends, **Then** the prices of PASSED proposals become visible (second envelope) and the Tender moves to COMPARISON; prices of disqualified proposals are never shown.
-4. **Given** the OPENING decision is REJECTED or NO\_DECISION, **When** it closes, **Then** the Tender stays AWAITING\_OPENING and the owner can reopen the vote or cancel the Tender with a reason.
+4. **Given** the OPENING decision is REJECTED or NO\_DECISION, **When** it closes, **Then** the Tender stays AWAITING\_OPENING and the owner can reopen the vote (after REJECTED with a reason that the members see) or cancel the Tender with a reason. \[revised\]
 5. **Given** an RFQ or an SSP, **When** it closes, **Then** there is no opening decision: it moves to COMPARISON and its prices open at once.
 6. **Given** an OPENING decision closes, **When** it closes, **Then** numbered minutes are created as in CMT-03.
 
@@ -1042,7 +1042,8 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | (none) | VOTING | Tender closed (opening), Send to committee, PO approved by the Approver, or Reopen vote | Owner or System | Type OPENING, WINNER or PO |
 | VOTING | APPROVED | All voted or period ended; quorum; more For, or tie with the Chair For | System | Minutes created |
 | VOTING | REJECTED | All voted or period ended; quorum; more Against, or tie with the Chair Against | System | Minutes created |
-| VOTING | NO\_DECISION | No quorum, or tie without the Chair's vote | System | Minutes created; owner may reopen |
+| VOTING | NO\_DECISION | No quorum, or tie without the Chair's vote, or the sourcing was cancelled (OPENING only; rule "Sourcing cancelled") | System | Minutes created; owner may reopen, except after a cancellation |
+| REJECTED, NO\_DECISION | (new VOTING decision) | Reopen vote | Owner | REJECTED only for OPENING and with a reason shown to the members; WINNER and PO reopen only after NO\_DECISION |
 
 **Purchase order (PO)**
 
@@ -1613,7 +1614,10 @@ Table decision {
   sourcing_id uuid [ref: > sourcing.id, not null]
   purchase_order_id uuid [ref: > purchase_order.id, note: 'set for PO decisions']
   status varchar [not null, note: 'VOTING | APPROVED | REJECTED | NO_DECISION']
-  result_rule varchar [note: 'MAJORITY | CHAIR_CASTING_VOTE | NO_QUORUM | TIE_WITHOUT_CHAIR']
+  result_rule varchar [note: 'MAJORITY | CHAIR_CASTING_VOTE | NO_QUORUM | TIE_WITHOUT_CHAIR | SOURCING_CANCELLED']
+  reopened_from_id uuid [ref: > decision.id, note: 'set on a reopened decision']
+  reopen_reason text [note: 'required when reopened after REJECTED; shown to the members']
+  close_reason text [note: 'cancellation reason when result_rule is SOURCING_CANCELLED']
   opened_at timestamp
   deadline timestamp
   closed_at timestamp

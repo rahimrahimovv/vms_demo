@@ -39,6 +39,7 @@ type SourcingRecord = {
   ssp_justification: string | null;
   low_competition_reason: string | null;
   cancel_reason: string | null;
+  bids_opened_at: string | null;
   owner: { full_name: string } | null;
   ssp_vendor: { legal_name: string } | null;
 };
@@ -83,7 +84,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
   const { data: s } = await supabase
     .from("sourcing")
     .select(
-      "id, number, type, method, status, value, min_proposals, deadline, extension_count, owner_id, required_incoterm, named_place_id, delivery_mode_id, payment_term_id, tech_doc_required, ssp_justification, low_competition_reason, cancel_reason, owner:app_user!sourcing_owner_id_fkey(full_name), ssp_vendor:vendor!sourcing_ssp_vendor_id_fkey(legal_name)",
+      "id, number, type, method, status, value, min_proposals, deadline, extension_count, owner_id, required_incoterm, named_place_id, delivery_mode_id, payment_term_id, tech_doc_required, ssp_justification, low_competition_reason, cancel_reason, bids_opened_at, owner:app_user!sourcing_owner_id_fkey(full_name), ssp_vendor:vendor!sourcing_ssp_vendor_id_fkey(legal_name)",
     )
     .eq("id", id)
     .returns<SourcingRecord[]>()
@@ -130,6 +131,30 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
   const setting = (key: string) => Number((settings.data ?? []).find((r) => r.key === key)?.value ?? 0);
   const [incotermRows, placeRows, modeRows, termRows] = dictionaries.map((d) => d.data ?? []);
   const prLink = lines[0]?.requisition_line?.requisition;
+
+  // CMT-04: the Tender's opening decision, and once it is approved the bidders' names and technical documents
+  // (still no prices: proposal lines stay sealed until the technical evaluation, Slice 6).
+  const bidsOpen = Boolean(s.bids_opened_at);
+  const [{ data: openingData }, { data: proposalData }] = await Promise.all([
+    s.type === "TENDER"
+      ? supabase.from("decision").select("id, status").eq("sourcing_id", id).eq("type", "OPENING").order("opened_at", { ascending: false }).limit(1)
+      : Promise.resolve({ data: [] as { id: string; status: string }[] }),
+    bidsOpen
+      ? supabase
+          .from("proposal")
+          .select("id, submitted_at, vendor:vendor(legal_name)")
+          .eq("sourcing_id", id)
+          .eq("status", "SUBMITTED")
+          .order("submitted_at")
+          .returns<{ id: string; submitted_at: string | null; vendor: { legal_name: string } | null }[]>()
+      : Promise.resolve({ data: [] as { id: string; submitted_at: string | null; vendor: { legal_name: string } | null }[] }),
+  ]);
+  const opening = openingData?.[0] ?? null;
+  const proposals = proposalData ?? [];
+  const { data: proposalFiles } =
+    proposals.length > 0
+      ? await supabase.from("file").select("id, file_name, owner_id").eq("owner_type", "proposal").in("owner_id", proposals.map((p) => p.id))
+      : { data: [] as { id: string; file_name: string; owner_id: string }[] };
 
   const invitees = draft && owner ? ((await supabase.rpc("sourcing_invitees", { p_id: id })).data ?? []) : [];
 
@@ -215,6 +240,17 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           <AlertDescription>{s.cancel_reason}</AlertDescription>
         </Alert>
       )}
+      {opening && (
+        <Alert data-testid="opening-decision">
+          <AlertTitle>{t("sourcing.proposals.committeeDecision")}</AlertTitle>
+          <AlertDescription className="flex items-center gap-3">
+            <StatusBadge status={opening.status} />
+            <Link href={`/decisions/${opening.id}`} className="text-primary hover:underline" data-testid="opening-decision-link">
+              {t("sourcing.proposals.openDecision")}
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
       {s.low_competition_reason && (
         <Alert data-testid="continue-reason">
           <AlertTitle>{t("sourcing.continuedTitle")}</AlertTitle>
@@ -226,6 +262,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
         <TabsList>
           <TabsTrigger value="details">{t("record.tabs.details")}</TabsTrigger>
           <TabsTrigger value="invitations">{t("sourcing.tabs.invitations")}</TabsTrigger>
+          {bidsOpen && <TabsTrigger value="proposals">{t("sourcing.tabs.proposals")}</TabsTrigger>}
           <TabsTrigger value="files">{t("record.tabs.files")}</TabsTrigger>
           <TabsTrigger value="history">{t("record.tabs.history")}</TabsTrigger>
         </TabsList>
@@ -360,6 +397,47 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
             </div>
           )}
         </TabsContent>
+
+        {bidsOpen && (
+          <TabsContent value="proposals" className="flex flex-col gap-3 pt-4">
+            <div className="overflow-hidden rounded-lg border bg-card">
+              <Table>
+                <TableHeader className="bg-muted/60">
+                  <TableRow>
+                    <TableHead>{t("sourcing.proposals.vendor")}</TableHead>
+                    <TableHead>{t("sourcing.proposals.submitted")}</TableHead>
+                    <TableHead>{t("sourcing.proposals.documents")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {proposals.map((p) => {
+                    const docs = (proposalFiles ?? []).filter((f) => f.owner_id === p.id);
+                    return (
+                      <TableRow key={p.id} data-testid="proposal-row">
+                        <TableCell className="font-medium">{p.vendor?.legal_name}</TableCell>
+                        <TableCell>{p.submitted_at ? formatDateTime(p.submitted_at) : t("common.none")}</TableCell>
+                        <TableCell>
+                          {docs.length === 0
+                            ? t("sourcing.proposals.none")
+                            : docs.map((f) => (
+                                <a key={f.id} href={`/api/files/${f.id}`} className="block text-primary hover:underline">
+                                  {f.file_name}
+                                </a>
+                              ))}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+            {s.type === "TENDER" && s.status === "TECHNICAL_EVALUATION" && (
+              <p className="text-xs text-muted-foreground" data-testid="prices-sealed">
+                {t("sourcing.proposals.sealed")}
+              </p>
+            )}
+          </TabsContent>
+        )}
 
         <TabsContent value="files" className="pt-4">
           <FileList files={files} />
