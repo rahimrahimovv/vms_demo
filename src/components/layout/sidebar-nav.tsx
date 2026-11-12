@@ -9,9 +9,11 @@ import {
   ClipboardList,
   FileText,
   FolderTree,
+  Gavel,
   House,
   ListChecks,
   Package,
+  ScrollText,
   ShieldCheck,
   ShoppingCart,
   Tags,
@@ -37,6 +39,8 @@ const ICONS: Record<Section["icon"], LucideIcon> = {
   bookOpen: BookOpen,
   folderTree: FolderTree,
   package: Package,
+  gavel: Gavel,
+  scrollText: ScrollText,
 };
 
 type NavGroup = {

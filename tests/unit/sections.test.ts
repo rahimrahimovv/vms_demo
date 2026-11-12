@@ -9,6 +9,8 @@ describe("Role Matrix sections", () => {
       "plan",
       "requisitions",
       "sourcing",
+      "decisions",
+      "minutes",
       "vendors",
       "avl",
       "adminUsers",
@@ -16,6 +18,7 @@ describe("Role Matrix sections", () => {
       "adminDictionaries",
       "adminCategories",
       "adminItems",
+      "adminCommittee",
     ]);
   });
 
@@ -25,6 +28,8 @@ describe("Role Matrix sections", () => {
       "plan",
       "requisitions",
       "sourcing",
+      "decisions",
+      "minutes",
       "vendors",
       "questionnaires",
       "categoryApplications",
@@ -32,8 +37,9 @@ describe("Role Matrix sections", () => {
     ]);
   });
 
-  it("Committee Member: vendor cards only (REG-06 AC7); no plan, no PRs", () => {
-    expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "vendors"]);
+  it("Committee Member: sourcing (read), decisions, minutes and vendor cards (REG-06 AC7); no plan, no PRs, no committee setup", () => {
+    expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "sourcing", "decisions", "minutes", "vendors"]);
+    expect(canAccess(["COMMITTEE_MEMBER"], "adminCommittee")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "questionnaires")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "avl")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "plan")).toBe(false);
@@ -48,13 +54,22 @@ describe("Role Matrix sections", () => {
       "vendorProfile",
       "vendorInvitations",
     ]);
-    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "sourcing", "adminItems"] as const) {
+    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "sourcing", "adminItems", "decisions", "minutes", "adminCommittee"] as const) {
       expect(canAccess(["VENDOR"], key)).toBe(false);
     }
   });
 
-  it.each(["REQUESTER", "APPROVER"] as const)("%s: plan and PRs, no vendor or admin screens", (role) => {
-    expect(sectionsFor([role]).map((s) => s.key)).toEqual(["home", "plan", "requisitions"]);
+  it("Requester: plan and PRs, no decisions or minutes", () => {
+    expect(sectionsFor(["REQUESTER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions"]);
+    expect(canAccess(["REQUESTER"], "minutes")).toBe(false);
+  });
+
+  it("Approver: plan, PRs and minutes (Role Matrix: view minutes), no committee setup", () => {
+    expect(sectionsFor(["APPROVER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions", "decisions", "minutes"]);
+    expect(canAccess(["APPROVER"], "adminCommittee")).toBe(false);
+  });
+
+  it.each(["REQUESTER", "APPROVER"] as const)("%s: no vendor or admin screens", (role) => {
     expect(canAccess([role], "adminDictionaries")).toBe(false);
     expect(canAccess([role], "adminUsers")).toBe(false);
     expect(canAccess([role], "vendors")).toBe(false);

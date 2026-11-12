@@ -27,7 +27,10 @@
     "vendorInvitations": "Invitations",
     "adminDictionaries": "Dictionaries",
     "adminCategories": "Categories",
-    "adminItems": "Items"
+    "adminItems": "Items",
+    "adminCommittee": "Committee",
+    "decisions": "Decisions",
+    "minutes": "Minutes"
   },
   "roles": {
     "REQUESTER": "Requester",
@@ -162,6 +165,10 @@
         "extended": "The deadline for {number} moved to {deadline}",
         "closed": "{number} closed: {received} of {minimum} proposals received",
         "cancelled": "{number} was cancelled: {reason}"
+      },
+      "decision": {
+        "opened": "{decisionType} decision opened on {number}. Vote by {deadline}",
+        "closed": "{decisionType} decision on {number} closed: {result}. Minutes {minutes}"
       }
     }
   },
@@ -179,7 +186,8 @@
       "prsReadyForSourcing": "{count, plural, =0 {No approved PRs ready for sourcing} one {# approved PR ready for sourcing} other {# approved PRs ready for sourcing}}",
       "sourcingsBelowMinimum": "{count, plural, =0 {No sourcings below the minimum} one {# sourcing below the minimum} other {# sourcings below the minimum}}",
       "invitationsToAnswer": "{count, plural, =0 {No invitations to answer} one {# invitation to answer} other {# invitations to answer}}",
-      "proposalsToSubmit": "{count, plural, =0 {No proposals to submit} one {# proposal to submit} other {# proposals to submit}}"
+      "proposalsToSubmit": "{count, plural, =0 {No proposals to submit} one {# proposal to submit} other {# proposals to submit}}",
+      "votesWaiting": "{count, plural, =0 {No decisions waiting for your vote} one {# decision waiting for your vote} other {# decisions waiting for your vote}}"
     },
     "newPr": "New PR"
   },
@@ -261,7 +269,14 @@
     "deliveryDateFuture": "Delivery date must be in the future",
     "lineRequired": "Add at least one line",
     "ownRequest": "You cannot approve your own request",
-    "categoryHasChildren": "Remove or move its child categories first"
+    "categoryHasChildren": "Remove or move its child categories first",
+    "committeeSize": "The committee needs an odd number of at least 3 members",
+    "chairRequired": "Mark exactly one member as Chair",
+    "votingPeriod": "Enter the voting period as a whole number of business days, 1 or more",
+    "committeeMember": "Only active users with the Committee Member role can sit on the committee",
+    "votingClosed": "Voting on this decision has ended",
+    "alreadyVoted": "You have already voted on this decision",
+    "pdfFailed": "The PDF could not be generated, try again"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -879,7 +894,8 @@
       "cancel": "Cancel sourcing"
     },
     "tabs": {
-      "invitations": "Invitations"
+      "invitations": "Invitations",
+      "proposals": "Proposals"
     },
     "invitees": {
       "title": "Invited vendors",
@@ -889,6 +905,15 @@
       "none": "No vendors invited yet.",
       "vendor": "Vendor",
       "declineReason": "Decline reason"
+    },
+    "proposals": {
+      "vendor": "Vendor",
+      "submitted": "Submitted",
+      "documents": "Technical documents",
+      "none": "No technical documents",
+      "sealed": "Prices are still sealed. They open after the technical evaluation.",
+      "committeeDecision": "Opening decision",
+      "openDecision": "Open the decision"
     }
   },
   "proposal": {
@@ -991,5 +1016,153 @@
       "value": "Estimated value excl. VAT",
       "created": "Created"
     }
+  },
+  "committee": {
+    "title": "Committee",
+    "members": "Members",
+    "membersHint": "Choose from users who hold the Committee Member role. The committee needs an odd number of at least 3 members.",
+    "chair": "Chair",
+    "chairColumn": "Chair",
+    "member": "Member",
+    "votingPeriod": "Voting period (business days)",
+    "votingPeriodHint": "Monday to Friday. Public holidays are not counted in this release.",
+    "save": "Save committee",
+    "saved": "Committee saved. Decisions that are already open keep their voters.",
+    "selected": "{count, plural, =0 {No members selected} one {# member selected} other {# members selected}}",
+    "noCandidates": "No active user holds the Committee Member role yet. Add one under Users.",
+    "addUsers": "Go to Users"
+  },
+  "decisions": {
+    "title": "Committee decisions",
+    "types": {
+      "OPENING": "Opening",
+      "WINNER": "Winner",
+      "PO": "PO"
+    },
+    "typeTitle": {
+      "OPENING": "Opening of bids",
+      "WINNER": "Winner decision",
+      "PO": "PO decision"
+    },
+    "waitingTitle": "Waiting for your vote",
+    "allTitle": "All decisions",
+    "empty": "There are no committee decisions yet.",
+    "emptyAction": "Go to sourcing",
+    "columns": {
+      "sourcing": "Sourcing",
+      "type": "Type",
+      "status": "Status",
+      "opened": "Opened",
+      "deadline": "Voting ends",
+      "closed": "Closed",
+      "minutes": "Minutes",
+      "yourVote": "Your vote"
+    },
+    "yourVote": {
+      "WAITING": "Waiting for your vote",
+      "VOTED": "You voted",
+      "CONFLICT": "Conflict declared",
+      "NONE": "—"
+    },
+    "fields": {
+      "sourcing": "Sourcing",
+      "type": "Type",
+      "owner": "Sourcing owner",
+      "opened": "Opened",
+      "deadline": "Voting ends",
+      "closed": "Closed",
+      "rule": "Rule applied",
+      "minutes": "Minutes"
+    },
+    "actions": {
+      "voteFor": "Vote For",
+      "voteAgainst": "Vote Against",
+      "conflict": "Declare conflict of interest",
+      "reopen": "Reopen vote"
+    },
+    "comments": {
+      "against": "Comment on your Against vote",
+      "conflict": "Comment on the conflict of interest",
+      "reopenReason": "Reason for reopening the vote"
+    },
+    "rules": {
+      "MAJORITY": "Majority",
+      "CHAIR_CASTING_VOTE": "Chair's casting vote",
+      "NO_QUORUM": "No quorum",
+      "TIE_WITHOUT_CHAIR": "Tie without the Chair's vote",
+      "SOURCING_CANCELLED": "Sourcing cancelled"
+    },
+    "voters": {
+      "title": "Voters",
+      "member": "Member",
+      "state": "Status",
+      "vote": "Vote",
+      "comment": "Comment",
+      "chair": "Chair",
+      "WAITING": "Not voted yet",
+      "VOTED": "Voted",
+      "CONFLICT": "Conflict of interest"
+    },
+    "votes": {
+      "FOR": "For",
+      "AGAINST": "Against",
+      "CONFLICT": "Conflict of interest",
+      "NONE": "Did not vote"
+    },
+    "hidden": "You can see who has voted, but not how, until the decision closes.",
+    "yourVoteIs": "Your vote: {vote}.",
+    "ownerNote": "You own this sourcing, so you do not vote on its decisions.",
+    "notVoter": "You are not one of the voters of this decision.",
+    "reopenedBecause": "Reopened because: {reason}",
+    "cancelledBecause": "The sourcing was cancelled: {reason}",
+    "package": {
+      "title": "Package",
+      "proposals": "{count, plural, =0 {No proposals received} one {# proposal received} other {# proposals received}}",
+      "minimum": "Minimum: {minimum}",
+      "bidders": "Bidders",
+      "sealed": "Prices stay sealed until the technical evaluation is done.",
+      "lowCompetition": "Reason for continuing below the minimum",
+      "openSourcing": "Open the sourcing"
+    }
+  },
+  "minutes": {
+    "title": "Minutes",
+    "empty": "Minutes appear here when a committee decision closes.",
+    "emptyAction": "Go to decisions",
+    "columns": {
+      "number": "Number",
+      "type": "Type",
+      "sourcing": "Sourcing",
+      "po": "PO",
+      "result": "Result",
+      "closed": "Closed"
+    },
+    "heading": "Minutes of the procurement committee",
+    "fields": {
+      "type": "Decision type",
+      "sourcing": "Sourcing",
+      "po": "PO",
+      "opened": "Opened",
+      "closed": "Closed",
+      "result": "Result",
+      "rule": "Rule applied",
+      "counts": "Votes",
+      "cancellation": "Cancellation reason",
+      "reopen": "Reason for reopening"
+    },
+    "counts": "{for} For, {against} Against, {eligible} eligible voters",
+    "voters": "Eligible voters and votes",
+    "voterColumns": {
+      "member": "Member",
+      "role": "Role",
+      "vote": "Vote",
+      "comment": "Comment"
+    },
+    "chair": "Chair",
+    "memberRole": "Member",
+    "download": "Download PDF",
+    "downloading": "Preparing the PDF…",
+    "readOnly": "Minutes cannot be changed or deleted.",
+    "generated": "Generated by VMS Core"
   }
 }

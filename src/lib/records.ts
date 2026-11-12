@@ -12,6 +12,7 @@ const INTERNAL_PATHS: Record<string, (id: string) => string> = {
   requisition: (id) => `/requisitions/${id}`,
   plan_line: () => "/plan",
   sourcing: (id) => `/sourcing/${id}`,
+  decision: (id) => `/decisions/${id}`,
 };
 
 const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {

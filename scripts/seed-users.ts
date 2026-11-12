@@ -53,6 +53,7 @@ async function main() {
   const { data: list, error: listError } = await admin.auth.admin.listUsers({ perPage: 1000 });
   if (listError) throw listError;
   const existing = new Map(list.users.map((u) => [u.email?.toLowerCase(), u.id]));
+  const ids = new Map<string, string>();
 
   for (const user of USERS) {
     let id = existing.get(user.email);
@@ -86,8 +87,29 @@ async function main() {
       .insert(user.roles.map((role) => ({ user_id: id, role })));
     if (roleError) throw roleError;
 
+    ids.set(user.email, id);
     console.log(`seeded ${user.email} (${user.roles.join(", ")})`);
   }
+
+  // CMT-01 demo committee: Elchin Karimov (Chair), Sevinj Guliyeva, Tural Ismayilov; voting period from seed.sql.
+  const { data: committee, error: committeeError } = await admin
+    .from("committee")
+    .select("id")
+    .eq("company_id", COMPANY_ID)
+    .single();
+  if (committeeError) throw committeeError;
+  const { error: clearError } = await admin.from("committee_member").delete().eq("committee_id", committee.id);
+  if (clearError) throw clearError;
+  const members = [
+    { email: "elchin@demo-agro.test", isChair: true },
+    { email: "sevinj@demo-agro.test", isChair: false },
+    { email: "tural@demo-agro.test", isChair: false },
+  ];
+  const { error: memberError } = await admin.from("committee_member").insert(
+    members.map((m) => ({ committee_id: committee.id, user_id: ids.get(m.email), is_chair: m.isChair })),
+  );
+  if (memberError) throw memberError;
+  console.log("seeded committee: Elchin Karimov (Chair), Sevinj Guliyeva, Tural Ismayilov");
 }
 
 main().catch((error) => {

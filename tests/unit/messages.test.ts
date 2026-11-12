@@ -66,6 +66,8 @@ describe("messages/en.json", () => {
       "pr.returned",
       "pr.rejected",
       "pr.readyForSourcing",
+      "decision.opened",
+      "decision.closed",
     ]) {
       expect(get(`notifications.events.${event}`), event).toBeTypeOf("string");
     }

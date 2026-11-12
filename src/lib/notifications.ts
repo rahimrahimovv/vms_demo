@@ -40,6 +40,9 @@ export function messageValues(
     else if (typeof value === "string" && ISO_DATE.test(value)) out[key] = formatDate(value);
     else if (key === "score" && value !== null && value !== "") out[key] = Number(value).toFixed(1);
     else if (key === "type" && label.has(`certificateTypes.${value}`)) out[key] = label.translate(`certificateTypes.${value}`);
+    // committee decisions: the type and result are codes in the database, words on the screen
+    else if (key === "decisionType" && label.has(`decisions.types.${value}`)) out[key] = label.translate(`decisions.types.${value}`);
+    else if (key === "result" && label.has(`status.${value}`)) out[key] = label.translate(`status.${value}`);
     else out[key] = value ?? "";
   }
   return out;

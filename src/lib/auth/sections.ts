@@ -23,7 +23,10 @@ export type SectionKey =
   | "adminQuestionnaire"
   | "adminDictionaries"
   | "adminCategories"
-  | "adminItems";
+  | "adminItems"
+  | "adminCommittee"
+  | "decisions"
+  | "minutes";
 
 export type SectionIcon =
   | "home"
@@ -39,7 +42,9 @@ export type SectionIcon =
   | "shoppingCart"
   | "bookOpen"
   | "folderTree"
-  | "package";
+  | "package"
+  | "gavel"
+  | "scrollText";
 
 export type Section = {
   key: SectionKey;
@@ -65,8 +70,14 @@ export const SECTIONS: Section[] = [
   // PRs: the Requester creates own PRs, the Approver decides, the PS sources approved ones (Slice 4),
   // the Admin reads. RLS shows other users' PRs only once submitted.
   { key: "requisitions", href: "/requisitions", labelKey: "requisitions", icon: "shoppingCart", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
-  // Sourcing (RFQ-01, RFQ-04, RFQ-06): the Procurement Specialist works on it, the Admin reads.
-  { key: "sourcing", href: "/sourcing", labelKey: "sourcing", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
+  // Sourcing (RFQ-01, RFQ-04, RFQ-06): the Procurement Specialist works on it, the Admin reads. The Committee Member
+  // reads too (CMT-04 AC2: the committee sees vendor names and technical documents once the opening is approved);
+  // sealed data stays closed by RLS, and only the owner gets action buttons. Assumption to confirm with the BA.
+  { key: "sourcing", href: "/sourcing", labelKey: "sourcing", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "procurement" },
+  // Committee decisions (CMT-02, CMT-04) and minutes (CMT-03): "Vote on winner and PO decisions" = Committee Member
+  // (never the sourcing owner); "View minutes" = Approver, PS, Committee Member, Admin. Never vendors.
+  { key: "decisions", href: "/decisions", labelKey: "decisions", icon: "gavel", roles: ["APPROVER", "PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "procurement" },
+  { key: "minutes", href: "/minutes", labelKey: "minutes", icon: "scrollText", roles: ["APPROVER", "PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "procurement" },
   // Vendor cards: PS, CM, Admin ("View a vendor card"); only PS decides on registrations.
   { key: "vendors", href: "/vendors", labelKey: "vendors", icon: "building", roles: ["PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "vendors" },
   // "Review answers, adjust points, confirm the grade or return" = PS
@@ -81,6 +92,7 @@ export const SECTIONS: Section[] = [
   { key: "adminDictionaries", href: "/admin/dictionaries", labelKey: "adminDictionaries", icon: "bookOpen", roles: ["ADMIN"], group: "admin" },
   { key: "adminCategories", href: "/admin/categories", labelKey: "adminCategories", icon: "folderTree", roles: ["ADMIN"], group: "admin" },
   { key: "adminItems", href: "/admin/items", labelKey: "adminItems", icon: "package", roles: ["ADMIN"], group: "admin" },
+  { key: "adminCommittee", href: "/admin/committee", labelKey: "adminCommittee", icon: "gavel", roles: ["ADMIN"], group: "admin" },
 ];
 
 export const SECTION_GROUPS = ["main", "procurement", "vendors", "admin"] as const;
