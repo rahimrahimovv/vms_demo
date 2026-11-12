@@ -325,10 +325,13 @@ describe("RFQ-01 publish and RFQ-02 vendor side", () => {
   });
 
   it("RFQ-02 AC8 / NFR-002: while OPEN no internal user reads a proposal, a price or a vendor name; only the count", async () => {
+    // only this test's own sourcing and proposals: other data on the project is ignored
+    const own = (await db.query("select id from public.proposal where sourcing_id = $1", [id])).rows.map((r) => r.id as string);
+    expect(own.length).toBeGreaterThan(0);
     for (const key of ["specialist", "specialist2", "admin", "committee"] as const) {
       const c = actors[key].client;
-      expect((await c.from("proposal").select("id")).data, key).toEqual([]);
-      expect((await c.from("proposal_line").select("id")).data, key).toEqual([]);
+      expect((await c.from("proposal").select("id").eq("sourcing_id", id)).data, key).toEqual([]);
+      expect((await c.from("proposal_line").select("id").in("proposal_id", own)).data, key).toEqual([]);
     }
     expect((await actors.specialist.client.rpc("sourcing_proposal_count", { p_id: id })).data).toBe(1);
   });

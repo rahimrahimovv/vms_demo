@@ -5,7 +5,16 @@ import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { FileText, Plus, Trash2 } from "lucide-react";
 import { OWNER_ROLES, type VendorType } from "@/lib/vendors/constants";
-import type { BankAccount, CompanyValues, ContactValues, Owner } from "@/lib/vendors/validate";
+import {
+  isStorableAccount,
+  parseBankAccounts,
+  parseOwners,
+  sharesExceed100,
+  type BankAccount,
+  type CompanyValues,
+  type ContactValues,
+  type Owner,
+} from "@/lib/vendors/validate";
 import type { StepKey, StepStatus } from "@/lib/vendors/steps";
 import type { ContactRow } from "@/lib/vendors/queries";
 import {
@@ -43,15 +52,32 @@ function FormAlert({ state }: { state: StepState }) {
 }
 
 /** REG-07 AC8: Save and continue / Back. Back also saves, so nothing is lost. */
-function StepFooter({ pending, readOnly }: { pending: boolean; readOnly: boolean }) {
+/** True when rows of the step cannot be stored (owners, bank accounts): the vendor confirms before leaving the step. */
+type RowCheck = (form: HTMLFormElement) => boolean;
+
+const ownersNotStorable: RowCheck = (form) => {
+  const owners = parseOwners(new FormData(form).get("owners"));
+  return (
+    owners.some((o) => !o.fullName || !o.idNumber || (o.sharePercent !== "" && !(Number(o.sharePercent) > 0 && Number(o.sharePercent) <= 100))) ||
+    sharesExceed100(owners)
+  );
+};
+const banksNotStorable: RowCheck = (form) =>
+  parseBankAccounts(new FormData(form).get("bankAccounts")).some((a) => !isStorableAccount(a));
+
+function StepFooter({ pending, readOnly, rowCheck }: { pending: boolean; readOnly: boolean; rowCheck?: RowCheck }) {
   const t = useTranslations("registration");
   if (readOnly) return null;
+  const confirmRows = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const form = e.currentTarget.form;
+    if (rowCheck && form && rowCheck(form) && !window.confirm(t("incompleteRowsConfirm"))) e.preventDefault();
+  };
   return (
     <div className="flex justify-between">
-      <Button type="submit" name="intent" value="back" variant="outline" disabled={pending} data-testid="step-back">
+      <Button type="submit" name="intent" value="back" variant="outline" disabled={pending} onClick={confirmRows} data-testid="step-back">
         {t("back")}
       </Button>
-      <Button type="submit" name="intent" value="continue" disabled={pending} data-testid="step-continue">
+      <Button type="submit" name="intent" value="continue" disabled={pending} onClick={confirmRows} data-testid="step-continue">
         {t("saveContinue")}
       </Button>
     </div>
@@ -60,9 +86,9 @@ function StepFooter({ pending, readOnly }: { pending: boolean; readOnly: boolean
 
 // ---- Company details ----
 
-export function CompanyStep({ vendorType, initial, readOnly }: { vendorType: VendorType; initial: CompanyValues; readOnly: boolean }) {
+export function CompanyStep({ vendorType, initial, readOnly, initialErrors }: { vendorType: VendorType; initial: CompanyValues; readOnly: boolean; initialErrors?: Record<string, string> }) {
   const t = useTranslations();
-  const [state, formAction, pending] = useActionState(saveCompany, { errors: {}, company: initial } as StepState);
+  const [state, formAction, pending] = useActionState(saveCompany, { errors: initialErrors ?? {}, company: initial } as StepState);
   const v = state.company ?? initial;
   const err = (key: string) => (state.errors[key] ? t(state.errors[key]) : undefined);
   const local = vendorType === "LOCAL_COMPANY";
@@ -116,9 +142,9 @@ export function CompanyStep({ vendorType, initial, readOnly }: { vendorType: Ven
 
 // ---- Owners ----
 
-export function OwnersStep({ vendorType, initial, readOnly }: { vendorType: VendorType; initial: Owner[]; readOnly: boolean }) {
+export function OwnersStep({ vendorType, initial, readOnly, initialErrors }: { vendorType: VendorType; initial: Owner[]; readOnly: boolean; initialErrors?: Record<string, string> }) {
   const t = useTranslations();
-  const [state, formAction, pending] = useActionState(saveOwners, { errors: {}, owners: initial } as StepState);
+  const [state, formAction, pending] = useActionState(saveOwners, { errors: initialErrors ?? {}, owners: initial } as StepState);
   const [owners, setOwners] = useState<Owner[]>(
     (state.owners ?? initial).length > 0 ? (state.owners ?? initial) : [{ fullName: "", idNumber: "", sharePercent: "", role: "HEAD" }],
   );
@@ -184,15 +210,15 @@ export function OwnersStep({ vendorType, initial, readOnly }: { vendorType: Vend
           )}
         </CardContent>
       </Card>
-      <StepFooter pending={pending} readOnly={readOnly} />
+      <StepFooter pending={pending} readOnly={readOnly} rowCheck={ownersNotStorable} />
     </form>
   );
 }
 
 // ---- Bank accounts ----
 
-export function BankStep({ initial, currencies, readOnly }: { initial: BankAccount[]; currencies: string[]; readOnly: boolean }) {
-  const [state, formAction, pending] = useActionState(saveBank, { errors: {}, bankAccounts: initial } as StepState);
+export function BankStep({ initial, currencies, readOnly, initialErrors }: { initial: BankAccount[]; currencies: string[]; readOnly: boolean; initialErrors?: Record<string, string> }) {
+  const [state, formAction, pending] = useActionState(saveBank, { errors: initialErrors ?? {}, bankAccounts: initial } as StepState);
   const t = useTranslations();
   return (
     <form action={formAction} noValidate className="flex flex-col gap-6" data-testid="step-bank">
@@ -207,16 +233,16 @@ export function BankStep({ initial, currencies, readOnly }: { initial: BankAccou
           />
         </CardContent>
       </Card>
-      <StepFooter pending={pending} readOnly={readOnly} />
+      <StepFooter pending={pending} readOnly={readOnly} rowCheck={banksNotStorable} />
     </form>
   );
 }
 
 // ---- Documents ----
 
-export function DocumentsStep({ kinds, files, readOnly }: { kinds: string[]; files: Files; readOnly: boolean }) {
+export function DocumentsStep({ kinds, files, readOnly, initialErrors }: { kinds: string[]; files: Files; readOnly: boolean; initialErrors?: Record<string, string> }) {
   const t = useTranslations();
-  const [state, formAction, pending] = useActionState(saveDocuments, { errors: {} } as StepState);
+  const [state, formAction, pending] = useActionState(saveDocuments, { errors: initialErrors ?? {} } as StepState);
   return (
     <form action={formAction} noValidate className="flex flex-col gap-6" data-testid="step-documents">
       <FormAlert state={state} />

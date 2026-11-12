@@ -91,3 +91,44 @@ export async function removeTestData(db: Client, service: SupabaseClient, prefix
   });
   return { users: users.length, vendors: vendors.length, sourcings: sourcings.length, requisitions: requisitions.length };
 }
+
+/**
+ * Removes one sourcing by number with its invitations, proposals, committee decisions (voters, votes, minutes),
+ * files, notifications and audit entries. Same guards as {@link removeTestData}: dev project only, immutability
+ * triggers switched back on in finally blocks. The PR it came from is not touched.
+ */
+export async function removeSourcingByNumber(db: Client, number: string) {
+  assertDevDatabase();
+  if (!/^SRC-\d{4}-\d{4}$/.test(number)) throw new Error("Cleanup refused: unexpected sourcing number");
+  const ids = async (sql: string, params: unknown[] = []) => (await db.query(sql, params)).rows.map((r) => r.id as string);
+  const sourcings = await ids("select id from public.sourcing where number = $1", [number]);
+  if (sourcings.length === 0) return { sourcings: 0 };
+  const decisions = await ids("select id from public.decision where sourcing_id = any($1::uuid[])", [sourcings]);
+  const minutes = await ids("select id from public.minutes where decision_id = any($1::uuid[])", [decisions]);
+  const related = [
+    ...sourcings,
+    ...decisions,
+    ...minutes,
+    ...(await ids("select id from public.invitation where sourcing_id = any($1::uuid[])", [sourcings])),
+    ...(await ids("select id from public.proposal where sourcing_id = any($1::uuid[])", [sourcings])),
+    ...(await ids("select id from public.question where sourcing_id = any($1::uuid[])", [sourcings])),
+  ];
+  await db.query("delete from public.file where owner_id = any($1::uuid[])", [related]);
+  if (decisions.length > 0) {
+    await db.query("alter table public.minutes disable trigger minutes_immutable");
+    try {
+      await db.query("delete from public.minutes where decision_id = any($1::uuid[])", [decisions]);
+    } finally {
+      await db.query("alter table public.minutes enable trigger minutes_immutable");
+    }
+    await db.query("delete from public.decision_voter where decision_id = any($1::uuid[])", [decisions]);
+    await db.query("update public.decision set reopened_from_id = null where id = any($1::uuid[])", [decisions]);
+    await db.query("delete from public.decision where id = any($1::uuid[])", [decisions]);
+  }
+  await withAuditTriggerOff(db, async () => {
+    await db.query("delete from public.audit_entry where record_id = any($1::uuid[])", [related]);
+    await db.query("delete from public.notification where record_id = any($1::uuid[])", [related]);
+    await db.query("delete from public.sourcing where id = any($1::uuid[])", [sourcings]);
+  });
+  return { sourcings: sourcings.length, decisions: decisions.length, minutes: minutes.length };
+}

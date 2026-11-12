@@ -11,7 +11,7 @@ import { removeFiles, storeFile, validateUpload, type FileKind } from "@/lib/fil
 import { errorKey } from "@/lib/db-errors";
 import { bakuToday } from "@/lib/vendors/rules";
 import { loadSnapshot } from "@/lib/vendors/queries";
-import { contactsError, neighbourStep, requiredKinds, type StepKey } from "@/lib/vendors/steps";
+import { neighbourStep, requiredKinds, type StepKey } from "@/lib/vendors/steps";
 import {
   isStorableAccount,
   parseBankAccounts,
@@ -20,7 +20,6 @@ import {
   parseOwners,
   toBankAccountRows,
   toOwnerRows,
-  validateBankAccounts,
   validateCompany,
   validateContact,
   validateOwners,
@@ -93,7 +92,6 @@ export async function saveCompany(_prev: StepState, formData: FormData): Promise
   const { error } = await ctx.supabase.from("vendor").update(update).eq("id", ctx.vendor.id);
   if (error) return state({ errors: { form: errorKey(error) ?? "common.genericError" }, company: values });
 
-  if (Object.keys(errors).length > 0 && formData.get("intent") !== "back") return state({ errors, company: values, saved: true });
   return leave("company", formData.get("intent"), type);
 }
 
@@ -119,7 +117,6 @@ export async function saveOwners(_prev: StepState, formData: FormData): Promise<
     if (error) errors.owners = errorKey(error) ?? "common.genericError"; // the 100% rule is also checked by the database
   }
 
-  if (Object.keys(errors).length > 0 && formData.get("intent") !== "back") return state({ errors, owners, saved: true });
   return leave("owners", formData.get("intent"), type);
 }
 
@@ -131,9 +128,6 @@ export async function saveBank(_prev: StepState, formData: FormData): Promise<St
   if (!EDITABLE.includes(ctx.vendor.status)) return state({ errors: { form: "errors.registrationReadOnly" }, bankAccounts: accounts });
 
   const errors: Record<string, string> = {};
-  const problem = validateBankAccounts(accounts);
-  if (problem) errors.bankAccounts = problem;
-
   const storable = accounts.filter(isStorableAccount);
   const rows = toBankAccountRows(storable);
   // several accounts marked main: keep the first one as main so the rest can still be saved
@@ -145,7 +139,8 @@ export async function saveBank(_prev: StepState, formData: FormData): Promise<St
   const { error } = await ctx.supabase.rpc("registration_bank_save", { p_accounts: rows });
   if (error) errors.bankAccounts = errorKey(error) ?? "common.genericError";
 
-  if (Object.keys(errors).length > 0) return state({ errors, bankAccounts: accounts, saved: true });
+  // incomplete rows were confirmed in the browser; only a database failure keeps the vendor on the step
+  if (error) return state({ errors, bankAccounts: accounts, saved: true });
   return leave("bank", formData.get("intent"), ctx.vendor.vendor_type);
 }
 
@@ -178,12 +173,10 @@ export async function saveDocuments(_prev: StepState, formData: FormData): Promi
       if (error) errors[`file_${kind}`] = error;
       else have.add(kind);
     }
-    if (!have.has(kind) && !errors[`file_${kind}`]) {
-      errors[`file_${kind}`] = kind === "vat_certificate" ? "errors.uploadVatCertificate" : "errors.fileRequired";
-    }
   }
   revalidatePath("/vendor/registration", "layout");
-  if (Object.keys(errors).length > 0 && formData.get("intent") !== "back") return state({ errors, saved: true });
+  // a rejected file stays on the step; a missing file only keeps the step In progress
+  if (Object.entries(errors).some(([k, v]) => k.startsWith("file_") && v === "errors.fileType")) return state({ errors, saved: true });
   return leave("documents", formData.get("intent"), ctx.vendor.vendor_type);
 }
 
@@ -259,10 +252,6 @@ export async function deleteContact(id: string): Promise<{ error: string | null 
 export async function continueContacts(_prev: StepState, formData: FormData): Promise<StepState> {
   const ctx = await vendorContext();
   if (!ctx) return state({ errors: { form: "access.denied" } });
-  if (formData.get("intent") !== "back") {
-    const problem = contactsError(ctx.vendor.vendor_type, ctx.snapshot.contacts);
-    if (problem) return state({ errors: { contacts: problem }, saved: true });
-  }
   return leave("contacts", formData.get("intent"), ctx.vendor.vendor_type);
 }
 

@@ -242,14 +242,14 @@ at Submit; SUBMITTED and APPROVED vendors keep working.
 
 ### Decisions and deviations to confirm
 
-- Save and continue stays on the step and shows the messages while the step is incomplete; it moves on when the step is
-  complete (steps can also be opened from the checklist in any order). Back always saves and goes back.
-- Rows of owners and bank accounts that are incomplete are not stored (the database needs name, ID, IBAN, SWIFT); they stay in
-  the form and keep their message. Complete rows are saved at once.
+- Answered 13 Nov 2026 (REG-07 AC8 patched in the backlog): Save and continue opens the next step even if the step is incomplete
+  (it stays In progress and shows its messages when opened again); Back saves the same way. Owner or bank rows that cannot be
+  stored (incomplete, IBAN format, shares over 100%) ask "Some rows are incomplete and will not be saved. Continue?" first; only
+  complete rows are stored. A rejected file (type or size) keeps the vendor on the Documents step.
 - Additional contact persons are information only (no logins). Editing the primary contact keeps the sign-in e-mail; its name
   and phone also update `vendor.contact_person` and `vendor.phone`.
 - Contact changes write no `audit_entry` (it records status changes only; no new statuses, CLAUDE.md rule 9).
-- Labels added beyond the confirmed list: "Qualification" and "Categories" on the locked cards.
+- Labels "Qualification" and "Categories" on the locked cards: accepted 13 Nov 2026.
 - Every step form uses plain named fields, JSON for owners and bank accounts, and the signed-URL file inputs, so Slice 8's
   Fill sample can prefill them.
 
@@ -257,17 +257,23 @@ at Submit; SUBMITTED and APPROVED vendors keep working.
 
 - `npm test`: 95 unit tests (adds the account form and the REG-07 step rules: legal representative, Individual exception, bank
   account, owners, documents, statuses and progress).
-- `npm run test:rls`: 165 tests on vms-dev; 164 pass. New file `registration.rls.test.ts` (21 tests, two vendors): short-form
+- `npm run test:rls`: 165 tests on vms-dev, all pass (13 Nov 2026, after the fix below). New file `registration.rls.test.ts` (21 tests, two vendors): short-form
   account, DRAFT never in the review queue, `vendor_contact` and proof files isolated per vendor, no direct writes, contact rules,
   draft bank saves, Submit step by step, read-only after Submit, Individual exception, last legal representative after approval.
-  The one failure (`sourcing.rls.test.ts`, RFQ-02 AC8) is not from this slice: vms-dev holds two submitted proposals of the
-  opened tender SRC-2026-0142 from the 12 Nov click-through, which the sealed-proposal test does not expect.
+  The sealed-proposals test (`sourcing.rls.test.ts`, RFQ-02 AC8) failed on leftover data (two submitted proposals of the opened
+  tender SRC-2026-0142 from the 12 Nov click-through). It now looks only at its own sourcing and proposals, and the leftover
+  tender with its decision and minutes was removed from vms-dev with the guarded helper (`removeSourcingByNumber`, script
+  `scripts/dev-cleanup-sourcing.ts`, dev project only). The PR it came from was not touched.
 - Click-through in Edge at 1280 px on the dev server (vms-dev): create account, warning and checklist, empty step shows messages,
   company details, owners, legal representative refused without proof then saved with a PDF, bank account, charter, Submit,
   read-only steps, as Nigar: not under Incomplete registrations, vendor card shows the contact and proof file, Approve.
   The click-through found and fixed one bug (controlled checkbox and radios lost their state after a failed save).
 - vms-prod: 3 migrations and the seed applied; 6 vendors, 6 primary contacts; Beta Trade and Gamma Supply have a legal
   representative with a proof file; RLS on; no `anon` access to the table or the new functions.
+
+- Vercel: https://vms-demo-rho.vercel.app/register answers 200 and shows the short form (checked read-only, 13 Nov 2026).
+- The click-through was repeated after the AC8 change (next step opens while incomplete, messages on return, confirmation for an
+  incomplete bank row, only the complete account saved).
 
 ### Open issues
 

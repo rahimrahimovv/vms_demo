@@ -444,7 +444,8 @@
     "lockedSteps": {
       "questionnaire": "Qualification",
       "categories": "Categories"
-    }
+    },
+    "incompleteRowsConfirm": "Some rows are incomplete and will not be saved. Continue?"
   },
   "bankAccounts": {
     "title": "Bank accounts",
