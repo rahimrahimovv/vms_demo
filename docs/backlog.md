@@ -929,6 +929,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Submit a final offer | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (if chosen) |
 | Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | View a vendor card, including owners | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
+| View a sourcing record, read-only | ❌ | ❌ | ✅ | ✅ | ✅ | Only its own invitation |
 
 Owner means the Procurement Specialist who started the sourcing; other specialists can read it. Demo tools (DEMO-01) are open to everyone, and only while demo mode is on.
 
