@@ -131,6 +131,13 @@
         "returned": "{number} was returned for correction: {comment}",
         "rejected": "{number} was rejected: {comment}",
         "readyForSourcing": "{number} was approved and is ready for sourcing"
+      },
+      "sourcing": {
+        "published": "{number} ({type}) invites you to submit a proposal by {deadline}",
+        "deadlineSoon": "The deadline for {number} is {deadline}. You have not submitted a proposal yet",
+        "extended": "The deadline for {number} moved to {deadline}",
+        "closed": "{number} closed: {received} of {minimum} proposals received",
+        "cancelled": "{number} was cancelled: {reason}"
       }
     }
   },
@@ -177,6 +184,18 @@
     "statusChanged": "This record has changed. Reload the page and try again",
     "commentRequired": "Enter a comment",
     "reasonRequired": "Enter a reason",
+    "deadlinePast": "Set a deadline later than now",
+    "deadlinePassed": "The deadline has passed",
+    "noInvitees": "Invite at least one vendor",
+    "noQualifiedVendors": "No qualified vendors in this category",
+    "priceRequired": "Enter a price for at least one line",
+    "priceInvalid": "Enter a price greater than 0 with up to 2 decimals",
+    "vatRateRequired": "Enter the VAT rate when prices include VAT",
+    "sspVendorRequired": "Pick one vendor for a single source purchase",
+    "vendorNotInAvl": "This vendor is not qualified in this category",
+    "sspJustification": "A single source purchase above {limit} AZN needs a justification and a file",
+    "techDocRequired": "Attach the technical document",
+    "maxExtensions": "Maximum number of extensions reached",
     "registrationNotApproved": "Your registration must be approved first",
     "questionnaireFirst": "Complete the qualification questionnaire first",
     "vendorOnHold": "You cannot start a new questionnaire yet",
@@ -280,6 +299,8 @@
   "files": {
     "none": "No files.",
     "hint": "PDF, JPG, PNG, DOCX or XLSX, up to 10 MB",
+    "uploading": "Uploading…",
+    "uploadFailed": "Use PDF, JPG, PNG, DOCX or XLSX up to 10 MB",
     "kinds": {
       "charter": "Charter or state-registry extract",
       "id_card": "ID card",

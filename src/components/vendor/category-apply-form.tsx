@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import type { ApplyState } from "@/app/(app)/vendor/categories/actions";
 import type { CategoryNode } from "@/lib/categories";
-import { ACCEPT_ATTRIBUTE } from "@/lib/files/rules";
+import { StagedFileInput } from "@/components/file-field";
 import { StatusBadge } from "@/components/status-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export function CategoryApplyForm({
               <div className="flex flex-col gap-1">
                 {c.needsLicence && !c.blocked ? (
                   <>
-                    <Input name={`licence-${c.id}`} type="file" accept={ACCEPT_ATTRIBUTE} aria-label={t("categories.licenceFor", { name: c.name })} />
+                    <StagedFileInput id={`licence-${c.id}`} name={`licence-${c.id}`} label={t("categories.licenceFor", { name: c.name })} />
                     <span className="text-xs text-muted-foreground">{t("categories.licenceRequired")}</span>
                   </>
                 ) : null}

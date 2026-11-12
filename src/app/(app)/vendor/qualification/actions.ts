@@ -61,7 +61,7 @@ export async function saveQuestionnaire(
   if (own.length === 0) return answer("access.denied");
 
   const fileErrors: Record<string, string> = {};
-  const uploads: { answerId: string; file: File }[] = [];
+  const uploads: { answerId: string; file: string }[] = [];
   for (const row of own) {
     const value = formData.get(`evidence-${row.answer_id}`);
     if (!isUpload(value)) continue;

@@ -157,7 +157,7 @@ export async function addCertificate(_prev: FormState, formData: FormData): Prom
     .select("id")
     .single();
   if (error) return done({ form: errorKey(error) ?? "common.genericError" });
-  await storeFile({ companyId: user.companyId, ownerType: "vendor_certificate", ownerId: data.id, kind: "attachment", file: file as File, userId: user.id });
+  await storeFile({ companyId: user.companyId, ownerType: "vendor_certificate", ownerId: data.id, kind: "attachment", file: file as string, userId: user.id });
   refresh();
   return done({}, true);
 }
@@ -188,7 +188,7 @@ export async function renewCertificate(id: string, _prev: FormState, formData: F
 
   const { error } = await supabase.from("vendor_certificate").update({ expires_on: expiresOn }).eq("id", id);
   if (error) return done({ form: errorKey(error) ?? "common.genericError" });
-  await storeFile({ companyId: user.companyId, ownerType: "vendor_certificate", ownerId: id, kind: "attachment", file: file as File, userId: user.id });
+  await storeFile({ companyId: user.companyId, ownerType: "vendor_certificate", ownerId: id, kind: "attachment", file: file as string, userId: user.id });
   refresh();
   return done({}, true);
 }

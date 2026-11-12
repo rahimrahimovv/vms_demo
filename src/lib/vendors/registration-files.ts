@@ -23,8 +23,8 @@ export async function collectRegistrationFiles(
   vendorType: VendorType,
   isVatPayer: boolean,
   options: { submit: boolean; have: Set<string> },
-): Promise<{ files: { kind: FileKind; file: File }[]; errors: Record<string, string> }> {
-  const files: { kind: FileKind; file: File }[] = [];
+): Promise<{ files: { kind: FileKind; file: string }[]; errors: Record<string, string> }> {
+  const files: { kind: FileKind; file: string }[] = [];
   const errors: Record<string, string> = {};
   for (const kind of kindsForType(vendorType, isVatPayer)) {
     const value = formData.get(`file_${kind}`);
