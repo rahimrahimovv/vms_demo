@@ -56,8 +56,28 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
     { key: "categories", href: "/vendor/categories", state: qualified.length > 0 ? "done" : graded ? "current" : "todo" },
   ];
 
+  // Slice 4 (RFQ-02): invitations waiting for an answer, accepted ones still without a submitted proposal
+  const { data: invitationRows } = await supabase.rpc("vendor_invitation_list");
+  const open = ((invitationRows ?? []) as { sourcing_status: string; deadline: string; invitation_status: string; proposal_status: string | null }[]).filter(
+    (i) => i.sourcing_status === "OPEN" && new Date(i.deadline) > new Date(),
+  );
+  const toAnswer = open.filter((i) => i.invitation_status === "INVITED").length;
+  const toSubmit = open.filter((i) => i.invitation_status === "ACCEPTED" && i.proposal_status !== "SUBMITTED").length;
+
   return (
     <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-4 gap-4">
+        {[
+          { key: "invitationsToAnswer", count: toAnswer },
+          { key: "proposalsToSubmit", count: toSubmit },
+        ].map((card) => (
+          <Link key={card.key} href="/vendor/invitations" data-testid={`task-card-${card.key}`}>
+            <Card className="h-full hover:bg-muted/60">
+              <CardContent className="text-sm font-medium">{t(`home.cards.${card.key}`, { count: card.count })}</CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
       {warnings.map((c) => (
         <Alert key={c.id} variant={c.status === "EXPIRED" ? "destructive" : "default"} className={cn(c.status === "EXPIRING" && "border-amber-300 bg-amber-50")} data-testid="certificate-warning">
           <TriangleAlert className="size-4" aria-hidden />
