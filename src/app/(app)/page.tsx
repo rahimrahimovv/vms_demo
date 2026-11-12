@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Building2, ClipboardCheck, ListChecks, PackageSearch, ShoppingCart, Undo2, UserPlus } from "lucide-react";
+import { Bell, Building2, ClipboardCheck, Gavel, ListChecks, PackageSearch, ShoppingCart, Undo2, UserPlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { canAccess } from "@/lib/auth/sections";
@@ -69,7 +69,18 @@ export default async function HomePage() {
     isRequester ? prCount("RETURNED", "own") : null,
     isSpecialist ? prCount("APPROVED") : null,
   ]);
+  // Slice 5 (CMT-02): decisions where this member's vote is still missing (the owner is never a voter).
+  const isCommittee = user.roles.includes("COMMITTEE_MEMBER");
+  const votesWaiting = isCommittee
+    ? await supabase
+        .from("decision_voter")
+        .select("id, decision!inner(status)", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("vote", "NONE")
+        .eq("decision.status", "VOTING")
+    : null;
   const taskCards = [
+    ...(isCommittee ? [{ key: "votesWaiting", href: "/decisions", count: votesWaiting?.count ?? 0, icon: Gavel }] : []),
     ...(isApprover ? [{ key: "prsToApprove", href: "/requisitions?tab=toApprove", count: toApprove?.count ?? 0, icon: ShoppingCart }] : []),
     ...(isRequester ? [{ key: "prsReturned", href: "/requisitions?tab=mine", count: returned?.count ?? 0, icon: Undo2 }] : []),
     ...(isSpecialist

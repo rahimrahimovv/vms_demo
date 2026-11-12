@@ -52,8 +52,9 @@ export async function removeTestData(db: Client, service: SupabaseClient, prefix
   const sourcings = await ids("select id from public.sourcing where owner_id = any($1::uuid[])", [users]);
   const requisitions = await ids("select id from public.requisition where requester_id = any($1::uuid[])", [users]);
   const planLines = await ids("select id from public.plan_line where description like $1", [`${label} plan %`]);
+  const decisions = await ids("select id from public.decision where sourcing_id = any($1::uuid[])", [sourcings]);
   const related = [
-    ...sourcings, ...requisitions, ...planLines, ...vendors,
+    ...sourcings, ...requisitions, ...planLines, ...vendors, ...decisions,
     ...(await ids("select id from public.invitation where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.proposal where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.category_application where vendor_id = any($1::uuid[])", [vendors])),
@@ -61,6 +62,20 @@ export async function removeTestData(db: Client, service: SupabaseClient, prefix
   ];
 
   await db.query("delete from public.file where owner_id = any($1::uuid[])", [related]);
+  // Committee decisions of the test sourcings go first. Minutes are immutable (CMT-03 AC4), so their trigger is
+  // switched off for a moment here, under the same guards as the audit trigger (dev project only, finally block).
+  if (decisions.length > 0) {
+    await db.query("alter table public.minutes disable trigger minutes_immutable");
+    try {
+      await db.query("delete from public.minutes where decision_id = any($1::uuid[])", [decisions]);
+    } finally {
+      await db.query("alter table public.minutes enable trigger minutes_immutable");
+    }
+    await db.query("delete from public.decision_voter where decision_id = any($1::uuid[])", [decisions]);
+    await db.query("update public.decision set reopened_from_id = null where id = any($1::uuid[])", [decisions]);
+    await db.query("delete from public.decision where id = any($1::uuid[])", [decisions]);
+  }
+  await db.query("delete from public.committee_member where user_id = any($1::uuid[])", [users]);
   await db.query("delete from public.sourcing where id = any($1::uuid[])", [sourcings]);
   await withAuditTriggerOff(db, async () => {
     await db.query("delete from public.audit_entry where record_id = any($1::uuid[]) or user_id = any($2::uuid[])", [related, users]);
