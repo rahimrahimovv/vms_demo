@@ -117,4 +117,41 @@ policies were dropped), so each rule and message is checked in one place. Home c
 6. **Test vendor left on vms-prod.** The Slice 2 production click-through registered "Alpha Agro UI …"
    (e-mail `ui2-alpha-…@rls.test`, status APPROVED). Its login is banned, but the vendor row and its user
    stay, because their audit entries reference them and the audit log is immutable. Removing them means
-   deleting those audit rows on vms-prod; that needs an explicit decision.
+   deleting those audit rows on vms-prod. **Decision of 12 Nov 2026:** keep the test vendor on vms-prod; DEMO-02's
+   reset removes it later; no audit rows are deleted on vms-prod.
+
+## Slice 4 (12 Nov 2026)
+
+Changes agreed on 12 Nov 2026: every upload goes browser to Storage with a signed upload URL (the file body no longer
+passes through a Vercel function); the server then checks first bytes, type and size and writes the file row (all Slice 2
+uploads retrofitted); RFQ-01 AC4: the deadline is prefilled at creation and, if the specialist did not change it,
+recalculated at Publish from the publish time, a deadline set by hand must be later than now; new error texts
+(RFQ-01 AC4/AC5, RFQ-02 AC3/AC5, RFQ-06 AC1/AC2) and the SSP limit taken from the setting. The deadline job runs every
+minute. The reason entered on Continue is stored in `sourcing.low_competition_reason`.
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| RFQ-01 Start sourcing, RFQ or Tender by value | done | AC1-AC7; Start sourcing on an APPROVED PR, type and minimum from the Admin settings, invitations from the AVL (standing, grade, category or parent), vendors may be removed |
+| RFQ-02 Vendor answers, sealed proposal | done | AC1-AC9; invitation list and page, decline with a reason, proposal with Incoterm, terms and VAT, resubmit, withdraw; vendors read only through functions |
+| RFQ-04 Deadline below the minimum | done | AC1-AC6; job closes within 1 minute, Tender goes to AWAITING_OPENING, RFQ and SSP to COMPARISON; Extend (max 2), Continue (reason), Cancel |
+| RFQ-06 Single Source Purchase | partial | AC1-AC5 done; AC6-AC7 (comparison, committee label) come with Slices 5-6 |
+
+### Verified
+
+- `npm test`: 70 unit tests.
+- `npm run test:rls`: 122 tests on vms-dev, 28 new: signed-URL upload with a 9 MB file, 11 MB, a renamed .exe and a token
+  outside staging/; bands and the Tender threshold at their boundaries; deadline rules; invitations only to the AVL; vendor
+  isolation; decline, price, VAT and submit rules; resubmit and withdraw; sealed proposals per internal role while OPEN and
+  for a Tender at AWAITING_OPENING; the job, locking after the deadline, extend (limit 2), continue, cancel, the 24-hour
+  reminder; SSP rules; audit entries, with System for the job.
+- Click-through at 1280 px: **not done yet.**
+
+### Open issues
+
+7. **Test cleanup on vms-dev.** Tests remove their throwaway users with the audit trigger switched off for a moment
+   (`tests/rls/helpers/dev-cleanup.ts`, `scripts/dev-cleanup-rls.ts`). Guards: only the .env.local project, never the
+   production project; trigger switched back on in a finally block; never in a migration.
+8. **A Tender waits at AWAITING_OPENING until Slice 5 (CMT-04).** Cancel works from there; Slice 5 must close an open
+   OPENING vote when the sourcing is cancelled.
+9. Staged uploads that no action claims stay under `staging/` in the bucket; no cleanup job is built.
+10. vms-prod is not migrated for Slice 4 yet (`ENV_FILE=.env.production.local npm run db:push`).
