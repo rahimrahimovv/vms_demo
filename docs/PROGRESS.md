@@ -144,7 +144,11 @@ minute. The reason entered on Continue is stored in `sourcing.low_competition_re
   isolation; decline, price, VAT and submit rules; resubmit and withdraw; sealed proposals per internal role while OPEN and
   for a Tender at AWAITING_OPENING; the job, locking after the deadline, extend (limit 2), continue, cancel, the 24-hour
   reminder; SSP rules; audit entries, with System for the job.
-- Click-through at 1280 px: **not done yet.**
+- Click-through on vms-dev, done by the BA on 12 Nov 2026: start sourcing as a Tender, publish, Beta Trade accepted and
+  submitted, Gamma declined, the specialist sees the count only. The deadline actions are covered by the workflow test.
+- vms-prod: migrations `20261112100000` and `20261112110000` applied on 12 Nov 2026; read-only check shows the same
+  15 public and 10 internal functions, the `deadline_prefilled` column, the `vms-sourcing` (every minute) and `vms-daily`
+  jobs and no `anon` grants as on vms-dev. Vercel deploy of `main` answers on the production URL.
 
 ### Open issues
 
@@ -154,4 +158,5 @@ minute. The reason entered on Continue is stored in `sourcing.low_competition_re
 8. **A Tender waits at AWAITING_OPENING until Slice 5 (CMT-04).** Cancel works from there; Slice 5 must close an open
    OPENING vote when the sourcing is cancelled.
 9. Staged uploads that no action claims stay under `staging/` in the bucket; no cleanup job is built.
-10. vms-prod is not migrated for Slice 4 yet (`ENV_FILE=.env.production.local npm run db:push`).
+10. vms-prod migrated for Slice 4 on 12 Nov 2026. Run `db:push` with `.env.production.local` before every push that
+    brings a new migration.
