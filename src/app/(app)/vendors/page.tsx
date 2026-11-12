@@ -35,7 +35,7 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
   const t = await getTranslations();
   const supabase = await createClient();
   const params = await searchParams;
-  const tab = params.tab === "all" ? "all" : "review";
+  const tab = params.tab === "all" ? "all" : params.tab === "incomplete" ? "incomplete" : "review";
   const today = bakuToday();
 
   let query = supabase
@@ -43,15 +43,24 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
     .select(
       "id, legal_name, vendor_type, voen, foreign_tax_number, country_code, status, standing, submitted_at, created_at, questionnaire_response(grade, status, valid_until)",
     );
-  query = tab === "review" ? query.eq("status", "SUBMITTED").order("submitted_at", { ascending: true }) : query.order("legal_name");
+  // REG-01 AC8: DRAFT accounts only appear under "Incomplete registrations", never in the review queue
+  query =
+    tab === "review"
+      ? query.eq("status", "SUBMITTED").order("submitted_at", { ascending: true })
+      : tab === "incomplete"
+        ? query.eq("status", "DRAFT").order("created_at", { ascending: true })
+        : query.order("legal_name");
   const { data } = await query.returns<VendorListRow[]>();
   const vendors = data ?? [];
 
-  const link = (v: VendorListRow) => (
+  const link = (v: VendorListRow) =>
+    tab === "incomplete" ? (
+      <span className="font-medium">{v.legal_name}</span>
+    ) : (
     <Link href={`/vendors/${v.id}`} className="font-medium text-primary hover:underline">
       {v.legal_name}
     </Link>
-  );
+    );
   const grade = (v: VendorListRow) =>
     v.questionnaire_response.find((r) => r.status === "GRADED" && r.valid_until && r.valid_until >= today)?.grade ?? "";
 
@@ -66,11 +75,19 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
       status: { sort: v.status, node: <StatusBadge status={v.status} /> },
       standing: { sort: v.standing ?? "", node: v.standing ? <StatusBadge status={v.standing} /> : t("common.none") },
       grade: { sort: grade(v), node: grade(v) || t("common.none") },
+      created: { sort: v.created_at, node: formatDate(v.created_at) },
     },
   }));
 
   const columns =
-    tab === "review"
+    tab === "incomplete"
+      ? [
+          { key: "name", label: t("vendors.columns.name") },
+          { key: "type", label: t("vendors.columns.type") },
+          { key: "tax", label: t("vendors.columns.taxNumber") },
+          { key: "created", label: t("vendors.columns.created") },
+        ]
+      : tab === "review"
       ? [
           { key: "name", label: t("vendors.columns.name") },
           { key: "type", label: t("vendors.columns.type") },
@@ -89,10 +106,10 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
   return (
     <div className="flex flex-col gap-5">
       <nav className="flex gap-1 border-b" aria-label={t("vendors.tabsLabel")}>
-        {(["review", "all"] as const).map((key) => (
+        {(["review", "incomplete", "all"] as const).map((key) => (
           <Link
             key={key}
-            href={key === "review" ? "/vendors" : "/vendors?tab=all"}
+            href={key === "review" ? "/vendors" : "/vendors?tab=" + key}
             aria-current={tab === key ? "page" : undefined}
             className={cn(
               "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
@@ -104,12 +121,12 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
         ))}
       </nav>
       {vendors.length === 0 ? (
-        <EmptyState message={t(tab === "review" ? "vendors.emptyReview" : "vendors.emptyAll")} />
+        <EmptyState message={t(tab === "review" ? "vendors.emptyReview" : tab === "incomplete" ? "vendors.emptyIncomplete" : "vendors.emptyAll")} />
       ) : (
         <SortableTable
           columns={columns}
           rows={rows}
-          initialSort={tab === "review" ? { key: "submitted", dir: "asc" } : { key: "name", dir: "asc" }}
+          initialSort={tab === "review" ? { key: "submitted", dir: "asc" } : tab === "incomplete" ? { key: "created", dir: "asc" } : { key: "name", dir: "asc" }}
         />
       )}
     </div>

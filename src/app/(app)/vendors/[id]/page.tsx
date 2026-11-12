@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
 import { flattenTree, type CategoryRow } from "@/lib/categories";
 import { bakuToday, certificateStatus, yearsInBusiness } from "@/lib/vendors/rules";
-import { loadVendor } from "@/lib/vendors/queries";
+import { loadContacts, loadVendor } from "@/lib/vendors/queries";
 import { NoAccess } from "@/components/no-access";
 import { RecordHeader } from "@/components/record-header";
 import { HistoryTab } from "@/components/history-tab";
@@ -43,6 +43,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
   const supabase = await createClient();
   const today = bakuToday();
   const { vendor, owners, files, bankAccounts } = await loadVendor(supabase, id);
+  const contacts = await loadContacts(supabase, id);
   if (!vendor) return <NoAccess />;
 
   const [{ data: brands }, { data: certificates }, { data: applications }, { data: responses }, { data: categories }, { data: shared }] =
@@ -207,6 +208,48 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
                         <TableCell>{a.currency}</TableCell>
                         <TableCell className="text-right">
                           {a.is_main && <Badge variant="secondary">{t("bankAccounts.main")}</Badge>}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* REG-06 AC7: contact persons, the legal representatives and their proof files marked. */}
+              <h3 className="mt-6 mb-2 text-sm font-medium">{t("vendorCard.contacts")}</h3>
+              <div className="overflow-hidden rounded-md border">
+                <Table data-testid="contacts">
+                  <TableHeader className="bg-muted/60">
+                    <TableRow>
+                      <TableHead>{t("owners.fullName")}</TableHead>
+                      <TableHead>{t("registration.contacts.position")}</TableHead>
+                      <TableHead>{t("registration.fields.phone")}</TableHead>
+                      <TableHead>{t("registration.fields.contactEmail")}</TableHead>
+                      <TableHead>{t("registration.contacts.legalRepresentative")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {contacts.map((c) => (
+                      <TableRow key={c.id} data-testid="contact-row">
+                        <TableCell>
+                          {c.full_name} {c.is_primary && <Badge variant="secondary">{t("registration.contacts.primary")}</Badge>}
+                        </TableCell>
+                        <TableCell>{c.position ?? none}</TableCell>
+                        <TableCell>{c.phone}</TableCell>
+                        <TableCell>{c.email}</TableCell>
+                        <TableCell>
+                          {c.is_legal_representative ? (
+                            <span className="flex flex-col gap-1">
+                              <Badge variant="secondary" className="self-start">{t("registration.contacts.legalRepresentative")}</Badge>
+                              {c.proof.map((f) => (
+                                <a key={f.id} href={"/api/files/" + f.id} className="text-xs text-primary hover:underline" data-testid="proof-file">
+                                  {f.file_name}
+                                </a>
+                              ))}
+                            </span>
+                          ) : (
+                            none
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

@@ -221,3 +221,55 @@ the Role Matrix has the row "View a sourcing record, read-only". Deployed: `main
     (`app.apply_decision_outcome`).
 15. A Tender already at AWAITING_OPENING from Slice 4 gets its OPENING decision in the CMT-04 migration only where a committee
     exists at that moment. Without a decision it cannot be opened (Reopen needs a decision); the owner can cancel it.
+
+## Slice 2b: short account form and registration in steps (13 Nov 2026)
+
+Backlog export of 31 stories (REG-01 short form, REG-07 new, REG-06 AC3 / AC6 / AC7, ERD `vendor_contact`, file kind
+`proof_of_authority`). REG-02 and REG-05 keep their earlier wording. Migrations `20261114100000` (vendor_contact, RLS, file
+kind, draft-friendly bank accounts, `register_vendor` without owners and accounts, contact functions, `registration_submit`
+with the step rules), `20261114110000` (an ID card number already used is refused, REG-01 AC4) and `20261114120000` (the
+per-type vendor field rules apply from SUBMITTED on).
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| REG-01 Vendor creates an account (short form) | done | AC1-AC8; 6 visible fields; confirmed by the server, signed in, DRAFT; "Incomplete registrations" tab for the specialist (read-only; DRAFT never in the review queue) |
+| REG-07 Vendor completes the registration in steps | done | AC1-AC11; checklist with progress bar and Continue; Company details, Owners, Contact persons, Bank accounts, Documents, Review and submit; read-only when SUBMITTED; RETURNED comment on top |
+| REG-06 contact persons (AC3, AC6, AC7) | done | contact persons on Profile (add, edit, remove, always one legal representative with a proof file for companies); vendor card shows them with the proof file |
+
+Existing vendors got their first contact person (primary) from `contact_person`, `phone` and `contact_email`. Beta Trade and
+Gamma Supply have a legal representative with a sample proof file (`db:seed` uploads it). The legal-representative rule applies
+at Submit; SUBMITTED and APPROVED vendors keep working.
+
+### Decisions and deviations to confirm
+
+- Save and continue stays on the step and shows the messages while the step is incomplete; it moves on when the step is
+  complete (steps can also be opened from the checklist in any order). Back always saves and goes back.
+- Rows of owners and bank accounts that are incomplete are not stored (the database needs name, ID, IBAN, SWIFT); they stay in
+  the form and keep their message. Complete rows are saved at once.
+- Additional contact persons are information only (no logins). Editing the primary contact keeps the sign-in e-mail; its name
+  and phone also update `vendor.contact_person` and `vendor.phone`.
+- Contact changes write no `audit_entry` (it records status changes only; no new statuses, CLAUDE.md rule 9).
+- Labels added beyond the confirmed list: "Qualification" and "Categories" on the locked cards.
+- Every step form uses plain named fields, JSON for owners and bank accounts, and the signed-URL file inputs, so Slice 8's
+  Fill sample can prefill them.
+
+### Verified
+
+- `npm test`: 95 unit tests (adds the account form and the REG-07 step rules: legal representative, Individual exception, bank
+  account, owners, documents, statuses and progress).
+- `npm run test:rls`: 165 tests on vms-dev; 164 pass. New file `registration.rls.test.ts` (21 tests, two vendors): short-form
+  account, DRAFT never in the review queue, `vendor_contact` and proof files isolated per vendor, no direct writes, contact rules,
+  draft bank saves, Submit step by step, read-only after Submit, Individual exception, last legal representative after approval.
+  The one failure (`sourcing.rls.test.ts`, RFQ-02 AC8) is not from this slice: vms-dev holds two submitted proposals of the
+  opened tender SRC-2026-0142 from the 12 Nov click-through, which the sealed-proposal test does not expect.
+- Click-through in Edge at 1280 px on the dev server (vms-dev): create account, warning and checklist, empty step shows messages,
+  company details, owners, legal representative refused without proof then saved with a PDF, bank account, charter, Submit,
+  read-only steps, as Nigar: not under Incomplete registrations, vendor card shows the contact and proof file, Approve.
+  The click-through found and fixed one bug (controlled checkbox and radios lost their state after a failed save).
+- vms-prod: 3 migrations and the seed applied; 6 vendors, 6 primary contacts; Beta Trade and Gamma Supply have a legal
+  representative with a proof file; RLS on; no `anon` access to the table or the new functions.
+
+### Open issues
+
+16. Test vendors of the click-through were removed from vms-dev. The helper `removeTestData` does not delete `file` rows that
+    real uploads attach to a test user (`uploaded_by`); that was done by hand this time.

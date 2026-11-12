@@ -110,6 +110,50 @@ async function main() {
   );
   if (memberError) throw memberError;
   console.log("seeded committee: Elchin Karimov (Chair), Sevinj Guliyeva, Tural Ismayilov");
+
+  // REG-07 AC4: Beta Trade and Gamma Supply keep a legal representative with a sample proof-of-authority file.
+  const SAMPLE_PDF = Buffer.from(
+    [
+      "%PDF-1.4",
+      "1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj",
+      "2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj",
+      "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 100]>>endobj",
+      "trailer<</Root 1 0 R>>",
+      "%%EOF",
+      "",
+    ].join("\n"),
+  );
+  for (const vendorId of ["00000000-0000-4000-8000-000000000502", "00000000-0000-4000-8000-000000000503"]) {
+    const { data: contact, error: contactError } = await admin
+      .from("vendor_contact")
+      .select("id")
+      .eq("vendor_id", vendorId)
+      .eq("is_primary", true)
+      .single();
+    if (contactError) throw contactError;
+    const { data: existing } = await admin
+      .from("file")
+      .select("id")
+      .eq("owner_type", "vendor_contact")
+      .eq("owner_id", contact.id)
+      .eq("kind", "proof_of_authority");
+    if (existing && existing.length > 0) continue;
+    const path = `${COMPANY_ID}/vendor_contact/${contact.id}/sample-power-of-attorney.pdf`;
+    const { error: uploadError } = await admin.storage.from("files").upload(path, SAMPLE_PDF, { contentType: "application/pdf", upsert: true });
+    if (uploadError) throw uploadError;
+    const { error: fileError } = await admin.from("file").insert({
+      company_id: COMPANY_ID,
+      owner_type: "vendor_contact",
+      owner_id: contact.id,
+      kind: "proof_of_authority",
+      file_name: "sample-power-of-attorney.pdf",
+      mime_type: "application/pdf",
+      size_bytes: SAMPLE_PDF.length,
+      storage_path: path,
+    });
+    if (fileError) throw fileError;
+  }
+  console.log("seeded sample proof-of-authority files for Beta Trade and Gamma Supply");
 }
 
 main().catch((error) => {

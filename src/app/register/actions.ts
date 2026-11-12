@@ -3,51 +3,37 @@
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { storeFile } from "@/lib/files/server";
 import { errorKey } from "@/lib/db-errors";
-import { bakuToday } from "@/lib/vendors/rules";
-import {
-  parseRegistration,
-  toBankAccountRows,
-  toOwnerRows,
-  toVendorColumns,
-  validateRegistration,
-  withoutPassword,
-} from "@/lib/vendors/validate";
-import { collectRegistrationFiles } from "@/lib/vendors/registration-files";
-import type { RegistrationFormState } from "@/components/vendor/registration-form";
+import { parseAccount, toAccountColumns, validateAccount, withoutPassword } from "@/lib/vendors/validate";
+import type { RegisterFormState } from "@/components/vendor/register-form";
 
-function answer(values: ReturnType<typeof parseRegistration>, errors: Record<string, string>): RegistrationFormState {
+function answer(values: ReturnType<typeof parseAccount>, errors: Record<string, string>): RegisterFormState {
   return { errors, values: withoutPassword(values), attempt: Date.now() };
 }
 
 /**
- * REG-01: public self-registration. The account is created by the server as already confirmed
- * (no confirmation e-mail, CLAUDE.md rule 1), then the vendor is signed in. Save leaves the
- * registration in DRAFT; Submit also sends it for review (REG-01 AC10).
+ * REG-01: public account creation with the short form. The server creates the account as already
+ * confirmed (no confirmation e-mail, CLAUDE.md rule 1), registration status DRAFT, signs the vendor in
+ * and opens its home page. No approval is needed and nobody is notified yet.
  */
-export async function registerVendor(_prev: RegistrationFormState, formData: FormData): Promise<RegistrationFormState> {
-  const submit = formData.get("intent") === "submit";
-  const values = parseRegistration(formData);
-  const errors: Record<string, string> = { ...validateRegistration(values, { withAccount: true, today: bakuToday() }) };
-  const uploads = await collectRegistrationFiles(formData, values.vendorType, values.isVatPayer === "yes", {
-    submit,
-    have: new Set(),
-  });
-  Object.assign(errors, uploads.errors);
+export async function registerVendor(_prev: RegisterFormState, formData: FormData): Promise<RegisterFormState> {
+  const values = parseAccount(formData);
+  const errors: Record<string, string> = { ...validateAccount(values) };
   if (Object.keys(errors).length > 0) return answer(values, errors);
 
   const admin = createAdminClient();
-  const vendor = toVendorColumns(values);
+  const vendor = toAccountColumns(values);
 
-  // REG-01 AC7: one vendor per tax number; checked before any account is created.
+  // AC4: one vendor per tax number; checked before any account is created.
   const { data: taken } = await admin.rpc("vendor_tax_number_taken", {
     p_voen: vendor.voen,
     p_foreign_tax_number: vendor.foreign_tax_number,
+    p_id_card_number: vendor.id_card_number,
   });
-  if (taken) {
-    return answer(values, { [vendor.foreign_tax_number ? "foreignTaxNumber" : "voen"]: "errors.taxNumberTaken" });
-  }
+  const taxField = vendor.foreign_tax_number ? "foreignTaxNumber" : vendor.id_card_number ? "idCardNumber" : "voen";
+  if (taken) return answer(values, { [taxField]: "errors.taxNumberTaken" });
+
+  // AC5
   const { data: emailUser } = await admin.from("app_user").select("id").ilike("email", values.contactEmail).maybeSingle();
   if (emailUser) return answer(values, { contactEmail: "users.errors.emailInUse" });
 
@@ -62,30 +48,14 @@ export async function registerVendor(_prev: RegistrationFormState, formData: For
   }
   const userId = created.user.id;
 
-  const { data: vendorId, error: registerError } = await admin.rpc("register_vendor", {
+  const { error: registerError } = await admin.rpc("register_vendor", {
     p_user_id: userId,
     p_vendor: { ...vendor, contact_email: values.contactEmail },
-    p_owners: toOwnerRows(values),
-    p_accounts: toBankAccountRows(values.bankAccounts),
   });
-  if (registerError || !vendorId) {
+  if (registerError) {
     await admin.auth.admin.deleteUser(userId);
-    if (registerError?.code === "23505") {
-      return answer(values, { [vendor.foreign_tax_number ? "foreignTaxNumber" : "voen"]: "errors.taxNumberTaken" });
-    }
+    if (registerError.code === "23505") return answer(values, { [taxField]: "errors.taxNumberTaken" });
     return answer(values, { form: errorKey(registerError) ?? "common.genericError" });
-  }
-
-  const { data: row } = await admin.from("vendor").select("company_id").eq("id", vendorId).single();
-  for (const upload of uploads.files) {
-    await storeFile({
-      companyId: row!.company_id,
-      ownerType: "vendor",
-      ownerId: vendorId,
-      kind: upload.kind,
-      file: upload.file,
-      userId,
-    });
   }
 
   const supabase = await createClient();
@@ -94,10 +64,5 @@ export async function registerVendor(_prev: RegistrationFormState, formData: For
     password: values.password,
   });
   if (signInError) redirect("/sign-in");
-
-  if (submit) {
-    const { error } = await supabase.rpc("registration_submit");
-    if (error) redirect(`/vendor/registration?error=${encodeURIComponent(errorKey(error) ?? "common.genericError")}`);
-  }
-  redirect("/vendor/registration?saved=1");
+  redirect("/");
 }

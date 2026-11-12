@@ -95,6 +95,13 @@ async function fileRow(ownerType: string, ownerId: string, kind: string) {
   );
 }
 
+/** The primary contact becomes a legal representative with a proof file (REG-07 AC4), as the Contact persons step does. */
+async function legalRepWithProof(vendorId: string) {
+  const { rows } = await db.query("select id from public.vendor_contact where vendor_id = $1 and is_primary", [vendorId]);
+  await db.query("update public.vendor_contact set is_legal_representative = true where id = $1", [rows[0].id]);
+  await fileRow("vendor_contact", rows[0].id, "proof_of_authority");
+}
+
 async function notificationsFor(userId: string, event: string, recordId: string) {
   const { rows } = await db.query(
     "select params from public.notification where user_id = $1 and event = $2 and record_id = $3",
@@ -231,6 +238,9 @@ describe("REG-01 / REG-02 registration workflow", () => {
   });
 
   it("REG-01 AC1 / AC8: Submit needs the charter and, for a VAT payer, the VAT certificate", async () => {
+    const { error: e0 } = await actors.vendorA.client.rpc("registration_submit");
+    expect(e0?.message).toBe("errors.legalRepresentativeRequired"); // REG-07 AC4: companies need one
+    await legalRepWithProof(actors.vendorA.vendorId!);
     const { error: e1 } = await actors.vendorA.client.rpc("registration_submit");
     expect(e1?.message).toBe("errors.uploadCharter");
     await fileRow("vendor", actors.vendorA.vendorId!, "charter");
@@ -324,6 +334,7 @@ describe("REG-01 / REG-02 registration workflow", () => {
   });
 
   it("REG-02 AC5: Reject needs a reason and is final", async () => {
+    await legalRepWithProof(actors.vendorB.vendorId!);
     await fileRow("vendor", actors.vendorB.vendorId!, "charter");
     await fileRow("vendor", actors.vendorB.vendorId!, "vat_certificate");
     await actors.vendorB.client.rpc("registration_submit");
@@ -652,25 +663,7 @@ describe("REG-01 AC4 / REG-06 AC3 / AC7 bank accounts", () => {
     expect(await accountsOf(actors.vendorB.vendorId!)).toEqual([{ iban: "AZ00TEST0001", currency: "AZN", is_main: true }]);
   });
 
-  it("REG-01 AC4: no registration without a bank account", async () => {
-    const { error } = await service.rpc("register_vendor", {
-      p_user_id: randomUUID(),
-      p_vendor: {
-        vendor_type: "INDIVIDUAL",
-        legal_name: `RLS no account ${RUN}`,
-        id_card_number: `ID-${RUN}`,
-        country_code: "AZ",
-        contact_person: "Test",
-        contact_email: `rls2-noaccount-${RUN}@rls.test`,
-        phone: "+994500000000",
-      },
-      p_owners: [],
-      p_accounts: [],
-    });
-    expect(error?.message).toBe("errors.bankAccountRequired");
-    const { rows } = await db.query("select 1 from public.vendor where legal_name = $1", [`RLS no account ${RUN}`]);
-    expect(rows).toHaveLength(0);
-  });
+  // REG-01 AC6 / REG-07 AC9: the account form has no bank account; Submit still needs one (registration.rls.test.ts).
 
   it("REG-06 AC3: the vendor adds, edits and removes accounts after submit, keeping one main", async () => {
     const id = actors.vendorA.vendorId!;

@@ -1,8 +1,8 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { RegistrationFormState } from "@/components/vendor/registration-form";
 import type { OwnerRole, VendorType } from "./constants";
-import type { BankAccount } from "./validate";
+import type { BankAccount, CompanyValues } from "./validate";
+import type { RegistrationSnapshot } from "./steps";
 
 export const VENDOR_COLUMNS =
   "id, company_id, vendor_type, legal_name, voen, foreign_tax_number, country_code, id_card_number, legal_address, " +
@@ -82,32 +82,75 @@ export async function loadVendor(supabase: SupabaseClient, vendorId: string) {
   return { vendor, owners: owners ?? [], files: files ?? [], bankAccounts };
 }
 
-export function toFormState(vendor: VendorRow, owners: OwnerRow[], bankAccounts: BankAccountRow[]): RegistrationFormState {
+export type ContactRow = {
+  id: string;
+  full_name: string;
+  position: string | null;
+  phone: string;
+  email: string;
+  is_primary: boolean;
+  is_legal_representative: boolean;
+  proof: { id: string; file_name: string }[];
+};
+
+/** REG-07 AC4, REG-06 AC7: contact persons, the main one first, each with its proof-of-authority file(s). */
+export async function loadContacts(supabase: SupabaseClient, vendorId: string): Promise<ContactRow[]> {
+  const { data } = await supabase
+    .from("vendor_contact")
+    .select("id, full_name, position, phone, email, is_primary, is_legal_representative")
+    .eq("vendor_id", vendorId)
+    .order("is_primary", { ascending: false })
+    .order("created_at");
+  const rows = (data ?? []) as Omit<ContactRow, "proof">[];
+  if (rows.length === 0) return [];
+  const { data: files } = await supabase
+    .from("file")
+    .select("id, file_name, owner_id")
+    .eq("owner_type", "vendor_contact")
+    .eq("kind", "proof_of_authority")
+    .in("owner_id", rows.map((r) => r.id));
+  return rows.map((r) => ({
+    ...r,
+    proof: (files ?? []).filter((f) => f.owner_id === r.id).map((f) => ({ id: f.id, file_name: f.file_name })),
+  }));
+}
+
+export function toCompanyValues(vendor: VendorRow): CompanyValues {
   return {
-    errors: {},
-    values: {
-      vendorType: vendor.vendor_type,
-      legalName: vendor.legal_name,
-      voen: vendor.voen ?? "",
-      foreignTaxNumber: vendor.foreign_tax_number ?? "",
-      countryCode: vendor.country_code,
-      idCardNumber: vendor.id_card_number ?? "",
-      legalAddress: vendor.legal_address ?? "",
-      directorName: vendor.director_name ?? "",
-      isVatPayer: vendor.is_vat_payer === null ? "" : vendor.is_vat_payer ? "yes" : "no",
-      contactPerson: vendor.contact_person,
-      contactEmail: vendor.contact_email,
-      phone: vendor.phone,
-      bankAccounts: toBankAccounts(bankAccounts),
-      foundedOn: vendor.founded_on ?? "",
-      owners: owners.map((o) => ({
-        fullName: o.full_name,
-        idNumber: o.id_number,
-        sharePercent: o.share_percent === null ? "" : String(Number(o.share_percent)),
-        role: o.role,
-      })),
-    },
+    voen: vendor.voen ?? "",
+    legalAddress: vendor.legal_address ?? "",
+    directorName: vendor.director_name ?? "",
+    foundedOn: vendor.founded_on ?? "",
+    isVatPayer: vendor.is_vat_payer === null ? "" : vendor.is_vat_payer ? "yes" : "no",
   };
+}
+
+export function toOwners(owners: OwnerRow[]) {
+  return owners.map((o) => ({
+    fullName: o.full_name,
+    idNumber: o.id_number,
+    sharePercent: o.share_percent === null ? "" : String(Number(o.share_percent)),
+    role: o.role,
+  }));
+}
+
+/** Everything the step rules need, read with the caller's own session (RLS). */
+export async function loadSnapshot(supabase: SupabaseClient, vendorId: string) {
+  const [{ vendor, owners, files, bankAccounts }, contacts] = await Promise.all([
+    loadVendor(supabase, vendorId),
+    loadContacts(supabase, vendorId),
+  ]);
+  if (!vendor) return null;
+  const snapshot: RegistrationSnapshot = {
+    vendorType: vendor.vendor_type,
+    status: vendor.status,
+    company: toCompanyValues(vendor),
+    owners: toOwners(owners),
+    contacts: contacts.map((c) => ({ isLegalRepresentative: c.is_legal_representative, hasProof: c.proof.length > 0 })),
+    bankAccounts: toBankAccounts(bankAccounts),
+    fileKinds: files.map((f) => f.kind ?? ""),
+  };
+  return { vendor, owners, files, bankAccounts, contacts, snapshot };
 }
 
 /** Files grouped by kind, for the registration form. */

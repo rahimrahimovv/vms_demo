@@ -9,7 +9,8 @@ import { NoAccess } from "@/components/no-access";
 import { StatusBadge } from "@/components/status-badge";
 import { FileList } from "@/components/file-list";
 import { BankAccountsForm, BrandForm, CertificateForm, ProfileDetailsForm, RenewForm } from "@/components/vendor/profile-forms";
-import { loadBankAccounts, toBankAccounts } from "@/lib/vendors/queries";
+import { loadBankAccounts, loadContacts, toBankAccounts } from "@/lib/vendors/queries";
+import { ContactList } from "@/components/vendor/registration-steps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -46,7 +47,7 @@ export default async function VendorProfilePage() {
   const [{ data: vendor }, { data: brands }, { data: certificates }, { data: owners }, bankAccounts] = await Promise.all([
     supabase
       .from("vendor")
-      .select("main_activity, main_goods, bank_guarantee_available, bank_guarantee_types, bank_guarantee_max, bank_guarantee_currency")
+      .select("vendor_type, status, main_activity, main_goods, bank_guarantee_available, bank_guarantee_types, bank_guarantee_max, bank_guarantee_currency")
       .eq("id", user.vendorId)
       .single(),
     supabase.from("vendor_brand").select("id, brand, is_official_dealer").eq("vendor_id", user.vendorId).order("brand").returns<Brand[]>(),
@@ -93,6 +94,20 @@ export default async function VendorProfilePage() {
               bankGuaranteeCurrency: vendor.bank_guarantee_currency ?? "",
             }}
             currencies={guaranteeCurrencies}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("registration.contacts.title")}</CardTitle>
+          <p className="text-sm text-muted-foreground">{t("registration.contacts.hint")}</p>
+        </CardHeader>
+        <CardContent>
+          <ContactList
+            contacts={await loadContacts(supabase, user.vendorId)}
+            vendorType={vendor.vendor_type}
+            readOnly={!["DRAFT", "RETURNED", "APPROVED"].includes(vendor.status)}
           />
         </CardContent>
       </Card>

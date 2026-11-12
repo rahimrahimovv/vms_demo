@@ -206,6 +206,21 @@ insert into public.vendor_bank_account (id, vendor_id, bank_name, iban, swift, c
    'AZ00DEMO00000000000000000003', 'DEMOAZ22', 'AZN', true)
 on conflict (id) do nothing;
 
+-- REG-07 AC4 / REG-06 AC7: the first contact person (the person on the account form) is also the legal
+-- representative; the sample proof-of-authority file comes with scripts/seed-users.ts (it needs Storage).
+insert into public.vendor_contact (id, company_id, vendor_id, full_name, position, phone, email, is_primary,
+                                   is_legal_representative)
+select c.id, v.company_id, v.id, v.contact_person, c.position, v.phone, v.contact_email, true, true
+from (values
+  ('00000000-0000-4000-8000-000000005026'::uuid, '00000000-0000-4000-8000-000000000502'::uuid, 'Sales director'),
+  ('00000000-0000-4000-8000-000000005036'::uuid, '00000000-0000-4000-8000-000000000503'::uuid, 'Director')
+) as c (id, vendor_id, position)
+join public.vendor v on v.id = c.vendor_id
+where not exists (select 1 from public.vendor_contact x where x.vendor_id = c.vendor_id and x.is_primary)
+on conflict (id) do nothing;
+update public.vendor_contact set is_legal_representative = true, position = coalesce(position, 'Director')
+ where is_primary and vendor_id in ('00000000-0000-4000-8000-000000000502', '00000000-0000-4000-8000-000000000503');
+
 insert into public.vendor_brand (id, vendor_id, brand, is_official_dealer) values
   ('00000000-0000-4000-8000-000000005025', '00000000-0000-4000-8000-000000000502', 'TerraGrow', true),
   ('00000000-0000-4000-8000-000000005035', '00000000-0000-4000-8000-000000000503', 'FieldPro', false)

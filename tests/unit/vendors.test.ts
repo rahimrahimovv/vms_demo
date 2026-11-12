@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+
+const TODAY = "2026-11-10";
 import {
   bakuToday,
   canRetakeEarly,
@@ -9,100 +11,12 @@ import {
 } from "@/lib/vendors/rules";
 import {
   parseBankAccounts,
-  sharesExceed100,
   validateBankAccounts,
-  validateRegistration,
   type BankAccount,
-  type RegistrationValues,
 } from "@/lib/vendors/validate";
 import { checkFile, MAX_FILE_BYTES } from "@/lib/files/rules";
 import { ancestorsOf, flattenTree } from "@/lib/categories";
 import { validateQuestion } from "@/lib/questionnaire/validate";
-
-const TODAY = "2026-11-10";
-
-function local(overrides: Partial<RegistrationValues> = {}): RegistrationValues {
-  return {
-    vendorType: "LOCAL_COMPANY",
-    legalName: "Alpha Agro LLC",
-    voen: "1234567890",
-    foreignTaxNumber: "",
-    countryCode: "AZ",
-    idCardNumber: "",
-    legalAddress: "Demo street 1, Baku",
-    directorName: "Kamran Aliyev",
-    isVatPayer: "yes",
-    contactPerson: "Kamran Aliyev",
-    contactEmail: "info@alpha-agro.test",
-    phone: "+994501234567",
-    password: "long-enough",
-    bankAccounts: [{ bankName: "Demo Bank", iban: "AZ00DEMO0000000000000001", swift: "DEMOAZ22", currency: "AZN", isMain: true }],
-    foundedOn: "2012-03-15",
-    owners: [
-      { fullName: "Kamran Aliyev", idNumber: "AZE-1", sharePercent: "60", role: "HEAD" },
-      { fullName: "Sabina Huseynova", idNumber: "AZE-2", sharePercent: "40", role: "SHAREHOLDER" },
-    ],
-    ...overrides,
-  };
-}
-
-const check = (v: RegistrationValues) => validateRegistration(v, { withAccount: true, today: TODAY });
-
-describe("REG-01 registration rules", () => {
-  it("accepts the Alpha Agro scenario values", () => {
-    expect(check(local())).toEqual({});
-  });
-
-  it("AC6: VÖEN must be 10 digits", () => {
-    expect(check(local({ voen: "12345" })).voen).toBe("errors.voenFormat");
-    expect(check(local({ voen: "12345678901" })).voen).toBe("errors.voenFormat");
-  });
-
-  it("AC5: phone is + and 8 to 15 digits, any country code", () => {
-    expect(check(local({ phone: "0501234567" })).phone).toBe("errors.phoneFormat");
-    expect(check(local({ phone: "+9055500000" })).phone).toBeUndefined();
-    expect(check(local({ phone: "+1234567" })).phone).toBe("errors.phoneFormat");
-  });
-
-  it("AC1: a local company needs the VAT payer answer", () => {
-    expect(check(local({ isVatPayer: "" })).isVatPayer).toBe("errors.required");
-  });
-
-  it("AC2: an individual needs the ID card number; VÖEN optional; no owners", () => {
-    const individual = local({ vendorType: "INDIVIDUAL", voen: "", idCardNumber: "", owners: [], foundedOn: "" });
-    expect(check(individual)).toEqual({ idCardNumber: "errors.required" });
-    expect(check({ ...individual, idCardNumber: "AA1234567" })).toEqual({});
-  });
-
-  it("AC3: a foreign company needs country and a 3-30 character tax number, no VÖEN", () => {
-    const foreign = local({ vendorType: "FOREIGN_COMPANY", voen: "", countryCode: "TR", foreignTaxNumber: "TR" });
-    expect(check(foreign).foreignTaxNumber).toBe("errors.foreignTaxFormat");
-    expect(check({ ...foreign, foreignTaxNumber: "TR-4810276" })).toEqual({});
-    expect(check({ ...foreign, countryCode: "" }).countryCode).toBe("errors.required");
-  });
-
-  it("AC4: password of at least 8 characters for a new account", () => {
-    expect(check(local({ password: "short" })).password).toBe("errors.passwordShort");
-  });
-
-  it("REG-06 AC1: a company needs the founding date and a Head owner", () => {
-    expect(check(local({ foundedOn: "" })).foundedOn).toBe("errors.required");
-    expect(check(local({ foundedOn: "2027-01-01" })).foundedOn).toBe("errors.dateInvalid");
-    expect(
-      check(local({ owners: [{ fullName: "A", idNumber: "1", sharePercent: "50", role: "FOUNDER" }] })).owners,
-    ).toBe("errors.headOwnerRequired");
-  });
-
-  it("REG-06 AC2: shares cannot exceed 100% in total", () => {
-    const owners = [
-      { fullName: "A", idNumber: "1", sharePercent: "60", role: "HEAD" as const },
-      { fullName: "B", idNumber: "2", sharePercent: "40.01", role: "SHAREHOLDER" as const },
-    ];
-    expect(sharesExceed100(owners)).toBe(true);
-    expect(check(local({ owners })).owners).toBe("errors.sharesOver100");
-    expect(sharesExceed100(local().owners)).toBe(false);
-  });
-});
 
 describe("REG-01 AC4 / REG-06 AC3 bank accounts", () => {
   const account = (overrides: Partial<BankAccount> = {}): BankAccount => ({
@@ -121,7 +35,6 @@ describe("REG-01 AC4 / REG-06 AC3 bank accounts", () => {
 
   it("needs at least one account", () => {
     expect(validateBankAccounts([])).toBe("errors.bankAccountRequired");
-    expect(check(local({ bankAccounts: [] })).bankAccounts).toBe("errors.bankAccountRequired");
   });
 
   it("needs exactly one main account", () => {

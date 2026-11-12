@@ -276,7 +276,10 @@
     "committeeMember": "Only active users with the Committee Member role can sit on the committee",
     "votingClosed": "Voting on this decision has ended",
     "alreadyVoted": "You have already voted on this decision",
-    "pdfFailed": "The PDF could not be generated, try again"
+    "pdfFailed": "The PDF could not be generated, try again",
+    "proofRequired": "Upload the proof of authority",
+    "legalRepresentativeRequired": "Mark at least one contact person as a legal representative",
+    "keepLegalRepresentative": "You must keep at least one legal representative with a proof of authority"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -352,12 +355,13 @@
       "technical_document": "Technical document",
       "justification": "Justification",
       "attachment": "Attachment",
-      "pdf": "PDF"
+      "pdf": "PDF",
+      "proof_of_authority": "Proof of authority (power of attorney, charter extract or decision)"
     }
   },
   "registration": {
     "title": "Register as a vendor",
-    "subtitle": "Create your account, fill in your company data and attach the documents for your type.",
+    "subtitle": "Create your account in about two minutes. You complete the rest of the registration after signing in.",
     "haveAccount": "Already registered? Sign in",
     "submit": "Submit for review",
     "saved": "Your registration is saved.",
@@ -371,7 +375,8 @@
       "contact": "Contact and sign-in",
       "bank": "Bank accounts",
       "owners": "Owners",
-      "documents": "Documents"
+      "documents": "Documents",
+      "account": "Account"
     },
     "typeHints": {
       "LOCAL_COMPANY": "Registered in Azerbaijan, with a VÖEN",
@@ -400,6 +405,45 @@
       "phone": "With country code, e.g. +994501234567",
       "contactEmail": "You sign in with this e-mail",
       "owners": "The company head is required; add founders and shareholders above 10%."
+    },
+    "createAccount": "Create account",
+    "warning": "Complete your profile and submit it for approval",
+    "progress": "{done} of {total} steps complete",
+    "continue": "Continue",
+    "saveContinue": "Save and continue",
+    "back": "Back",
+    "submitDisabled": "Complete these steps before submitting:",
+    "readOnlyNote": "Your registration is under review. It cannot be edited until the specialist returns it.",
+    "locked": "Available after your registration is approved",
+    "stepStatus": {
+      "NOT_STARTED": "Not started",
+      "IN_PROGRESS": "In progress",
+      "COMPLETE": "Complete",
+      "NOT_NEEDED": "Not needed"
+    },
+    "steps": {
+      "account": "Account",
+      "company": "Company details",
+      "owners": "Owners",
+      "contacts": "Contact persons",
+      "bank": "Bank accounts",
+      "documents": "Documents",
+      "review": "Review and submit"
+    },
+    "contacts": {
+      "position": "Position",
+      "legalRepresentative": "Legal representative",
+      "primary": "Main contact",
+      "proof": "Proof of authority",
+      "add": "Add contact person",
+      "remove": "Remove contact person",
+      "save": "Save contact person",
+      "title": "Contact persons",
+      "hint": "Tick Legal representative for each person who may sign for the company and attach the proof."
+    },
+    "lockedSteps": {
+      "questionnaire": "Qualification",
+      "categories": "Categories"
     }
   },
   "bankAccounts": {
@@ -526,7 +570,8 @@
     "emptyAll": "No vendors have registered yet.",
     "tabs": {
       "review": "To review",
-      "all": "All vendors"
+      "all": "All vendors",
+      "incomplete": "Incomplete registrations"
     },
     "columns": {
       "name": "Name",
@@ -536,8 +581,10 @@
       "country": "Country",
       "status": "Registration",
       "standing": "Standing",
-      "grade": "Grade"
-    }
+      "grade": "Grade",
+      "created": "Created"
+    },
+    "emptyIncomplete": "No incomplete registrations"
   },
   "vendorCard": {
     "sharesOwner": "Shares an owner with",
@@ -552,8 +599,10 @@
     "tabs": {
       "owners": "Owners",
       "certificates": "Certificates",
-      "categories": "Categories"
-    }
+      "categories": "Categories",
+      "contacts": "Contact persons"
+    },
+    "contacts": "Contact persons"
   },
   "questionnaires": {
     "emptyReview": "No questionnaires are waiting for review.",

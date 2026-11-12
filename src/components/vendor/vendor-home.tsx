@@ -9,6 +9,10 @@ import { StatusBadge } from "@/components/status-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { loadSnapshot } from "@/lib/vendors/queries";
+import { firstIncompleteStep, progress, stepStatuses } from "@/lib/vendors/steps";
+import { RegistrationChecklist } from "@/components/vendor/registration-checklist";
+import { AlertTitle } from "@/components/ui/alert";
 
 type Step = { key: "registration" | "questionnaire" | "categories"; href: string; state: "done" | "current" | "todo"; status?: string };
 
@@ -63,6 +67,37 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
   );
   const toAnswer = open.filter((i) => i.invitation_status === "INVITED").length;
   const toSubmit = open.filter((i) => i.invitation_status === "ACCEPTED" && i.proposal_status !== "SUBMITTED").length;
+
+  // REG-07 AC1, AC10: while DRAFT or RETURNED the home page is the registration checklist
+  const registering = vendor?.status === "DRAFT" || vendor?.status === "RETURNED";
+  if (registering) {
+    const loaded = await loadSnapshot(supabase, vendorId);
+    if (loaded) {
+      const statuses = stepStatuses(loaded.snapshot, today);
+      return (
+        <div className="flex flex-col gap-6">
+          {loaded.vendor.status === "RETURNED" && loaded.vendor.review_comment && (
+            <Alert className="border-amber-300 bg-amber-50" data-testid="returned-comment">
+              <AlertTitle>{t("registration.returnedTitle")}</AlertTitle>
+              <AlertDescription>{loaded.vendor.review_comment}</AlertDescription>
+            </Alert>
+          )}
+          <Alert className="border-amber-300 bg-amber-50" data-testid="complete-profile-warning">
+            <TriangleAlert className="size-4" aria-hidden />
+            <AlertDescription>{t("registration.warning")}</AlertDescription>
+          </Alert>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">{t("vendorHome.checklist")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RegistrationChecklist statuses={statuses} progress={progress(statuses)} continueStep={firstIncompleteStep(statuses)} />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
