@@ -196,15 +196,27 @@ Outcome hook `app.apply_decision_outcome`: OPENING is real, WINNER and PO do not
   cancel closes the open vote with minutes, Continue below the minimum, an RFQ never gets an opening decision).
   The demo committee is backed up before the test run and put back afterwards.
 
+Committee Member read access to sourcing records (read-only, confirmed 12 Nov 2026): section `sourcing` now lists the Committee Member;
+the Role Matrix has the row "View a sourcing record, read-only". Deployed: `main` at f95b096, Vercel deployment completed (green).
+
+### Production check (12 Nov 2026)
+
+- API as `anon`: decision, voter, minutes and committee tables and the committee, vote and minutes functions refused.
+- Vendor Beta Trade: 0 decisions, 0 minutes. Elchin: sees the 3 committee members, 0 decisions (none opened on production yet).
+- Browser smoke check of the production pages (Admin → Committee, Decisions, Minutes) not done: the production URL is not in the
+  repo and the Vercel preview hostnames sit behind SSO.
+
 ### Open issues
 
 11. **Committee tests touch the live demo committee on vms-dev** (saved and restored in `beforeAll` / `afterAll`). If a run is
     killed half-way, run `npm run db:seed` to restore Elchin, Sevinj and Tural.
 12. **Cleanup of test decisions** also switches off the minutes immutability trigger for a moment, in the same dev-only helper
     and under the same guards as the audit trigger (issue 7).
-13. **vms-prod is not migrated for Slice 5 yet.** Before the next push to `main`: `db:push` with `.env.production.local`, then
-    set the committee in Admin → Committee (or run `ENV_FILE=.env.production.local npx tsx scripts/seed-users.ts`). The new job
-    `vms-decisions` must appear next to `vms-sourcing` and `vms-daily`.
+13. vms-prod migrated and seeded for Slice 5 on 12 Nov 2026 (the 4 migrations, then `ENV_FILE=.env.production.local npm run db:seed`;
+    note that `db:seed` needs `ENV_FILE` too, otherwise it seeds vms-dev). Read-only check: committee Elchin (Chair), Sevinj, Tural with 3 business
+    days; jobs `vms-decisions`, `vms-sourcing` (every minute, succeeding) and `vms-daily` active; the 17 committee, decision and minutes
+    functions and their grants equal to vms-dev, none executable by `anon`. Run `db:push` with `.env.production.local` before every push
+    that brings a new migration.
 14. WINNER and PO decisions open only from Slices 6 and 7; until then a closed WINNER or PO decision changes nothing else
     (`app.apply_decision_outcome`).
 15. A Tender already at AWAITING_OPENING from Slice 4 gets its OPENING decision in the CMT-04 migration only where a committee
