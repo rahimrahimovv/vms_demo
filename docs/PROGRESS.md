@@ -378,8 +378,8 @@ Home: "N POs to approve" (Approver, own PRs and sourcings excluded), "N POs to a
   download, Accept, other vendor sees none, sourcing and PR Completed. It found one bug, fixed: the new `purchase_order.winner_decision_id`
   made the `decision` -> `purchase_order` embed ambiguous, so the decision and minutes pages showed "no access"; the embeds now name their
   foreign key. The "result notice" text was not clicked (covered by the RLS test).
-- vms-dev migrated. **vms-prod not migrated yet** (waiting for the BA): run `ENV_FILE=.env.production.local npm run db:push` before pushing `main`,
-  because the new screens call `po_list` and `po_view`.
+- vms-dev migrated. vms-prod migrated on 13 Nov 2026 (target checked first: DB and API ref `bxomavkbdppdbpdklkeg`, not the vms-dev ref): `20261116100000_purchase_orders` and `20261116110000_po_respond_released`.
+- Vercel: `main` pushed (77c4431); production smoke check (read-only, https://vms-demo-rho.vercel.app): /sign-in and /register 200; /purchase-orders, /vendor/purchase-orders and /decisions redirect to sign-in (307); the PO PDF route answers 401 without a session; as `anon`, `po_list`, `po_view`, `po_decide` and `po_respond` and a direct read of `purchase_order` are refused (42501).
 
 ### Open issues
 
