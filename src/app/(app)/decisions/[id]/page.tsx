@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime } from "@/lib/format";
+import { formatAmount, formatDateTime } from "@/lib/format";
 import { NoAccess } from "@/components/no-access";
 import { RecordHeader } from "@/components/record-header";
 import { HistoryTab } from "@/components/history-tab";
@@ -15,6 +15,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ComparisonView } from "@/components/sourcing/comparison-view";
 import type { Comparison } from "@/lib/sourcing/comparison";
+import type { PoDifference, PoPackage } from "@/lib/purchase-orders/types";
+import { PoBodyView } from "@/components/po/po-body";
 import { decideVote } from "../actions";
 
 type DecisionRecord = {
@@ -50,7 +52,15 @@ type Pkg = {
   bidders: string[] | null;
   /** WINNER: the comparison frozen at Send to committee (CMT-02 AC2); null for readers who may not see bids. */
   comparison: Comparison | null;
+  /** PO: the PO and every difference from the approved winner decision (CMT-02 AC3). */
+  po: PoPackage | null;
 };
+
+/** Amounts as "60,000.00 AZN", everything else as written. */
+function differenceValue(diff: PoDifference, value: string | number | null): string {
+  if (value === null || value === undefined) return "—";
+  return diff.field === "unitPrice" || diff.field === "total" ? formatAmount(value) : String(value);
+}
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -241,7 +251,46 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
             </section>
           )}
 
-          {pkg && d.type !== "WINNER" && (
+          {pkg && d.type === "PO" && (
+            <section className="flex flex-col gap-4" data-testid="po-package">
+              <h3 className="text-base font-semibold">{t("decisions.package.poTitle")}</h3>
+              {pkg.po ? (
+                <>
+                  {pkg.po.same ? (
+                    <Alert data-testid="po-same">
+                      <AlertDescription>{t("decisions.package.samePackage")}</AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Alert className="border-amber-300 bg-amber-50" data-testid="po-differences">
+                      <AlertTitle>{t("decisions.package.differencesTitle")}</AlertTitle>
+                      <AlertDescription>
+                        <ul className="list-disc pl-5">
+                          {pkg.po.differences.map((diff, i) => (
+                            <li key={i}>
+                              {t("decisions.package.diffLine", {
+                                field: t(`decisions.package.diffFields.${diff.field}`),
+                                item: diff.item ? ` (${diff.item})` : "",
+                                winner: differenceValue(diff, diff.winner),
+                                po: differenceValue(diff, diff.po),
+                              })}
+                            </li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  <PoBodyView
+                    body={pkg.po.po}
+                    fields={<Field label={t("purchaseOrders.fields.vendor")}>{pkg.po.po.vendor}</Field>}
+                  />
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t("decisions.package.noPo")}</p>
+              )}
+            </section>
+          )}
+
+          {pkg && d.type === "OPENING" && (
             <Card>
               <CardContent className="flex flex-col gap-3" data-testid="decision-package">
                 <h3 className="text-sm font-semibold">{t("decisions.package.title")}</h3>

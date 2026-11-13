@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Building2, ClipboardCheck, Gavel, ListChecks, PackageSearch, ShoppingCart, Undo2, UserPlus } from "lucide-react";
+import { Bell, Building2, ClipboardCheck, FileCheck, Gavel, ListChecks, PackageSearch, ShoppingCart, Undo2, UserPlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { canAccess } from "@/lib/auth/sections";
@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { messageValues } from "@/lib/notifications";
 import { recordHref } from "@/lib/records";
+import type { PoListRow } from "@/lib/purchase-orders/types";
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
 import { VendorHome } from "@/components/vendor/vendor-home";
@@ -79,8 +80,12 @@ export default async function HomePage() {
         .eq("vote", "NONE")
         .eq("decision.status", "VOTING")
     : null;
+  // Slice 7 (PO-02): POs waiting for this Approver; never the ones for the own PR or own sourcing (#83).
+  const poRows = isApprover ? (((await supabase.rpc("po_list")).data ?? []) as PoListRow[]) : [];
+  const posToApprove = poRows.filter((po) => po.status === "PENDING_APPROVAL" && po.requester_id !== user.id && po.owner_id !== user.id).length;
   const taskCards = [
     ...(isCommittee ? [{ key: "votesWaiting", href: "/decisions", count: votesWaiting?.count ?? 0, icon: Gavel }] : []),
+    ...(isApprover ? [{ key: "posToApprove", href: "/purchase-orders", count: posToApprove, icon: FileCheck }] : []),
     ...(isApprover ? [{ key: "prsToApprove", href: "/requisitions?tab=toApprove", count: toApprove?.count ?? 0, icon: ShoppingCart }] : []),
     ...(isRequester ? [{ key: "prsReturned", href: "/requisitions?tab=mine", count: returned?.count ?? 0, icon: Undo2 }] : []),
     ...(isSpecialist
