@@ -125,6 +125,120 @@ export async function removeJustificationFile(sourcingId: string, fileId: string
   revalidatePath(`/sourcing/${sourcingId}`);
 }
 
+const done = (error: { message?: string } | null): DecisionState => ({ error: errorKey(error), attempt: Date.now() });
+const failed = (error: string): DecisionState => ({ error, attempt: Date.now() });
+const text = (formData: FormData, name: string) => String(formData.get(name) ?? "").trim();
+const AMOUNT = /^\d+(\.\d{1,2})?$/;
+
+async function specialist() {
+  const user = await requireUser();
+  return user.roles.includes("PROCUREMENT_SPECIALIST") ? user : null;
+}
+
+/** RFQ-05 AC1-AC2: PASSED, or DISQUALIFIED with a reason (decision PASSED / DISQUALIFIED, comment = reason). */
+export async function evaluateProposal(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const result = text(formData, "decision");
+  const reason = text(formData, "reason");
+  if (result === "DISQUALIFIED" && !reason) return failed("errors.reasonRequired");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("proposal_evaluate", { p_proposal: text(formData, "proposal"), p_result: result, p_reason: reason || null });
+  refresh(sourcingId);
+  return done(error);
+}
+
+/** RFQ-05 AC4: the proposed winner of a line; an empty proposal goes back to the default winner. */
+export async function chooseWinner(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("award_choose", {
+    p_line: text(formData, "line"),
+    p_proposal: text(formData, "proposal") || null,
+    p_justification: text(formData, "justification") || null,
+  });
+  refresh(sourcingId);
+  return done(error);
+}
+
+/** RFQ-05 AC4, AC7: cancel one line with a reason. */
+export async function cancelLine(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const reason = text(formData, "reason");
+  if (!reason) return failed("errors.reasonRequired");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("sourcing_line_cancel", { p_line: text(formData, "line"), p_reason: reason });
+  refresh(sourcingId);
+  return done(error);
+}
+
+/** RFQ-07 AC1: add an extra cost per unit (type, amount in AZN, note) to a vendor's line. */
+export async function saveCost(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const amount = text(formData, "amount").replace(",", ".");
+  if (!AMOUNT.test(amount)) return failed("errors.amountInvalid");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("comparison_cost_save", {
+    p_id: text(formData, "cost") || null,
+    p_line: text(formData, "line"),
+    p_proposal: text(formData, "proposal"),
+    p_type: text(formData, "type"),
+    p_amount: Number(amount),
+    p_note: text(formData, "note"),
+  });
+  refresh(sourcingId);
+  return done(error);
+}
+
+export async function deleteCost(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("comparison_cost_delete", { p_id: text(formData, "cost") });
+  refresh(sourcingId);
+  return done(error);
+}
+
+/** RFQ-08 AC1: chosen vendors (default all), a deadline and an optional message. */
+export async function requestFinalOffer(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const vendors = formData.getAll("vendors").map(String).filter(Boolean);
+  if (vendors.length === 0) return failed("errors.pickVendors");
+  const deadline = bakuLocalToIso(text(formData, "deadline"));
+  if (!deadline || new Date(deadline) <= new Date()) return failed("errors.deadlinePast");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("final_offer_request", {
+    p_id: sourcingId, p_vendors: vendors, p_deadline: deadline, p_message: text(formData, "message"),
+  });
+  refresh(sourcingId);
+  return done(error);
+}
+
+/** RFQ-05 AC5-AC6: Send to committee, with the low-competition reason when one is needed. */
+export async function sendToCommittee(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("sourcing_send_to_committee", { p_id: sourcingId, p_reason: text(formData, "lowCompetitionReason") });
+  refresh(sourcingId);
+  revalidatePath("/decisions");
+  if (error || !data) return done(error ?? { message: "common.genericError" });
+  redirect(`/decisions/${data}`);
+}
+
+/** RFQ-03 AC2-AC4: publish an answer (question id) or a clarification without a question (no id). */
+export async function publishAnswer(sourcingId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  if (!(await specialist())) return failed("access.denied");
+  const answer = text(formData, "answer");
+  if (!answer) return failed("errors.required");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("question_publish", {
+    p_sourcing: sourcingId,
+    p_question: text(formData, "question") || null,
+    p_question_text: text(formData, "questionText"),
+    p_answer: answer,
+  });
+  refresh(sourcingId);
+  return done(error);
+}
+
 /** RFQ-04 AC4-AC6: Extend (new deadline + reason), Continue (reason) and Cancel (reason). */
 export async function decideSourcing(id: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
   const user = await requireUser();

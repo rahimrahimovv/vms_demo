@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ComparisonView } from "@/components/sourcing/comparison-view";
+import type { Comparison } from "@/lib/sourcing/comparison";
 import { decideVote } from "../actions";
 
 type DecisionRecord = {
@@ -46,6 +48,8 @@ type Pkg = {
   lowCompetitionReason: string | null;
   proposalCount: number;
   bidders: string[] | null;
+  /** WINNER: the comparison frozen at Send to committee (CMT-02 AC2); null for readers who may not see bids. */
+  comparison: Comparison | null;
 };
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -195,7 +199,49 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
             </CardContent>
           </Card>
 
-          {pkg && (
+          {pkg && d.type === "WINNER" && (
+            <section className="flex flex-col gap-4" data-testid="winner-package">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="text-base font-semibold">{t("decisions.package.comparisonTitle")}</h3>
+                {pkg.comparison?.frozenAt && (
+                  <p className="text-xs text-muted-foreground">{t("decisions.package.frozenAt", { date: formatDateTime(pkg.comparison.frozenAt) })}</p>
+                )}
+              </div>
+              {pkg.comparison?.sourcing.type === "SSP" && (
+                <Card className="border-sky-200" data-testid="ssp-label">
+                  <CardContent className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Badge>{t("decisions.package.sspLabel")}</Badge>
+                      <span className="text-sm text-muted-foreground">{t("decisions.package.sspNote")}</span>
+                    </div>
+                    {pkg.comparison.sourcing.sspJustification && (
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-xs text-muted-foreground">{t("decisions.package.sspJustification")}</p>
+                        <p className="text-sm whitespace-pre-wrap">{pkg.comparison.sourcing.sspJustification}</p>
+                      </div>
+                    )}
+                    {pkg.comparison.sourcing.sspFiles.length > 0 && (
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-xs text-muted-foreground">{t("decisions.package.sspFiles")}</p>
+                        {pkg.comparison.sourcing.sspFiles.map((f) => (
+                          <a key={f.id} href={`/api/files/${f.id}`} className="text-sm text-primary hover:underline">
+                            {f.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              {pkg.comparison ? (
+                <ComparisonView data={pkg.comparison} />
+              ) : (
+                <p className="text-sm text-muted-foreground">{t("decisions.package.noComparison")}</p>
+              )}
+            </section>
+          )}
+
+          {pkg && d.type !== "WINNER" && (
             <Card>
               <CardContent className="flex flex-col gap-3" data-testid="decision-package">
                 <h3 className="text-sm font-semibold">{t("decisions.package.title")}</h3>

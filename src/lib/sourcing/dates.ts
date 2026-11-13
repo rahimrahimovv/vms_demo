@@ -19,6 +19,11 @@ export function isoToBakuLocal(iso: string | null): string {
 }
 
 /** Whole hours and minutes left, for "time remaining" (vendor invitation page). */
+/** A default deadline `days` from now, as the datetime-local value in Asia/Baku (RFQ-08 AC1: final offer + 2 days). */
+export function bakuLocalInDays(days: number, now: Date = new Date()): string {
+  return isoToBakuLocal(new Date(now.getTime() + days * 86_400_000).toISOString());
+}
+
 export function timeRemaining(deadlineIso: string, now: Date = new Date()): { days: number; hours: number; minutes: number } | null {
   const ms = new Date(deadlineIso).getTime() - now.getTime();
   if (ms <= 0) return null;

@@ -6,7 +6,7 @@ import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatAmount, formatDate, formatDateTime } from "@/lib/format";
-import { isoToBakuLocal } from "@/lib/sourcing/dates";
+import { bakuLocalInDays, isoToBakuLocal } from "@/lib/sourcing/dates";
 import { NoAccess } from "@/components/no-access";
 import { RecordHeader } from "@/components/record-header";
 import { HistoryTab } from "@/components/history-tab";
@@ -18,7 +18,26 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { decideSourcing, removeJustificationFile, saveSourcing } from "../actions";
+import { ActionButton, ActionDialog } from "@/components/action-dialog";
+import { ComparisonView } from "@/components/sourcing/comparison-view";
+import { RequestFinalOffer, SEND_FORM_ID, SendToCommittee } from "@/components/sourcing/owner-actions";
+import { QaPanel, type QaItem } from "@/components/sourcing/qa-panel";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import type { Comparison } from "@/lib/sourcing/comparison";
+import {
+  cancelLine,
+  chooseWinner,
+  decideSourcing,
+  deleteCost,
+  evaluateProposal,
+  publishAnswer,
+  removeJustificationFile,
+  requestFinalOffer,
+  saveCost,
+  saveSourcing,
+  sendToCommittee,
+} from "../actions";
 
 type SourcingRecord = {
   id: string;
@@ -132,25 +151,53 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
   const [incotermRows, placeRows, modeRows, termRows] = dictionaries.map((d) => d.data ?? []);
   const prLink = lines[0]?.requisition_line?.requisition;
 
-  // CMT-04: the Tender's opening decision, and once it is approved the bidders' names and technical documents
-  // (still no prices: proposal lines stay sealed until the technical evaluation, Slice 6).
+  // CMT-04: the Tender's opening decision, and once it is approved the bidders' names and technical documents;
+  // prices only after the technical evaluation (RFQ-05 AC1, CMT-04 AC3).
   const bidsOpen = Boolean(s.bids_opened_at);
-  const [{ data: openingData }, { data: proposalData }] = await Promise.all([
-    s.type === "TENDER"
-      ? supabase.from("decision").select("id, status").eq("sourcing_id", id).eq("type", "OPENING").order("opened_at", { ascending: false }).limit(1)
-      : Promise.resolve({ data: [] as { id: string; status: string }[] }),
+  const canReadQa = user.roles.some((r) => r === "PROCUREMENT_SPECIALIST" || r === "ADMIN");
+  type ProposalRow = { id: string; status: string; disqualify_reason: string | null; submitted_at: string | null; vendor: { legal_name: string } | null };
+  type QuestionRow = {
+    id: string; question_text: string | null; published_question_text: string | null; answer_text: string | null;
+    status: "UNANSWERED" | "PUBLISHED"; asked_at: string; published_at: string | null; vendor: { legal_name: string } | null;
+  };
+  const [{ data: decisionData }, { data: proposalData }, comparisonResult, { data: questionData }] = await Promise.all([
+    supabase.from("decision").select("id, type, status").eq("sourcing_id", id).in("type", ["OPENING", "WINNER"]).order("opened_at", { ascending: false }),
     bidsOpen
       ? supabase
           .from("proposal")
-          .select("id, submitted_at, vendor:vendor(legal_name)")
+          .select("id, status, disqualify_reason, submitted_at, vendor:vendor(legal_name)")
           .eq("sourcing_id", id)
-          .eq("status", "SUBMITTED")
+          .in("status", ["SUBMITTED", "PASSED", "DISQUALIFIED", "AWARDED", "NOT_AWARDED"])
           .order("submitted_at")
-          .returns<{ id: string; submitted_at: string | null; vendor: { legal_name: string } | null }[]>()
-      : Promise.resolve({ data: [] as { id: string; submitted_at: string | null; vendor: { legal_name: string } | null }[] }),
+          .returns<ProposalRow[]>()
+      : Promise.resolve({ data: [] as ProposalRow[] }),
+    supabase.rpc("sourcing_comparison", { p_id: id }),
+    canReadQa && !draft
+      ? supabase
+          .from("question")
+          .select("id, question_text, published_question_text, answer_text, status, asked_at, published_at, vendor:vendor(legal_name)")
+          .eq("sourcing_id", id)
+          .order("asked_at")
+          .returns<QuestionRow[]>()
+      : Promise.resolve({ data: [] as QuestionRow[] }),
   ]);
-  const opening = openingData?.[0] ?? null;
+  const opening = (decisionData ?? []).find((d) => d.type === "OPENING") ?? null;
+  const winnerDecision = (decisionData ?? []).find((d) => d.type === "WINNER") ?? null;
   const proposals = proposalData ?? [];
+  const comparison = comparisonResult.data as Comparison | null;
+  const questions = questionData ?? [];
+  const { data: questionFiles } =
+    questions.length > 0
+      ? await supabase.from("file").select("id, file_name, owner_id").eq("owner_type", "question").in("owner_id", questions.map((q) => q.id))
+      : { data: [] as { id: string; file_name: string; owner_id: string }[] };
+  const qaItems: QaItem[] = questions.map((q) => ({
+    id: q.id, vendorName: q.vendor?.legal_name ?? null, questionText: q.question_text, publishedText: q.published_question_text,
+    answer: q.answer_text, status: q.status, askedAt: q.asked_at, publishedAt: q.published_at,
+    files: (questionFiles ?? []).filter((f) => f.owner_id === q.id),
+  }));
+  const evaluating = owner && s.status === "TECHNICAL_EVALUATION";
+  const unmarked = proposals.filter((p) => p.status === "SUBMITTED").length;
+  const comparing = owner && s.status === "COMPARISON";
   const { data: proposalFiles } =
     proposals.length > 0
       ? await supabase.from("file").select("id, file_name, owner_id").eq("owner_type", "proposal").in("owner_id", proposals.map((p) => p.id))
@@ -206,17 +253,30 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
   const extendDisabled = belowMinimum && s.extension_count >= 2;
   const filteredOptions = extendDisabled ? decisionOptions.filter((o) => o.value !== "EXTEND") : decisionOptions;
 
+  const finalOfferDays = comparison?.sourcing.finalOfferDays ?? 2;
   const actions =
-    filteredOptions.length > 0 || extendDisabled ? (
-      <div className="flex flex-col items-end gap-2">
-        <DecisionPanel action={decideSourcing.bind(null, s.id)} options={filteredOptions} />
-        {extendDisabled && (
-          <p className="text-xs text-muted-foreground" data-testid="max-extensions">
-            {t("errors.maxExtensions")}
-          </p>
+    filteredOptions.length > 0 || extendDisabled || comparing ? (
+      <div className="flex items-start gap-2">
+        {comparing && comparison && (
+          <RequestFinalOffer
+            action={requestFinalOffer.bind(null, s.id)}
+            vendors={comparison.vendors.map((v) => ({ vendorId: v.vendorId, name: v.name }))}
+            defaultDeadline={bakuLocalInDays(finalOfferDays)}
+            used={comparison.sourcing.finalOfferRoundsUsed >= comparison.sourcing.finalOfferRoundsMax}
+          />
         )}
+        <div className="flex flex-col items-end gap-2">
+          <DecisionPanel action={decideSourcing.bind(null, s.id)} options={filteredOptions} />
+          {extendDisabled && (
+            <p className="text-xs text-muted-foreground" data-testid="max-extensions">
+              {t("errors.maxExtensions")}
+            </p>
+          )}
+        </div>
+        {comparing && <SendToCommittee action={sendToCommittee.bind(null, s.id)} />}
       </div>
     ) : undefined;
+  const defaultTab = comparison ? "comparison" : evaluating ? "proposals" : "details";
 
   return (
     <div className="flex flex-col gap-6">
@@ -251,18 +311,37 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           </AlertDescription>
         </Alert>
       )}
-      {s.low_competition_reason && (
+      {winnerDecision && (
+        <Alert data-testid="winner-decision">
+          <AlertTitle>{t("sourcing.comparison.winnerDecision")}</AlertTitle>
+          <AlertDescription className="flex items-center gap-3">
+            <StatusBadge status={winnerDecision.status} />
+            <Link href={`/decisions/${winnerDecision.id}`} className="text-primary hover:underline" data-testid="winner-decision-link">
+              {t("sourcing.comparison.openDecision")}
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+      {s.low_competition_reason && !comparison && (
         <Alert data-testid="continue-reason">
           <AlertTitle>{t("sourcing.continuedTitle")}</AlertTitle>
           <AlertDescription>{s.low_competition_reason}</AlertDescription>
         </Alert>
       )}
 
-      <Tabs defaultValue="details">
+      <Tabs defaultValue={defaultTab}>
         <TabsList>
           <TabsTrigger value="details">{t("record.tabs.details")}</TabsTrigger>
-          <TabsTrigger value="invitations">{t("sourcing.tabs.invitations")}</TabsTrigger>
+          <TabsTrigger value="invitations">
+            {t("sourcing.tabs.invitations")} ({invitations.length})
+          </TabsTrigger>
           {bidsOpen && <TabsTrigger value="proposals">{t("sourcing.tabs.proposals")}</TabsTrigger>}
+          {comparison && <TabsTrigger value="comparison">{t("sourcing.tabs.comparison")}</TabsTrigger>}
+          {canReadQa && !draft && (
+            <TabsTrigger value="qa">
+              {t("sourcing.tabs.qa")} ({qaItems.length})
+            </TabsTrigger>
+          )}
           <TabsTrigger value="files">{t("record.tabs.files")}</TabsTrigger>
           <TabsTrigger value="history">{t("record.tabs.history")}</TabsTrigger>
         </TabsList>
@@ -407,13 +486,16 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
                     <TableHead>{t("sourcing.proposals.vendor")}</TableHead>
                     <TableHead>{t("sourcing.proposals.submitted")}</TableHead>
                     <TableHead>{t("sourcing.proposals.documents")}</TableHead>
+                    <TableHead>{t("sourcing.proposals.result")}</TableHead>
+                    {evaluating && <TableHead className="text-right" />}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {proposals.map((p) => {
                     const docs = (proposalFiles ?? []).filter((f) => f.owner_id === p.id);
+                    const last = unmarked === 1 && p.status === "SUBMITTED";
                     return (
-                      <TableRow key={p.id} data-testid="proposal-row">
+                      <TableRow key={p.id} data-testid="proposal-row" data-status={p.status}>
                         <TableCell className="font-medium">{p.vendor?.legal_name}</TableCell>
                         <TableCell>{p.submitted_at ? formatDateTime(p.submitted_at) : t("common.none")}</TableCell>
                         <TableCell>
@@ -425,6 +507,55 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
                                 </a>
                               ))}
                         </TableCell>
+                        <TableCell>
+                          <StatusBadge status={p.status} />
+                          {p.disqualify_reason && <p className="mt-1 max-w-xs text-xs text-muted-foreground">{p.disqualify_reason}</p>}
+                        </TableCell>
+                        {evaluating && (
+                          <TableCell>
+                            <div className="flex justify-end gap-2">
+                              {p.status === "SUBMITTED" &&
+                                (last ? (
+                                  <ActionDialog
+                                    action={evaluateProposal.bind(null, s.id)}
+                                    trigger={t("sourcing.proposals.pass")}
+                                    triggerSize="sm"
+                                    title={`${t("sourcing.proposals.pass")}: ${p.vendor?.legal_name ?? ""}`}
+                                    description={t("sourcing.proposals.lastConfirm")}
+                                    hidden={{ proposal: p.id, decision: "PASSED" }}
+                                    testId="pass-proposal"
+                                  />
+                                ) : (
+                                  <ActionButton
+                                    action={evaluateProposal.bind(null, s.id)}
+                                    label={t("sourcing.proposals.pass")}
+                                    hidden={{ proposal: p.id, decision: "PASSED" }}
+                                    size="sm"
+                                    testId="pass-proposal"
+                                  />
+                                ))}
+                              {(p.status === "SUBMITTED" || p.status === "PASSED") && (
+                                <ActionDialog
+                                  action={evaluateProposal.bind(null, s.id)}
+                                  trigger={t("sourcing.proposals.disqualify")}
+                                  triggerSize="sm"
+                                  triggerVariant="destructive"
+                                  title={`${t("sourcing.proposals.disqualify")}: ${p.vendor?.legal_name ?? ""}`}
+                                  description={last ? t("sourcing.proposals.lastConfirm") : undefined}
+                                  hidden={{ proposal: p.id, decision: "DISQUALIFIED" }}
+                                  submitVariant="destructive"
+                                  testId="disqualify-proposal"
+                                >
+                                  <Label htmlFor={`dq-${p.id}`}>
+                                    {t("sourcing.proposals.disqualifyReason")}
+                                    <span className="text-destructive" aria-hidden>*</span>
+                                  </Label>
+                                  <Textarea id={`dq-${p.id}`} name="reason" rows={3} required />
+                                </ActionDialog>
+                              )}
+                            </div>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })}
@@ -433,9 +564,40 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
             </div>
             {s.type === "TENDER" && s.status === "TECHNICAL_EVALUATION" && (
               <p className="text-xs text-muted-foreground" data-testid="prices-sealed">
-                {t("sourcing.proposals.sealed")}
+                {evaluating ? t("sourcing.proposals.markHint") : t("sourcing.proposals.sealed")}
               </p>
             )}
+          </TabsContent>
+        )}
+
+        {comparison && (
+          <TabsContent value="comparison" className="pt-4">
+            <ComparisonView
+              data={comparison}
+              sendFormId={comparing ? SEND_FORM_ID : undefined}
+              actions={
+                comparing
+                  ? {
+                      chooseWinner: chooseWinner.bind(null, s.id),
+                      cancelLine: cancelLine.bind(null, s.id),
+                      saveCost: saveCost.bind(null, s.id),
+                      deleteCost: deleteCost.bind(null, s.id),
+                      disqualify: evaluateProposal.bind(null, s.id),
+                    }
+                  : undefined
+              }
+            />
+          </TabsContent>
+        )}
+
+        {canReadQa && !draft && (
+          <TabsContent value="qa" className="pt-4">
+            <QaPanel
+              items={qaItems}
+              publish={publishAnswer.bind(null, s.id)}
+              canAnswer={owner && !["COMPLETED", "CANCELLED"].includes(s.status)}
+              canClarify={owner && s.status === "OPEN"}
+            />
           </TabsContent>
         )}
 
