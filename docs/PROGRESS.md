@@ -357,9 +357,9 @@ Home: "N POs to approve" (Approver, own PRs and sourcings excluded), "N POs to a
 
 ### Decisions and deviations to confirm
 
-- **COMPARISON -> COMPLETED.** The Status Transition Model lists only WINNER_APPROVED -> COMPLETED. When a PO is rejected or declined the
-  sourcing is back in COMPARISON; if the owner then cancels the last open line while at least one PO is ACCEPTED, the sourcing completes
-  from COMPARISON (otherwise it could never complete). Please add the transition to the model.
+- **COMPARISON -> COMPLETED** (confirmed by the BA on 13 Nov 2026, backlog Status Transition Model and PO-03 AC4 patched): the sourcing completes from COMPARISON when the owner cancels the last open line, or the last pending PO is accepted, with at least one ACCEPTED PO.
+- Two result events (`sourcing.completed`, `sourcing.notAwarded`) accepted by the BA.
+- Migration `20261116110000_po_respond_released`: a vendor answering its own PO that is not released yet gets `errors.noAccess`, like an unknown PO (it first got `statusChanged`, which told the vendor that the PO existed).
 - A WINNER decision that closes while an earlier PO of the same sourcing was rejected sends lines without a winner straight back to COMPARISON.
 - The PO's History tab is not shown to vendors (it would list internal steps).
 
@@ -367,7 +367,7 @@ Home: "N POs to approve" (Approver, own PRs and sourcings excluded), "N POs to a
 
 - `npm test`: 106 unit tests (adds PO totals 56,000.00 + 10,080.00 = 66,080.00, notification total as AZN, decision buttons for Requester and
   owner, PO PDF with Azerbaijani letters, menus per role).
-- `npm run test:rls`: 200 tests on vms-dev, all pass. New `po.rls.test.ts` (19 tests, four vendors, three flows): PO per vendor with
+- `npm run test:rls`: 201 tests on vms-dev, all pass. New `po.rls.test.ts` (19 tests, four vendors, three flows): PO per vendor with
   quantities, 20.00 not 21.00 (extra cost not used), VAT 36.00, terms, minutes link; notices without the Requester and the owner; no direct
   writes; readers per role; vendors see nothing before release and only their own after; own-PR and own-sourcing refusal; PO decision package
   (same, and forced differences); committee approve, reject (2-1) and NO_DECISION with Reopen (same package, REJECTED not reopenable);

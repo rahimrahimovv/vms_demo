@@ -872,7 +872,7 @@ TBD
 1. **Given** a PO in FULLY\_APPROVED, **When** the vendor opens Purchase orders, **Then** it is listed with its lines and total and can be downloaded as a PDF in English.
 2. **Given** a FULLY\_APPROVED PO, **When** the vendor clicks Accept, **Then** it becomes ACCEPTED and the owner and the Requester are notified.
 3. **Given** a FULLY\_APPROVED PO, **When** the vendor clicks Decline, **Then** a reason is required; on confirm the PO becomes DECLINED\_BY\_VENDOR, the owner is notified and its lines return to the sourcing's COMPARISON.
-4. **Given** every line of a sourcing is either on an ACCEPTED PO or cancelled, **When** the last such change is saved, **Then** the sourcing becomes COMPLETED, the PR becomes COMPLETED and every vendor with a submitted proposal gets a result notice listing the lines it won, or "Not awarded" (#41).
+4. **Given** every line of a sourcing is either on an ACCEPTED PO or cancelled, **When** the last such change is saved, **Then** the sourcing (in WINNER\_APPROVED, or in COMPARISON with at least one ACCEPTED PO) becomes COMPLETED, the PR becomes COMPLETED and every vendor with a submitted proposal gets a result notice listing the lines it won, or "Not awarded" (#41).
 5. **Given** a vendor, **When** they open Purchase orders, **Then** only their own company's POs are listed.
 
 ---
@@ -989,7 +989,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | IN\_COMMITTEE | WINNER\_APPROVED | Winner decision APPROVED | System | POs created |
 | IN\_COMMITTEE | COMPARISON | Winner decision REJECTED | System | Rejected winners excluded |
 | WINNER\_APPROVED | COMPARISON | A PO is REJECTED or DECLINED\_BY\_VENDOR | System | Only that PO's lines |
-| WINNER\_APPROVED | COMPLETED | Every line is on an ACCEPTED PO or cancelled | System | PR becomes COMPLETED |
+| WINNER\_APPROVED, COMPARISON | COMPLETED | Every line is on an ACCEPTED PO or cancelled, with at least one ACCEPTED PO | System | PR becomes COMPLETED; from COMPARISON when the owner cancels the last open line or the last pending PO is accepted |
 | DRAFT, OPEN, CLOSED, AWAITING\_OPENING, TECHNICAL\_EVALUATION, COMPARISON, FINAL\_OFFER\_ROUND | CANCELLED | Cancel | Owner | Reason; vendors notified; PR back to APPROVED |
 
 **Vendor standing**

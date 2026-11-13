@@ -350,7 +350,7 @@ describe("Flow 1: two lines, two POs, rejection beside an accepted PO, completio
     // not visible to the vendor before the committee approves
     expect((await actors.vendorB.client.rpc("po_view", { p_id: poB })).data).toBeNull();
     expect((await actors.vendorB.client.rpc("po_list")).data as unknown[]).toEqual([]);
-    expect((await respond("vendorB", poB, "ACCEPT")).error?.message).toBe("errors.statusChanged"); // its own PO, not released yet
+    expect((await respond("vendorB", poB, "ACCEPT")).error?.message).toBe("errors.noAccess"); // its own PO, not released yet: refused like an unknown PO
     // a second Approve on the same PO is refused
     expect((await actors.approver.client.rpc("po_decide", { p_po: poB, p_decision: "APPROVE", p_reason: null })).error?.message).toBe("errors.statusChanged");
   });
@@ -612,4 +612,29 @@ describe("Flow 3: separation of duties, committee rejection, NO_DECISION and Reo
     await voteAll(reopened.data as string);
     expect(await poStatus(poB)).toBe("FULLY_APPROVED");
   });
+});
+
+describe("Flow 4: the last pending PO is accepted while the sourcing is in COMPARISON", () => {
+  it("COMPARISON -> COMPLETED when the owner cancelled the open line and the last PO is accepted", async () => {
+    const id = await offersClosed(
+      [{ quantity: 10, price: 25 }, { quantity: 4, price: 50 }],
+      [{ key: "vendorA", prices: [20, 60] }, { key: "vendorB", prices: [22, 45] }],
+    );
+    const [l1] = await lineIds(id);
+    await sendAndApprove(id);
+    const poA = (await poOf(id, "vendorA")).id;
+    const poB = (await poOf(id, "vendorB")).id;
+    for (const po of [poA, poB]) await voteAll((await approvePo(po)).id);
+    expect((await respond("vendorA", poA, "DECLINE", "No stock")).error).toBeNull();
+    expect((await sourcingRow(id)).status).toBe("COMPARISON");
+    // the owner cancels the returned line while the other PO still waits for its vendor: not complete yet
+    expect((await actors.specialist.client.rpc("sourcing_line_cancel", { p_line: l1, p_reason: "Not needed any more" })).error).toBeNull();
+    expect((await sourcingRow(id)).status).toBe("COMPARISON");
+    expect((await respond("vendorB", poB, "ACCEPT")).error).toBeNull();
+    expect((await sourcingRow(id)).status).toBe("COMPLETED");
+    expect((await requisitionOf(id)).status).toBe("COMPLETED");
+    expect((await auditOf("sourcing", id)).at(-1)).toMatchObject({ from_status: "COMPARISON", to_status: "COMPLETED" });
+    expect(await notified("vendorB", "sourcing.completed", id)).toHaveLength(1);
+    expect(await notified("vendorA", "sourcing.notAwarded", id)).toHaveLength(1);
+  }, 300_000);
 });
