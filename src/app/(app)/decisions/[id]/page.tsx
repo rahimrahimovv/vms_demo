@@ -85,7 +85,7 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
   const { data: d } = await supabase
     .from("decision")
     .select(
-      "id, type, status, result_rule, opened_at, deadline, closed_at, reopen_reason, close_reason, sourcing:sourcing(id, number, owner_id, status, owner:app_user!sourcing_owner_id_fkey(full_name)), po:purchase_order(number)",
+      "id, type, status, result_rule, opened_at, deadline, closed_at, reopen_reason, close_reason, sourcing:sourcing(id, number, owner_id, status, owner:app_user!sourcing_owner_id_fkey(full_name)), po:purchase_order!decision_purchase_order_id_fkey(number)",
     )
     .eq("id", id)
     .returns<DecisionRecord[]>()

@@ -333,3 +333,55 @@ but not the comparison.
 17. Click-through sourcings SRC-2026-0209, 0243 and 0244 were removed from vms-dev with the guarded helper (13 Nov 2026). Their
     three PRs stay as they were (IN_SOURCING), as with the Slice 2b cleanup, until DEMO-02's reset.
 18. `.claude/settings.local.json` (not in git): `GATEGUARD_EXEMPT_GLOBS` = `src/**,tests/**,docs/**`.
+
+## Slice 7 (13 Nov 2026)
+
+Backlog patched to match the answers of 13 Nov: PO-01 AC3 and the "PO created" notification (every Approver except the PR's
+Requester **and the sourcing owner**), PO-02 AC3 and the Role Matrix row (message "You cannot approve a PO for your own request or
+sourcing"), RFQ-04 AC6 (a sourcing that has a PO other than REJECTED or DECLINED_BY_VENDOR cannot be cancelled: "This sourcing already
+has purchase orders; cancel its open lines instead"). Migration `20261116100000_purchase_orders` (ERD: `purchase_order.proposal_id`,
+`vat_rate`, `winner_decision_id`).
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| PO-01 One PO per winning vendor | done | AC1-AC4; created by the WINNER APPROVED outcome from the ACTIVE award lines not yet on a PO; vendor's own price excluding VAT, VAT at the vendor's rate, no extra costs; PO list, record, Purchase orders tab on the sourcing |
+| PO-02 Approver, then committee | done | AC1-AC4; own-PR and own-sourcing refusal; PO decision package with differences or "Same as the approved winner decision"; committee rejection returns only that PO's lines; Reopen after NO_DECISION only |
+| PO-03 Vendor accepts or declines | done | AC1-AC5; own POs only, English PDF (e-Procurement header), Accept, Decline with a reason; completion and result notices |
+| CMT-02 AC3, AC9, AC10 | done | WINNER and PO outcomes in `app.apply_decision_outcome` |
+
+Rules as built (BA answers of 13 Nov): an ACCEPTED PO is never touched when another PO is rejected or declined; lines on a live PO are
+locked in COMPARISON (no new winner, no cancel, no extra costs) and left out of the next winner package; Send to committee, the
+frozen package and the next POs cover only the returned lines. Notification events added: `po.created`, `po.rejected`, `po.fullyApproved`,
+`po.accepted`, `po.declined`, `sourcing.completed` (lines won) and `sourcing.notAwarded` (two events for the one "result notice").
+Home: "N POs to approve" (Approver, own PRs and sourcings excluded), "N POs to accept" (vendor). The Requester reads the POs of own PRs.
+
+### Decisions and deviations to confirm
+
+- **COMPARISON -> COMPLETED.** The Status Transition Model lists only WINNER_APPROVED -> COMPLETED. When a PO is rejected or declined the
+  sourcing is back in COMPARISON; if the owner then cancels the last open line while at least one PO is ACCEPTED, the sourcing completes
+  from COMPARISON (otherwise it could never complete). Please add the transition to the model.
+- A WINNER decision that closes while an earlier PO of the same sourcing was rejected sends lines without a winner straight back to COMPARISON.
+- The PO's History tab is not shown to vendors (it would list internal steps).
+
+### Verified
+
+- `npm test`: 106 unit tests (adds PO totals 56,000.00 + 10,080.00 = 66,080.00, notification total as AZN, decision buttons for Requester and
+  owner, PO PDF with Azerbaijani letters, menus per role).
+- `npm run test:rls`: 200 tests on vms-dev, all pass. New `po.rls.test.ts` (19 tests, four vendors, three flows): PO per vendor with
+  quantities, 20.00 not 21.00 (extra cost not used), VAT 36.00, terms, minutes link; notices without the Requester and the owner; no direct
+  writes; readers per role; vendors see nothing before release and only their own after; own-PR and own-sourcing refusal; PO decision package
+  (same, and forced differences); committee approve, reject (2-1) and NO_DECISION with Reopen (same package, REJECTED not reopenable);
+  accept, decline with reason, re-award creating a PO only for the returned line; accepted PO untouched; locked lines; cancel refused with a
+  live PO; completion by accepting and by cancelling the last open line; AWARDED / NOT_AWARDED and notices; audit entries.
+- Click-through in Edge at 1280 px on the dev server (vms-dev, SRC-2026-0291, since removed): Approver card and PO (2,800.00 + 504.00 =
+  3,304.00 AZN, vendor price 28.00, minutes link, no edit), Approve, committee vote on the PO decision, vendor card, own PO list, PDF
+  download, Accept, other vendor sees none, sourcing and PR Completed. It found one bug, fixed: the new `purchase_order.winner_decision_id`
+  made the `decision` -> `purchase_order` embed ambiguous, so the decision and minutes pages showed "no access"; the embeds now name their
+  foreign key. The "result notice" text was not clicked (covered by the RLS test).
+- vms-dev migrated. **vms-prod not migrated yet** (waiting for the BA): run `ENV_FILE=.env.production.local npm run db:push` before pushing `main`,
+  because the new screens call `po_list` and `po_view`.
+
+### Open issues
+
+19. `removeTestData` now also removes POs (links to winner decisions cut first); the click-through sourcing was removed with
+    `scripts/dev-cleanup-sourcing.ts`. The Slice 7 test data left on vms-dev: none.

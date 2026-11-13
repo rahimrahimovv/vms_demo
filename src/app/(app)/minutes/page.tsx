@@ -30,7 +30,7 @@ export default async function MinutesListPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("minutes")
-    .select("id, number, decision:decision(type, status, closed_at, sourcing:sourcing(number), po:purchase_order(number))")
+    .select("id, number, decision:decision(type, status, closed_at, sourcing:sourcing(number), po:purchase_order!decision_purchase_order_id_fkey(number))")
     .order("number", { ascending: false })
     .returns<MinutesRow[]>();
   const list = data ?? [];
