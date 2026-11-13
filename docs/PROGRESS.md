@@ -401,3 +401,17 @@ Done through shared tokens and components, no behaviour, text or test change. To
   and record with the comparison, vendors, decisions, minutes, decision record, vendor home and invitations): sidebar #0E2F2C, no right
   border, active item #1D5A54 white 600, rows 37 px, text 13 px, cells 8 x 12 px, page padding 16 / 32 px, prices 18 px, no horizontal
   overflow, nothing cut off.
+
+## Vendor menu and bell badge (13 Nov 2026)
+
+Commit 8c34814. REG-07 AC11 and REG-06 AC3 patched in the backlog. No change to the steps, the data or the RLS rules.
+
+- The vendor menu shows "Registration" only while the registration is DRAFT, SUBMITTED, RETURNED or REJECTED (`sectionsFor(roles, vendorStatus)`
+  in `src/lib/auth/sections.ts`, status read in the app layout). For an APPROVED vendor `/vendor/registration` redirects to the Profile, and the
+  Registration step on the vendor home links to the Profile.
+- The Profile has a "Registration history" tab that reuses `HistoryTab` (record type `vendor`).
+- The bell badge shows "99+" above 99 unread (`bellBadge()`, unit-tested).
+- Verified: typecheck, 108 unit tests, production build; click-through in Edge on the dev server (DRAFT vendor sees Registration; APPROVED vendor
+  does not, is redirected to the Profile and finds the history there); production check as Beta Trade after the deploy: menu without
+  Registration, redirect to `/vendor/profile`, history tab present. The 99+ badge was not seen on screen (needs more than 99 unread).
+- Open: the click-through registered a throwaway vendor, "Click Test LLC …", on vms-dev.
