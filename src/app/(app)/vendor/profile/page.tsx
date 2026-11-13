@@ -8,6 +8,8 @@ import { bakuToday, certificateStatus } from "@/lib/vendors/rules";
 import { NoAccess } from "@/components/no-access";
 import { StatusBadge } from "@/components/status-badge";
 import { FileList } from "@/components/file-list";
+import { HistoryTab } from "@/components/history-tab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BankAccountsForm, BrandForm, CertificateForm, ProfileDetailsForm, RenewForm } from "@/components/vendor/profile-forms";
 import { loadBankAccounts, loadContacts, toBankAccounts } from "@/lib/vendors/queries";
 import { ContactList } from "@/components/vendor/registration-steps";
@@ -77,6 +79,15 @@ export default async function VendorProfilePage() {
   const filesOf = (id: string) => (files ?? []).filter((f) => f.owner_id === id);
 
   return (
+    <Tabs defaultValue="profile">
+      <TabsList>
+        <TabsTrigger value="profile">{t("profile.tabs.profile")}</TabsTrigger>
+        <TabsTrigger value="registration-history">{t("profile.tabs.registrationHistory")}</TabsTrigger>
+      </TabsList>
+      <TabsContent value="registration-history" className="pt-4">
+        <HistoryTab recordType="vendor" recordId={user.vendorId} />
+      </TabsContent>
+      <TabsContent value="profile" className="pt-4">
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
@@ -231,5 +242,7 @@ export default async function VendorProfilePage() {
         </CardContent>
       </Card>
     </div>
+      </TabsContent>
+    </Tabs>
   );
 }

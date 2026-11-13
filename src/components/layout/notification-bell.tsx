@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { BELL_MAX_ITEMS, messageValues, toBellItem, type BellItem, type NotificationRow } from "@/lib/notifications";
+import { BELL_MAX_ITEMS, bellBadge, messageValues, toBellItem, type BellItem, type NotificationRow } from "@/lib/notifications";
 
 /**
  * PLT-02 AC1-2: bell with unread counter, pushed live via Supabase Realtime (RLS limits the
@@ -94,7 +94,7 @@ export function NotificationBell({
               data-testid="bell-count"
               className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground"
             >
-              {unread > 99 ? "99+" : unread}
+              {bellBadge(unread)}
             </span>
           )}
         </Button>

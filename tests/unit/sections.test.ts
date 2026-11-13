@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canAccess, sectionForPath, sectionsFor } from "@/lib/auth/sections";
+import { bellBadge } from "@/lib/notifications";
 
 // PLT-01 AC4/AC5: the menu and the guard come from the same Role Matrix config.
 describe("Role Matrix sections", () => {
@@ -60,6 +61,20 @@ describe("Role Matrix sections", () => {
     for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "sourcing", "adminItems", "decisions", "minutes", "adminCommittee", "purchaseOrders"] as const) {
       expect(canAccess(["VENDOR"], key)).toBe(false);
     }
+  });
+
+  it("Vendor menu: Registration shows only while DRAFT, SUBMITTED, RETURNED or REJECTED (REG-07 AC11)", () => {
+    for (const status of ["DRAFT", "SUBMITTED", "RETURNED", "REJECTED"]) {
+      expect(sectionsFor(["VENDOR"], status).map((s) => s.key)).toContain("vendorRegistration");
+    }
+    const approved = sectionsFor(["VENDOR"], "APPROVED").map((s) => s.key);
+    expect(approved).not.toContain("vendorRegistration");
+    expect(approved).toContain("vendorProfile");
+  });
+
+  it("Bell badge shows 99+ above 99 unread", () => {
+    expect(bellBadge(99)).toBe("99");
+    expect(bellBadge(100)).toBe("99+");
   });
 
   it("Requester: plan and PRs, no decisions or minutes", () => {

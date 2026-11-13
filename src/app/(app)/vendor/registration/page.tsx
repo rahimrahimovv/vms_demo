@@ -27,6 +27,9 @@ export default async function VendorRegistrationPage() {
   const { vendor, snapshot } = loaded;
   const statuses = stepStatuses(snapshot, bakuToday());
 
+  // REG-07 AC11: an APPROVED vendor finds the registration history in the Profile.
+  if (vendor.status === "APPROVED") redirect("/vendor/profile");
+
   if (vendor.status === "DRAFT" || vendor.status === "RETURNED") {
     redirect(`/vendor/registration/${firstIncompleteStep(statuses)}`);
   }

@@ -112,8 +112,15 @@ export function canAccess(roles: readonly Role[], key: SectionKey): boolean {
   return section.roles.some((r) => roles.includes(r));
 }
 
-export function sectionsFor(roles: readonly Role[]): Section[] {
-  return SECTIONS.filter((s) => canAccess(roles, s.key));
+/** REG-07 AC11: the Registration page shows in the vendor menu only until the registration is APPROVED. */
+export function showsRegistration(vendorStatus: string | null | undefined): boolean {
+  return vendorStatus !== "APPROVED";
+}
+
+export function sectionsFor(roles: readonly Role[], vendorStatus?: string | null): Section[] {
+  return SECTIONS.filter(
+    (s) => canAccess(roles, s.key) && (s.key !== "vendorRegistration" || showsRegistration(vendorStatus)),
+  );
 }
 
 /** The section a path belongs to (longest matching href), used for the top-bar title. */

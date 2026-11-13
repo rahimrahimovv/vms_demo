@@ -50,7 +50,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
   const approved = vendor?.status === "APPROVED";
   const graded = Boolean(grade && grade.grade !== "D");
   const steps: Step[] = [
-    { key: "registration", href: "/vendor/registration", state: approved ? "done" : "current", status: vendor?.status },
+    { key: "registration", href: approved ? "/vendor/profile" : "/vendor/registration", state: approved ? "done" : "current", status: vendor?.status },
     {
       key: "questionnaire",
       href: "/vendor/qualification",

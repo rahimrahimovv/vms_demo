@@ -20,6 +20,11 @@ export type NotificationRow = {
 export const BELL_COLUMNS = "id, event, params, record_number, is_read, created_at";
 export const BELL_MAX_ITEMS = 10;
 
+/** Bell badge text: the count, or "99+" above 99 unread notifications. */
+export function bellBadge(unread: number): string {
+  return unread > 99 ? "99+" : String(unread);
+}
+
 import { formatAmount, formatDateTime } from "./format";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;

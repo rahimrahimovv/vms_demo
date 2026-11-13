@@ -549,6 +549,10 @@
     }
   },
   "profile": {
+    "tabs": {
+      "profile": "Profile",
+      "registrationHistory": "Registration history"
+    },
     "addBrand": "Add brand",
     "addCertificate": "Add certificate",
     "renew": "Upload renewal",

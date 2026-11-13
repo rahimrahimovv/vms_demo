@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const t = await getTranslations("roles");
   const supabase = await createClient();
 
-  const [{ data: latest }, { count: unread }] = await Promise.all([
+  const [{ data: latest }, { count: unread }, vendorStatus] = await Promise.all([
     supabase
       .from("notification")
       .select(BELL_COLUMNS)
@@ -21,11 +21,14 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       .limit(BELL_MAX_ITEMS)
       .returns<NotificationRow[]>(),
     supabase.from("notification").select("id", { count: "exact", head: true }).eq("is_read", false),
+    user.vendorId
+      ? supabase.from("vendor").select("status").eq("id", user.vendorId).single().then(({ data }) => data?.status ?? null)
+      : Promise.resolve(null),
   ]);
 
   return (
     <div className="flex min-h-screen">
-      <AppSidebar sections={sectionsFor(user.roles)} />
+      <AppSidebar sections={sectionsFor(user.roles, vendorStatus)} />
       <div className="flex min-w-0 flex-1 flex-col">
         <DemoBarSlot />
         <TopBar
