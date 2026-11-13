@@ -68,6 +68,11 @@ describe("messages/en.json", () => {
       "pr.readyForSourcing",
       "decision.opened",
       "decision.closed",
+      // Slice 6
+      "question.received",
+      "qa.published",
+      "finalOffer.requested",
+      "finalOffer.closed",
     ]) {
       expect(get(`notifications.events.${event}`), event).toBeTypeOf("string");
     }
@@ -100,5 +105,12 @@ describe("messages/en.json", () => {
     expect(get("errors.lineRequired")).toBe("Add at least one line");
     expect(get("errors.ownRequest")).toBe("You cannot approve your own request");
     expect(get("requisitions.planWarning")).toBe("This PR exceeds the remaining plan amount by {amount}");
+    // Slice 6 (RFQ-03, RFQ-05, RFQ-08)
+    expect(get("errors.questionsClosed")).toBe("Questions are closed");
+    expect(get("errors.finalOfferHigher")).toBe("A final offer cannot be higher than your previous price");
+    expect(get("errors.finalOfferUsed")).toBe("The final-offer round has been used");
+    expect(get("sourcing.comparison.notLowest")).toBe("No longer the lowest evaluated price");
+    expect(get("sourcing.comparison.sharesOwner")).toBe("Shares an owner with {names}");
+    expect(get("decisions.package.sspLabel")).toBe("Single Source Purchase");
   });
 });

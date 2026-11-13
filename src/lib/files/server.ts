@@ -11,7 +11,8 @@ export type FileOwnerType =
   | "questionnaire_answer"
   | "category_application"
   | "sourcing"
-  | "proposal";
+  | "proposal"
+  | "question";
 
 export type FileKind =
   | "charter"

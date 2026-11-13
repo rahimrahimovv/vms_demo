@@ -57,6 +57,7 @@ export async function removeTestData(db: Client, service: SupabaseClient, prefix
     ...sourcings, ...requisitions, ...planLines, ...vendors, ...decisions,
     ...(await ids("select id from public.invitation where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.proposal where sourcing_id = any($1::uuid[])", [sourcings])),
+    ...(await ids("select id from public.question where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.category_application where vendor_id = any($1::uuid[])", [vendors])),
     ...(await ids("select id from public.questionnaire_response where vendor_id = any($1::uuid[])", [vendors])),
   ];

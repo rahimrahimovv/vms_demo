@@ -169,6 +169,16 @@
       "decision": {
         "opened": "{decisionType} decision opened on {number}. Vote by {deadline}",
         "closed": "{decisionType} decision on {number} closed: {result}. Minutes {minutes}"
+      },
+      "question": {
+        "received": "{number}: new question: {text}"
+      },
+      "qa": {
+        "published": "{number}: an answer or clarification was published: {question}"
+      },
+      "finalOffer": {
+        "requested": "{number}: you are asked for a final offer by {deadline}. {message}",
+        "closed": "{number}: the final-offer round closed with {responded} of {chosen} responses"
       }
     }
   },
@@ -279,7 +289,19 @@
     "pdfFailed": "The PDF could not be generated, try again",
     "proofRequired": "Upload the proof of authority",
     "legalRepresentativeRequired": "Mark at least one contact person as a legal representative",
-    "keepLegalRepresentative": "You must keep at least one legal representative with a proof of authority"
+    "keepLegalRepresentative": "You must keep at least one legal representative with a proof of authority",
+    "questionsClosed": "Questions are closed",
+    "questionTooLong": "Use at most 2,000 characters",
+    "vendorNotEligible": "This vendor has no eligible offer here",
+    "justificationRequired": "Enter a justification for a vendor that is not the lowest evaluated price",
+    "lineNeedsWinner": "Every line needs a proposed winner or must be cancelled with a reason",
+    "noWinners": "Every line is cancelled. Cancel the sourcing instead",
+    "lowCompetitionReason": "Write the reason for continuing with fewer eligible proposals than the minimum",
+    "costsLocked": "Extra costs can be changed only during the comparison",
+    "amountInvalid": "Enter an amount of 0 or more with up to 2 decimals",
+    "finalOfferUsed": "The final-offer round has been used",
+    "finalOfferHigher": "A final offer cannot be higher than your previous price",
+    "pickVendors": "Pick at least one vendor"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -945,7 +967,9 @@
     },
     "tabs": {
       "invitations": "Invitations",
-      "proposals": "Proposals"
+      "proposals": "Proposals",
+      "comparison": "Comparison",
+      "qa": "Q&A"
     },
     "invitees": {
       "title": "Invited vendors",
@@ -963,7 +987,127 @@
       "none": "No technical documents",
       "sealed": "Prices are still sealed. They open after the technical evaluation.",
       "committeeDecision": "Opening decision",
-      "openDecision": "Open the decision"
+      "openDecision": "Open the decision",
+      "result": "Result",
+      "pass": "Pass",
+      "disqualify": "Disqualify",
+      "disqualifyReason": "Reason for disqualification",
+      "markHint": "Mark each proposal Passed or Disqualified. The prices of passed proposals open when every proposal is marked.",
+      "lastConfirm": "This is the last proposal. Once it is marked, the prices of the passed proposals open.",
+      "disqualifiedBecause": "Disqualified: {reason}"
+    },
+    "comparison": {
+      "title": "Price comparison",
+      "hint": "AZN, excluding VAT · evaluated price = unit price + extra costs per unit · lowest evaluated price per line is highlighted",
+      "requiredTerms": "Required terms",
+      "minimumChip": "Minimum {minimum, plural, one {# proposal} other {# proposals}}",
+      "finalOfferUsedChip": "Final-offer round used",
+      "line": "Line",
+      "lineMeta": "{quantity} {unit} · {place} by {date}",
+      "estimate": "Estimate {price} per {unit}",
+      "grade": "Grade {grade}",
+      "differentTerms": "Different terms: {terms}",
+      "termNames": {
+        "incoterm": "Incoterm",
+        "namedPlace": "named place",
+        "deliveryMode": "delivery mode",
+        "paymentTerm": "payment term"
+      },
+      "vendorMeta": "Delivery {days} days · valid {validity} days",
+      "vatNote": "prices include VAT {rate}%, shown without it",
+      "sharesOwner": "Shares an owner with {names}",
+      "lowestEvaluated": "Lowest evaluated",
+      "finalOffer": "Final offer",
+      "firstOffer": "First offer {price}",
+      "offer": "Offer",
+      "keptInRound": "Offer, kept in the final round",
+      "noChange": "No change in the final round",
+      "extraNone": "Extra costs: none",
+      "extraList": "Extra costs: {list}",
+      "add": "Add",
+      "edit": "Edit",
+      "evaluated": "Evaluated {price} · line total {total}",
+      "proposeWinner": "Propose as winner",
+      "proposedWinner": "Proposed winner",
+      "justificationLabel": "Justification for a vendor that is not the lowest evaluated price",
+      "justificationTitle": "Propose {name} as winner",
+      "notLowest": "No longer the lowest evaluated price",
+      "justification": "Justification: {text}",
+      "rejected": "Rejected by the committee",
+      "noOffer": "No offer",
+      "noEligibleOffer": "No eligible offer. Cancel this line with a reason.",
+      "cancelLine": "Cancel line",
+      "cancelLineReason": "Reason for cancelling the line",
+      "lineCancelled": "Line cancelled: {reason}",
+      "footer": "Choosing a vendor that is not the lowest evaluated price opens a field for a written justification. The committee sees it.",
+      "disqualifiedTitle": "Disqualified ({count})",
+      "disqualifiedReason": "Reason: {reason}",
+      "disqualifiedNote": "Prices of disqualified proposals are never shown, to anyone.",
+      "disqualifiedNone": "No proposal was disqualified.",
+      "poTitle": "If the committee approves: {count, plural, one {# purchase order} other {# purchase orders}}",
+      "poLine": "{count, plural, one {# line} other {# lines}} · {incoterm} {place}",
+      "poNote": "Purchase orders keep each vendor's own prices. Extra costs are used only to compare.",
+      "poNone": "No line has a proposed winner yet.",
+      "lowCompetitionTitle": "{count} of {total} proposals are eligible; the minimum is {minimum}",
+      "lowCompetitionLabel": "Write the reason for continuing with fewer than {minimum} eligible proposals. It goes to the committee with the comparison.",
+      "lowCompetitionStored": "Reason for fewer eligible proposals than the minimum",
+      "committeeRejected": "The committee rejected the proposed winner. The rejected vendor is excluded on its lines.",
+      "committeeComment": "{name}: {comment}",
+      "roundOpen": "Final-offer round open until {deadline}. New prices stay hidden until it closes.",
+      "responded": "Final offer received",
+      "waiting": "No final offer yet",
+      "sealed": "Prices open when the comparison starts.",
+      "winnerDecision": "Winner decision",
+      "openDecision": "Open the decision",
+      "sendToCommittee": "Send to committee",
+      "disqualify": "Disqualify",
+      "disqualifyReason": "Reason for disqualification",
+      "costs": {
+        "title": "Extra costs: {vendor}",
+        "type": "Type",
+        "amount": "Amount per unit, AZN",
+        "note": "Note",
+        "add": "Add cost",
+        "remove": "Remove",
+        "none": "No extra costs yet.",
+        "types": {
+          "CUSTOMS": "Customs",
+          "DELIVERY": "Delivery",
+          "INSURANCE": "Insurance",
+          "OTHER": "Other"
+        },
+        "item": "{type} {amount} per {unit}"
+      },
+      "finalOfferRequest": {
+        "button": "Request final offer",
+        "title": "Request a final offer",
+        "vendors": "Vendors",
+        "deadline": "Final-offer deadline",
+        "message": "Message to the vendors",
+        "send": "Send request"
+      }
+    },
+    "qa": {
+      "title": "Questions and answers",
+      "empty": "No questions yet. Vendors ask here while the sourcing is open.",
+      "question": "Question",
+      "answer": "Answer",
+      "publish": "Publish",
+      "awaiting": "Awaiting answer",
+      "clarification": "Publish a clarification",
+      "clarificationTitle": "Subject (optional)",
+      "clarificationText": "Clarification",
+      "editHint": "You may edit the question before publishing. The original stays visible to you and in History.",
+      "original": "Original question: {text}",
+      "askedBy": "Asked by {vendor} on {date}",
+      "askedOn": "Asked on {date}",
+      "publishedOn": "Published on {date}",
+      "attachment": "Attachment (only the specialist sees it)",
+      "ask": "Ask a question",
+      "send": "Send question",
+      "fileHint": "The file goes to the procurement specialist only.",
+      "channelNote": "Questions go to the procurement specialist. Answers are published to every invited vendor without your company name.",
+      "sent": "Your question was sent."
     }
   },
   "proposal": {
@@ -990,7 +1134,19 @@
       "submit": "Proposal submitted.",
       "withdraw": "Proposal withdrawn. You can submit it again before the deadline."
     },
-    "submittedNote": "Your proposal is submitted. Total {total}."
+    "submittedNote": "Your proposal is submitted. Total {total}.",
+    "finalOffer": {
+      "title": "Final offer",
+      "intro": "You are asked for a final offer by {deadline}.",
+      "message": "Message: {message}",
+      "previous": "Previous price",
+      "newPrice": "Final price",
+      "submit": "Submit final offer",
+      "keep": "Keep my previous prices",
+      "hint": "Leave a price empty to keep the previous one. A final offer cannot be higher than your previous price.",
+      "responded": "Your final offer was received on {date}. You can change it until the deadline.",
+      "saved": "Your final offer was saved."
+    }
   },
   "invitations": {
     "empty": "You have no invitations yet.",
@@ -1172,7 +1328,14 @@
       "bidders": "Bidders",
       "sealed": "Prices stay sealed until the technical evaluation is done.",
       "lowCompetition": "Reason for continuing below the minimum",
-      "openSourcing": "Open the sourcing"
+      "openSourcing": "Open the sourcing",
+      "comparisonTitle": "Comparison sent to the committee",
+      "frozenAt": "As sent to the committee on {date}",
+      "sspLabel": "Single Source Purchase",
+      "sspNote": "This vote also approves buying from a single source.",
+      "sspJustification": "Justification",
+      "sspFiles": "Justification files",
+      "noComparison": "The comparison is shown to Procurement Specialists, Committee Members and the Admin."
     }
   },
   "minutes": {
