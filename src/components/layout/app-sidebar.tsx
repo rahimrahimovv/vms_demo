@@ -17,10 +17,10 @@ export async function AppSidebar({ sections }: { sections: Section[] }) {
     .filter((g) => g.items.length > 0);
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r bg-sidebar">
-      <div className="flex h-16 items-center gap-2.5 border-b px-5">
-        <LogoMark className="size-8" iconClassName="size-5" />
-        <span className="text-base font-semibold tracking-tight">{t("app.name")}</span>
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground">
+      <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-divider px-5">
+        <LogoMark className="size-8 bg-sidebar-logo text-white" iconClassName="size-5" />
+        <span className="text-base font-semibold tracking-tight text-white">{t("app.name")}</span>
       </div>
       <SidebarNav groups={groups} />
     </aside>

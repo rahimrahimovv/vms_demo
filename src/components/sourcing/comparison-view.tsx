@@ -135,10 +135,10 @@ export function ComparisonView({
           <p className="text-xs text-muted-foreground">{t("hint")}</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px] table-fixed border-collapse text-sm" data-testid="comparison-table">
+          <table className="w-full min-w-[860px] table-fixed border-collapse text-(length:--density-table-text)" data-testid="comparison-table">
             <thead>
               <tr>
-                <th scope="col" className="w-[26%] bg-muted/50 px-5 py-3.5 text-left align-top font-semibold">
+                <th scope="col" className="w-[26%] bg-muted/50 px-(--density-cell-x) py-(--density-cell-y) text-left align-top font-semibold">
                   {t("line")}
                 </th>
                 {data.vendors.map((v) => (
@@ -213,7 +213,7 @@ function VendorHeader({
   const ts = useTranslations("status");
   const terms = [v.incoterm, v.namedPlace].filter(Boolean).join(" · ");
   return (
-    <th scope="col" className="bg-muted/50 px-5 py-3.5 text-left align-top font-normal" data-testid="vendor-header">
+    <th scope="col" className="bg-muted/50 px-(--density-cell-x) py-(--density-cell-y) text-left align-top font-normal" data-testid="vendor-header">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-start justify-between gap-2">
           {link ? (
@@ -290,7 +290,7 @@ function LineRow({
   const lineEditable = editable && !line.locked;
   return (
     <tr data-testid="comparison-line">
-      <th scope="row" className="border-t px-5 py-4 text-left align-top font-normal">
+      <th scope="row" className="border-t px-(--density-cell-x) py-(--density-cell-y) text-left align-top font-normal">
         <div className="font-semibold">{line.item}</div>
         <div className="text-xs text-muted-foreground">
           {t("lineMeta", { quantity: quantity(line.quantity), unit: line.unit, place: line.place ?? "", date: formatDate(line.deliveryDate) })}
@@ -331,7 +331,7 @@ function LineRow({
         return cell ? (
           <PriceCell key={v.proposalId} line={line} cell={cell} vendor={v} comparison={comparison} editable={lineEditable} actions={actions} />
         ) : (
-          <td key={v.proposalId} className="border-t px-5 py-4 align-top text-xs text-muted-foreground">
+          <td key={v.proposalId} className="border-t px-(--density-cell-x) py-(--density-cell-y) align-top text-xs text-muted-foreground">
             {active ? t("noOffer") : ""}
           </td>
         );
@@ -371,13 +371,13 @@ function PriceCell({
         });
 
   return (
-    <td className={cn("border-t px-5 py-4 align-top", lowest && "bg-primary/10")} data-testid="price-cell" data-lowest={lowest || undefined}>
+    <td className={cn("border-t px-(--density-cell-x) py-(--density-cell-y) align-top", lowest && "bg-primary/10")} data-testid="price-cell" data-lowest={lowest || undefined}>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2">
           <span className="text-xs text-zinc-600">{label}</span>
           {lowest && <span className={CHIP.brand}>{t("lowestEvaluated")}</span>}
         </div>
-        <div className={cn("text-[22px] font-bold tabular-nums", lowest && "text-primary")} data-testid="unit-price">
+        <div className={cn("text-(length:--density-price) font-bold tabular-nums", lowest && "text-primary")} data-testid="unit-price">
           {price(cell.unitExclVat)}
         </div>
         {cell.firstExclVat !== null && <div className="text-xs text-zinc-600">{t("firstOffer", { price: price(cell.firstExclVat) })}</div>}

@@ -385,3 +385,19 @@ Home: "N POs to approve" (Approver, own PRs and sourcings excluded), "N POs to a
 
 19. `removeTestData` now also removes POs (links to winner decisions cut first); the click-through sourcing was removed with
     `scripts/dev-cleanup-sourcing.ts`. The Slice 7 test data left on vms-dev: none.
+
+## Style change: dark sidebar and compact density (13 Nov 2026)
+
+Done through shared tokens and components, no behaviour, text or test change. Tokens `--sidebar*` and `--density-*`, `--control-h` in
+`globals.css`; the `Table` components, `SidebarNav`, `AppSidebar`, `LogoMark` use, the main layout, the top bar, the comparison table,
+`StatusBadge` (h-5, so a row with a badge is 37 px) and the form controls read them. One unlayered rule gives page stacks and tab panels the
+14 px gap. CLAUDE.md Design has the new rules.
+
+- Sidebar contrast: text 11.2:1, section labels 6.3:1, active item 7.9:1, product name 14.4:1. The white shield on the logo square
+  (#2E8F85) is 3.9:1: a graphic, above the 3:1 that applies to graphics, below 4.5:1; the colours are the BA's.
+- Form fields, buttons and selects were 32 px high; they are now 36 px (`--control-h`), the large button 40 px. Button sizes `xs` and `sm`
+  (inline row actions, sort buttons in table headers) stay small.
+- Verified: typecheck, 106 unit tests, production build; click-through in Edge at 1280 px on 12 pages (home, PO list and record, sourcing list
+  and record with the comparison, vendors, decisions, minutes, decision record, vendor home and invitations): sidebar #0E2F2C, no right
+  border, active item #1D5A54 white 600, rows 37 px, text 13 px, cells 8 x 12 px, page padding 16 / 32 px, prices 18 px, no horizontal
+  overflow, nothing cut off.

@@ -35,7 +35,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           initialItems={(latest ?? []).map(toBellItem)}
           initialUnread={unread ?? 0}
         />
-        <main className="flex-1 px-8 py-6">{children}</main>
+        <main className="flex-1 px-(--density-page-x) py-(--density-page-y)">{children}</main>
       </div>
     </div>
   );

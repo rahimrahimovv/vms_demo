@@ -42,6 +42,17 @@ If this file and the backlog disagree, the backlog wins; ask the BA.
 - Vendor portal: same app, simpler menu, with a progress checklist
   (Registration, Questionnaire, Categories) and a Profile page.
 - Every empty list shows one sentence and the main action button.
+- Style (13 Nov 2026), applied through shared tokens and components, never screen by screen. Keep the teal brand colour and
+  the rounded corners.
+  - Dark sidebar, tokens `--sidebar*` in `globals.css`: background #0E2F2C, text #D7E6E3, section labels #8FB3AD, active item
+    #1D5A54 with white text at weight 600, logo square #2E8F85 with the white shield, product name white, no right border.
+    Every text and background pair keeps at least 4.5:1 (the white shield on the logo square is a graphic at 3.9:1, accepted).
+  - Compact density, tokens `--density-*` in `globals.css`: table rows about 36 px, table text 13 px, cell padding 8 x 12 px,
+    gap between cards, tables and panels 14 px, page padding 16 px top and 32 px at the sides, big prices in the comparison
+    table 18 px. Use the shared `Table` components (or the same tokens in custom tables); a page stack `main > .flex-col` and
+    tab panels get the 14 px gap from one rule, so do not set another gap on them.
+  - Form fields, buttons and tap targets stay comfortable: at least 36 px high (`--control-h`); do not shrink them. Only the
+    small inline row actions (button sizes `xs` and `sm`) are smaller.
 
 ## Build order (vertical slices)
 Each slice ends deployed and clickable on the Vercel link. Never break an earlier slice.

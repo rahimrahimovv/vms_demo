@@ -26,7 +26,7 @@ export function TopBar({
   const section = sectionForPath(pathname);
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-card px-8">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-card px-(--density-page-x)">
       <h1 className="text-lg font-semibold tracking-tight" data-testid="page-title">
         {section ? t(section.labelKey) : ""}
       </h1>

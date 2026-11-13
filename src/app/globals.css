@@ -9,6 +9,9 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-label: var(--sidebar-label);
+  --color-sidebar-logo: var(--sidebar-logo);
+  --color-sidebar-divider: var(--sidebar-divider);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -72,14 +75,29 @@
   --chart-4: oklch(0.552 0.016 286);
   --chart-5: oklch(0.705 0.015 286);
   --radius: 0.5rem;
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.21 0.006 286);
+  /* Dark sidebar (CLAUDE.md Design). Contrast: text 11.2:1, section labels 6.3:1, active item 7.9:1. */
+  --sidebar: #0e2f2c;
+  --sidebar-foreground: #d7e6e3;
+  --sidebar-label: #8fb3ad;
+  --sidebar-logo: #2e8f85;
+  --sidebar-divider: #1a4440;
   --sidebar-primary: oklch(0.437 0.078 188.2);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.953 0.051 180.8);
-  --sidebar-accent-foreground: oklch(0.386 0.063 188.4);
-  --sidebar-border: oklch(0.92 0.004 286);
+  --sidebar-accent: #1d5a54;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: transparent; /* the sidebar has no right border */
   --sidebar-ring: oklch(0.6 0.118 184.7);
+
+  /* Compact density (CLAUDE.md Design): one place for table rows, gaps and page padding. */
+  --density-table-text: 13px;
+  --density-cell-x: 12px;
+  --density-cell-y: 8px;
+  --density-head-h: 36px;
+  --density-gap: 14px;
+  --density-page-y: 16px;
+  --density-page-x: 32px;
+  --density-price: 18px;
+  --control-h: 36px; /* form fields and buttons never go below this */
 }
 
 @layer base {
@@ -97,4 +115,11 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+}
+
+/* Compact density: stacks of cards, tables and tab panels on a page use the 14 px gap. Unlayered on purpose, so it
+   wins over the per-screen gap utilities and every new screen follows it without extra classes. */
+main > .flex.flex-col,
+main [data-slot="tabs-content"].flex-col {
+  gap: var(--density-gap);
 }

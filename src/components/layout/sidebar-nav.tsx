@@ -57,7 +57,7 @@ export function SidebarNav({ groups }: { groups: NavGroup[] }) {
     <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-5" data-testid="main-menu">
       {groups.map((group) => (
         <div key={group.group} className="flex flex-col gap-1">
-          <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{group.label}</p>
+          <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-sidebar-label">{group.label}</p>
           {group.items.map((item) => {
             const Icon = ICONS[item.icon];
             const active = item.key === activeKey;
@@ -68,8 +68,8 @@ export function SidebarNav({ groups }: { groups: NavGroup[] }) {
                 data-section={item.key}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  active && "bg-sidebar-accent text-sidebar-accent-foreground",
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-white",
+                  active && "bg-sidebar-accent font-semibold text-sidebar-accent-foreground hover:bg-sidebar-accent",
                 )}
               >
                 <Icon className="size-4" aria-hidden />

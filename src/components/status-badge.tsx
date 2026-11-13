@@ -18,7 +18,7 @@ export function StatusBadge({ status, className }: { status: string; className?:
     <span
       data-status={status}
       className={cn(
-        "inline-flex h-6 items-center rounded-full px-2.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap",
+        "inline-flex h-5 items-center rounded-full px-2.5 text-xs font-medium ring-1 ring-inset whitespace-nowrap",
         TONE_CLASSES[statusTone(status)],
         className,
       )}
