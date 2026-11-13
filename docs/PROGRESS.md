@@ -318,10 +318,18 @@ Migrations `20261115100000_qa`, `20261115110000_evaluation`, `20261115120000_ext
   (higher price refused, 28.90 accepted, hidden until the round closes), Send to committee, WINNER package, vote 2-1 ->
   WINNER_APPROVED. It found two bugs, both fixed: empty optional values were sent as missing parameters, and React's form
   reset after a refused final offer emptied the typed price.
-- vms-prod: **not migrated yet** (waiting for the BA's go).
+- vms-prod (13 Nov 2026): target checked as the production project (DB and API refs equal, not vms-dev), the 4 migrations
+  applied; read-only check shows the same 12 new functions as vms-dev (authenticated only, no `anon`), `decision.package` not
+  selectable, jobs `vms-sourcing`, `vms-decisions`, `vms-daily` active, `question_audit` trigger present.
+- Vercel: `main` at e9cb23f, deployment completed (green). Production smoke check (read-only): /sign-in and /register 200
+  with "e-Procurement", /sourcing and /decisions redirect to sign-in, `anon` refused on `sourcing_comparison`, `vendor_qa`,
+  `final_offer_submit` and `award_line` (42501).
+
+Confirmed by the BA on 13 Nov 2026: DISQUALIFIED is final (backlog RFQ-05 AC2 patched); the Approver sees the WINNER decision
+but not the comparison.
 
 ### Open issues
 
-17. Click-through sourcings SRC-2026-0209 (WINNER_APPROVED), SRC-2026-0243 and SRC-2026-0244 (IN_COMMITTEE, votes open for the
-    demo committee) stay on vms-dev; `scripts/dev-cleanup-sourcing.ts` removes them if wanted.
-18. vms-prod needs the 4 Slice 6 migrations before `main` is pushed (the new screens call the new functions).
+17. Click-through sourcings SRC-2026-0209, 0243 and 0244 were removed from vms-dev with the guarded helper (13 Nov 2026). Their
+    three PRs stay as they were (IN_SOURCING), as with the Slice 2b cleanup, until DEMO-02's reset.
+18. `.claude/settings.local.json` (not in git): `GATEGUARD_EXEMPT_GLOBS` = `src/**,tests/**,docs/**`.
