@@ -32,15 +32,15 @@ export function pdfText(value: string): string {
   return Array.from(value, (ch) => PLAIN[ch] ?? (ch.charCodeAt(0) <= 0xff ? ch : "?")).join("");
 }
 
-function label(path: string, values: Record<string, string | number> = {}): string {
+export function label(path: string, values: Record<string, string | number> = {}): string {
   const found = path.split(".").reduce<unknown>((node, key) => (node as Record<string, unknown> | undefined)?.[key], messages);
   if (typeof found !== "string") throw new Error(`Missing message ${path}`);
   return found.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
 }
 
-const PAGE = { width: 595.28, height: 841.89, margin: 50 };
+export const PAGE = { width: 595.28, height: 841.89, margin: 50 };
 
-function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
+export function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
   const lines: string[] = [];
   for (const paragraph of pdfText(text).split(/\r?\n/)) {
     let line = "";

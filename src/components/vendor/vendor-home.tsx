@@ -68,6 +68,10 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
   const toAnswer = open.filter((i) => i.invitation_status === "INVITED").length;
   const toSubmit = open.filter((i) => i.invitation_status === "ACCEPTED" && i.proposal_status !== "SUBMITTED").length;
 
+  // Slice 7 (PO-03): fully approved POs waiting for the vendor's answer
+  const { data: poRows } = await supabase.rpc("po_list");
+  const toAccept = ((poRows ?? []) as { status: string }[]).filter((po) => po.status === "FULLY_APPROVED").length;
+
   // REG-07 AC1, AC10: while DRAFT or RETURNED the home page is the registration checklist
   const registering = vendor?.status === "DRAFT" || vendor?.status === "RETURNED";
   if (registering) {
@@ -103,10 +107,11 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-4 gap-4">
         {[
-          { key: "invitationsToAnswer", count: toAnswer },
-          { key: "proposalsToSubmit", count: toSubmit },
+          { key: "invitationsToAnswer", count: toAnswer, href: "/vendor/invitations" },
+          { key: "proposalsToSubmit", count: toSubmit, href: "/vendor/invitations" },
+          { key: "posToAccept", count: toAccept, href: "/vendor/purchase-orders" },
         ].map((card) => (
-          <Link key={card.key} href="/vendor/invitations" data-testid={`task-card-${card.key}`}>
+          <Link key={card.key} href={card.href} data-testid={`task-card-${card.key}`}>
             <Card className="h-full hover:bg-muted/60">
               <CardContent className="text-sm font-medium">{t(`home.cards.${card.key}`, { count: card.count })}</CardContent>
             </Card>
