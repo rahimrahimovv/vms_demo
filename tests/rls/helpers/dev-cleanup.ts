@@ -58,11 +58,14 @@ export async function removeTestData(db: Client, service: SupabaseClient, prefix
     ...(await ids("select id from public.invitation where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.proposal where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.question where sourcing_id = any($1::uuid[])", [sourcings])),
+    ...(await ids("select id from public.purchase_order where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.category_application where vendor_id = any($1::uuid[])", [vendors])),
     ...(await ids("select id from public.questionnaire_response where vendor_id = any($1::uuid[])", [vendors])),
   ];
 
   await db.query("delete from public.file where owner_id = any($1::uuid[])", [related]);
+  // Slice 7: a PO points at its winner decision and a PO decision points at the PO; the links are cut, then the POs go.
+  await db.query("update public.purchase_order set winner_decision_id = null where sourcing_id = any($1::uuid[])", [sourcings]);
   // Committee decisions of the test sourcings go first. Minutes are immutable (CMT-03 AC4), so their trigger is
   // switched off for a moment here, under the same guards as the audit trigger (dev project only, finally block).
   if (decisions.length > 0) {
@@ -76,6 +79,7 @@ export async function removeTestData(db: Client, service: SupabaseClient, prefix
     await db.query("update public.decision set reopened_from_id = null where id = any($1::uuid[])", [decisions]);
     await db.query("delete from public.decision where id = any($1::uuid[])", [decisions]);
   }
+  await db.query("delete from public.purchase_order where sourcing_id = any($1::uuid[])", [sourcings]);
   await db.query("delete from public.committee_member where user_id = any($1::uuid[])", [users]);
   await db.query("delete from public.sourcing where id = any($1::uuid[])", [sourcings]);
   await withAuditTriggerOff(db, async () => {
@@ -113,8 +117,10 @@ export async function removeSourcingByNumber(db: Client, number: string) {
     ...(await ids("select id from public.invitation where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.proposal where sourcing_id = any($1::uuid[])", [sourcings])),
     ...(await ids("select id from public.question where sourcing_id = any($1::uuid[])", [sourcings])),
+    ...(await ids("select id from public.purchase_order where sourcing_id = any($1::uuid[])", [sourcings])),
   ];
   await db.query("delete from public.file where owner_id = any($1::uuid[])", [related]);
+  await db.query("update public.purchase_order set winner_decision_id = null where sourcing_id = any($1::uuid[])", [sourcings]);
   if (decisions.length > 0) {
     await db.query("alter table public.minutes disable trigger minutes_immutable");
     try {
@@ -126,6 +132,7 @@ export async function removeSourcingByNumber(db: Client, number: string) {
     await db.query("update public.decision set reopened_from_id = null where id = any($1::uuid[])", [decisions]);
     await db.query("delete from public.decision where id = any($1::uuid[])", [decisions]);
   }
+  await db.query("delete from public.purchase_order where sourcing_id = any($1::uuid[])", [sourcings]);
   await withAuditTriggerOff(db, async () => {
     await db.query("delete from public.audit_entry where record_id = any($1::uuid[])", [related]);
     await db.query("delete from public.notification where record_id = any($1::uuid[])", [related]);

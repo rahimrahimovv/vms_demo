@@ -286,6 +286,8 @@ function LineRow({
 }) {
   const t = useTranslations("sourcing.comparison");
   const active = line.status === "ACTIVE";
+  // a line already on a live PO is locked: its winner, its cost and its cancellation no longer change here
+  const lineEditable = editable && !line.locked;
   return (
     <tr data-testid="comparison-line">
       <th scope="row" className="border-t px-5 py-4 text-left align-top font-normal">
@@ -300,7 +302,10 @@ function LineRow({
           <div className="mt-1 text-xs whitespace-pre-wrap text-zinc-700">{t("justification", { text: line.justification })}</div>
         )}
         {active && line.notLowest && <div className="mt-1 text-xs font-semibold text-amber-800">{t("notLowest")}</div>}
-        {editable && active && actions && (
+        {active && line.locked && line.poNumber && (
+          <div className="mt-1 text-xs font-semibold text-emerald-800" data-testid="line-on-po">{t("lockedLine", { number: line.poNumber })}</div>
+        )}
+        {lineEditable && active && actions && (
           <div className="mt-2">
             <ActionDialog
               action={actions.cancelLine}
@@ -324,7 +329,7 @@ function LineRow({
       {vendors.map((v) => {
         const cell = active ? cellFor(line, v.proposalId) : undefined;
         return cell ? (
-          <PriceCell key={v.proposalId} line={line} cell={cell} vendor={v} comparison={comparison} editable={editable} actions={actions} />
+          <PriceCell key={v.proposalId} line={line} cell={cell} vendor={v} comparison={comparison} editable={lineEditable} actions={actions} />
         ) : (
           <td key={v.proposalId} className="border-t px-5 py-4 align-top text-xs text-muted-foreground">
             {active ? t("noOffer") : ""}

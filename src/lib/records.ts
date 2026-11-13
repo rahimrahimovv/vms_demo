@@ -13,6 +13,7 @@ const INTERNAL_PATHS: Record<string, (id: string) => string> = {
   plan_line: () => "/plan",
   sourcing: (id) => `/sourcing/${id}`,
   decision: (id) => `/decisions/${id}`,
+  purchase_order: (id) => `/purchase-orders/${id}`,
 };
 
 const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {
@@ -21,6 +22,7 @@ const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {
   questionnaire_response: () => "/vendor/qualification",
   category_application: () => "/vendor/categories",
   sourcing: (id) => `/vendor/invitations/${id}`,
+  purchase_order: (id) => `/vendor/purchase-orders/${id}`,
 };
 
 export function recordHref(recordType: string, recordId: string, audience: Audience = "internal", event?: string) {

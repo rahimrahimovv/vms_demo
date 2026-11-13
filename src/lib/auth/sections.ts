@@ -19,6 +19,8 @@ export type SectionKey =
   | "requisitions"
   | "sourcing"
   | "vendorInvitations"
+  | "purchaseOrders"
+  | "vendorPurchaseOrders"
   | "adminUsers"
   | "adminQuestionnaire"
   | "adminDictionaries"
@@ -66,6 +68,8 @@ export const SECTIONS: Section[] = [
   { key: "vendorProfile", href: "/vendor/profile", labelKey: "vendorProfile", icon: "building", roles: ["VENDOR"], group: "main" },
   // "View the plan" = Requester, Approver, PS, Admin; only the Admin adds, edits or closes lines.
   { key: "vendorInvitations", href: "/vendor/invitations", labelKey: "vendorInvitations", icon: "clipboardList", roles: ["VENDOR"], group: "main" },
+  // PO-03 AC1, AC5: the vendor reads only its own FULLY_APPROVED, ACCEPTED or DECLINED POs (public.po_list).
+  { key: "vendorPurchaseOrders", href: "/vendor/purchase-orders", labelKey: "vendorPurchaseOrders", icon: "fileText", roles: ["VENDOR"], group: "main" },
   { key: "plan", href: "/plan", labelKey: "plan", icon: "wallet", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "ADMIN"], group: "procurement" },
   // PRs: the Requester creates own PRs, the Approver decides, the PS sources approved ones (Slice 4),
   // the Admin reads. RLS shows other users' PRs only once submitted.
@@ -74,6 +78,10 @@ export const SECTIONS: Section[] = [
   // reads too (CMT-04 AC2: the committee sees vendor names and technical documents once the opening is approved);
   // sealed data stays closed by RLS, and only the owner gets action buttons. Assumption to confirm with the BA.
   { key: "sourcing", href: "/sourcing", labelKey: "sourcing", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "procurement" },
+  // Purchase orders (PO-01..PO-03): "Approve or reject a PO" = Approver (not for own PR or sourcing). Read by the Approver,
+  // Procurement Specialist, Committee Member and Admin, and by the Requester for the POs of the own PRs (the database
+  // function public.po_list decides which rows). Vendors have their own section.
+  { key: "purchaseOrders", href: "/purchase-orders", labelKey: "purchaseOrders", icon: "package", roles: ["REQUESTER", "APPROVER", "PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "procurement" },
   // Committee decisions (CMT-02, CMT-04) and minutes (CMT-03): "Vote on winner and PO decisions" = Committee Member
   // (never the sourcing owner); "View minutes" = Approver, PS, Committee Member, Admin. Never vendors.
   { key: "decisions", href: "/decisions", labelKey: "decisions", icon: "gavel", roles: ["APPROVER", "PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "procurement" },

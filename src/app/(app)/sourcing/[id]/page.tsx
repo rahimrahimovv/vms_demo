@@ -25,6 +25,7 @@ import { QaPanel, type QaItem } from "@/components/sourcing/qa-panel";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Comparison } from "@/lib/sourcing/comparison";
+import type { PoListRow } from "@/lib/purchase-orders/types";
 import {
   cancelLine,
   chooseWinner,
@@ -203,6 +204,12 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       ? await supabase.from("file").select("id, file_name, owner_id").eq("owner_type", "proposal").in("owner_id", proposals.map((p) => p.id))
       : { data: [] as { id: string; file_name: string; owner_id: string }[] };
 
+  // Slice 7 (PO-01): the sourcing's purchase orders. A sourcing with a PO other than REJECTED or DECLINED_BY_VENDOR cannot be
+  // cancelled (RFQ-04 AC6); the owner cancels its open lines instead.
+  const { data: poData } = draft ? { data: [] as PoListRow[] } : await supabase.rpc("po_list");
+  const purchaseOrders = ((poData ?? []) as PoListRow[]).filter((po) => po.sourcing_id === id);
+  const hasLivePo = purchaseOrders.some((po) => po.status !== "REJECTED" && po.status !== "DECLINED_BY_VENDOR");
+
   const invitees = draft && owner ? ((await supabase.rpc("sourcing_invitees", { p_id: id })).data ?? []) : [];
 
   // Dictionary entries: active ones, plus the one already chosen
@@ -241,7 +248,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       });
     }
   }
-  if (owner && CANCELLABLE.includes(s.status)) {
+  if (owner && CANCELLABLE.includes(s.status) && !hasLivePo) {
     decisionOptions.push({
       value: "CANCEL",
       label: t("sourcing.actions.cancel"),
@@ -300,6 +307,11 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           <AlertDescription>{s.cancel_reason}</AlertDescription>
         </Alert>
       )}
+      {owner && hasLivePo && s.status === "COMPARISON" && (
+        <Alert data-testid="cancel-blocked">
+          <AlertDescription>{t("sourcing.purchaseOrders.cancelBlocked")}</AlertDescription>
+        </Alert>
+      )}
       {opening && (
         <Alert data-testid="opening-decision">
           <AlertTitle>{t("sourcing.proposals.committeeDecision")}</AlertTitle>
@@ -340,6 +352,11 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           {canReadQa && !draft && (
             <TabsTrigger value="qa">
               {t("sourcing.tabs.qa")} ({qaItems.length})
+            </TabsTrigger>
+          )}
+          {purchaseOrders.length > 0 && (
+            <TabsTrigger value="purchaseOrders">
+              {t("sourcing.tabs.purchaseOrders")} ({purchaseOrders.length})
             </TabsTrigger>
           )}
           <TabsTrigger value="files">{t("record.tabs.files")}</TabsTrigger>
@@ -598,6 +615,41 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
               canAnswer={owner && !["COMPLETED", "CANCELLED"].includes(s.status)}
               canClarify={owner && s.status === "OPEN"}
             />
+          </TabsContent>
+        )}
+
+        {purchaseOrders.length > 0 && (
+          <TabsContent value="purchaseOrders" className="pt-4">
+            <div className="overflow-hidden rounded-lg border bg-card">
+              <Table>
+                <TableHeader className="bg-muted/60">
+                  <TableRow>
+                    <TableHead>{t("purchaseOrders.columns.number")}</TableHead>
+                    <TableHead>{t("purchaseOrders.columns.vendor")}</TableHead>
+                    <TableHead className="text-right">{t("purchaseOrders.columns.total")}</TableHead>
+                    <TableHead className="text-right">{t("purchaseOrders.columns.totalInclVat")}</TableHead>
+                    <TableHead>{t("purchaseOrders.columns.status")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {purchaseOrders.map((po) => (
+                    <TableRow key={po.id} data-testid="sourcing-po-row">
+                      <TableCell>
+                        <Link href={`/purchase-orders/${po.id}`} className="font-medium text-primary hover:underline" data-testid="sourcing-po-link">
+                          {po.number}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{po.vendor_name}</TableCell>
+                      <TableCell className="text-right tabular-nums">{formatAmount(po.total)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{formatAmount(po.total_incl_vat)}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={po.status} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </TabsContent>
         )}
 

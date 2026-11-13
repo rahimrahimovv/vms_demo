@@ -9,6 +9,7 @@ describe("Role Matrix sections", () => {
       "plan",
       "requisitions",
       "sourcing",
+      "purchaseOrders",
       "decisions",
       "minutes",
       "vendors",
@@ -28,6 +29,7 @@ describe("Role Matrix sections", () => {
       "plan",
       "requisitions",
       "sourcing",
+      "purchaseOrders",
       "decisions",
       "minutes",
       "vendors",
@@ -38,7 +40,7 @@ describe("Role Matrix sections", () => {
   });
 
   it("Committee Member: sourcing (read), decisions, minutes and vendor cards (REG-06 AC7); no plan, no PRs, no committee setup", () => {
-    expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "sourcing", "decisions", "minutes", "vendors"]);
+    expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "sourcing", "purchaseOrders", "decisions", "minutes", "vendors"]);
     expect(canAccess(["COMMITTEE_MEMBER"], "adminCommittee")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "questionnaires")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "avl")).toBe(false);
@@ -53,19 +55,21 @@ describe("Role Matrix sections", () => {
       "vendorCategories",
       "vendorProfile",
       "vendorInvitations",
+      "vendorPurchaseOrders",
     ]);
-    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "sourcing", "adminItems", "decisions", "minutes", "adminCommittee"] as const) {
+    for (const key of ["vendors", "questionnaires", "categoryApplications", "avl", "adminUsers", "plan", "requisitions", "sourcing", "adminItems", "decisions", "minutes", "adminCommittee", "purchaseOrders"] as const) {
       expect(canAccess(["VENDOR"], key)).toBe(false);
     }
   });
 
   it("Requester: plan and PRs, no decisions or minutes", () => {
-    expect(sectionsFor(["REQUESTER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions"]);
+    expect(sectionsFor(["REQUESTER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions", "purchaseOrders"]);
     expect(canAccess(["REQUESTER"], "minutes")).toBe(false);
+    expect(canAccess(["REQUESTER"], "vendorPurchaseOrders")).toBe(false);
   });
 
   it("Approver: plan, PRs and minutes (Role Matrix: view minutes), no committee setup", () => {
-    expect(sectionsFor(["APPROVER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions", "decisions", "minutes"]);
+    expect(sectionsFor(["APPROVER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions", "purchaseOrders", "decisions", "minutes"]);
     expect(canAccess(["APPROVER"], "adminCommittee")).toBe(false);
   });
 
@@ -95,5 +99,7 @@ describe("Role Matrix sections", () => {
     expect(sectionForPath("/admin/usersx")).toBeUndefined();
     expect(sectionForPath("/vendors/abc")?.key).toBe("vendors");
     expect(sectionForPath("/vendor/registration")?.key).toBe("vendorRegistration");
+    expect(sectionForPath("/vendor/purchase-orders/abc")?.key).toBe("vendorPurchaseOrders");
+    expect(sectionForPath("/purchase-orders/abc")?.key).toBe("purchaseOrders");
   });
 });

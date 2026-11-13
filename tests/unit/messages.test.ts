@@ -73,6 +73,14 @@ describe("messages/en.json", () => {
       "qa.published",
       "finalOffer.requested",
       "finalOffer.closed",
+      // Slice 7
+      "po.created",
+      "po.rejected",
+      "po.fullyApproved",
+      "po.accepted",
+      "po.declined",
+      "sourcing.completed",
+      "sourcing.notAwarded",
     ]) {
       expect(get(`notifications.events.${event}`), event).toBeTypeOf("string");
     }
@@ -112,5 +120,9 @@ describe("messages/en.json", () => {
     expect(get("sourcing.comparison.notLowest")).toBe("No longer the lowest evaluated price");
     expect(get("sourcing.comparison.sharesOwner")).toBe("Shares an owner with {names}");
     expect(get("decisions.package.sspLabel")).toBe("Single Source Purchase");
+    // Slice 7 (PO-01..PO-03)
+    expect(get("errors.ownPurchaseOrder")).toBe("You cannot approve a PO for your own request or sourcing");
+    expect(get("errors.sourcingHasPurchaseOrders")).toBe("This sourcing already has purchase orders; cancel its open lines instead");
+    expect(get("decisions.package.samePackage")).toBe("Same as the approved winner decision");
   });
 });

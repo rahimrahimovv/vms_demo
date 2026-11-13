@@ -590,7 +590,7 @@ TBD
 3. **Given** a CLOSED sourcing below the minimum, **When** the owner opens it, **Then** it shows "Below minimum: N of M proposals" with three actions: Extend, Continue, Cancel.
 4. **Given** Extend, **When** the owner sets a new deadline later than now and a reason, **Then** the sourcing returns to OPEN, invited vendors that have not declined are notified of the new deadline, and the extension count rises by 1; after 2 extensions (Admin setting) Extend is disabled with "Maximum number of extensions reached".
 5. **Given** Continue, **When** the owner enters a reason, **Then** the sourcing moves on as in criterion 2 and the reason is stored for the committee package (#26); with 0 proposals Continue is not offered.
-6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision closes as NO\_DECISION with the rule "Sourcing cancelled", and its minutes record the cancellation reason. \[revised\]
+6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision closes as NO\_DECISION with the rule "Sourcing cancelled", and its minutes record the cancellation reason; a sourcing that has a PO other than REJECTED or DECLINED\_BY\_VENDOR cannot be cancelled ("This sourcing already has purchase orders; cancel its open lines instead"), and the owner cancels its open lines instead. \[revised\]
 
 ---
 
@@ -823,7 +823,7 @@ TBD
 
 1. **Given** a WINNER decision becomes APPROVED, **When** it closes, **Then** one PO PO-YYYY-NNNN is created per winning vendor, holding an award line with its quantity for every line, or part of a line, that vendor won. \[revised\]
 2. **Given** a new PO, **When** it is opened, **Then** it shows vendor, lines (item, quantity, unit, unit price, line total, delivery date, delivery place), total in AZN excluding VAT, VAT amount, total including VAT, Incoterm, named place, delivery mode and payment term from the winning proposal and links to the sourcing and the winner decision's minutes. \[revised\]
-3. **Given** a new PO, **When** it is created, **Then** its status is PENDING\_APPROVAL and every Approver except the PR's Requester is notified.
+3. **Given** a new PO, **When** it is created, **Then** its status is PENDING\_APPROVAL and every Approver except the PR's Requester and the sourcing owner is notified.
 4. **Given** any PO, **When** any user tries to edit its lines, prices or vendor, **Then** no edit action exists; a change is made only by rejecting it and re-awarding the lines.
 
 ---
@@ -847,7 +847,7 @@ TBD
 
 1. **Given** a PO in PENDING\_APPROVAL, **When** an Approver clicks Approve, **Then** it becomes PENDING\_COMMITTEE and a PO decision opens (CMT-02).
 2. **Given** a PO in PENDING\_APPROVAL, **When** the Approver clicks Reject, **Then** a reason is required; on confirm the PO becomes REJECTED, the owner is notified, and its lines return to the sourcing's COMPARISON (RFQ-05).
-3. **Given** an Approver who is the Requester of the PR behind the PO, **When** they open it, **Then** no decision buttons are shown and a direct request is refused with "You cannot approve a PO for your own request" (#83).
+3. **Given** an Approver who is the Requester of the PR behind the PO or the owner of its sourcing, **When** they open it, **Then** no decision buttons are shown and a direct request is refused with "You cannot approve a PO for your own request or sourcing" (#83).
 4. **Given** the PO decision becomes APPROVED, **When** it closes, **Then** the PO becomes FULLY\_APPROVED, and the vendor, the owner and the Requester are notified.
 
 ---
@@ -950,7 +950,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | See proposal prices after the deadline | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
 | Disqualify, compare, propose the winner | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Vote on winner and PO decisions | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
-| Approve or reject a PO (not for own PR) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Approve or reject a PO (not for own PR or sourcing) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Accept or decline a PO | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
@@ -1114,7 +1114,7 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | Sourcing cancelled | Invited vendors not declined | In-app | Sourcing number, reason | No |
 | Committee decision opened | Eligible committee members | In-app | Decision type (opening, winner or PO), sourcing, voting deadline | No |
 | Committee decision closed | Sourcing owner, committee members | In-app | Result, minutes number | No |
-| PO created | Approvers except the PR's Requester | In-app | PO number, vendor, total | No |
+| PO created | Approvers except the PR's Requester and the sourcing owner | In-app | PO number, vendor, total | No |
 | PO rejected by the Approver | Sourcing owner | In-app | PO number, reason | No |
 | PO fully approved | Vendor, sourcing owner, Requester | In-app | PO number, total | No |
 | PO accepted | Sourcing owner, Requester | In-app | PO number | No |

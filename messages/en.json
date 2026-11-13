@@ -30,7 +30,9 @@
     "adminItems": "Items",
     "adminCommittee": "Committee",
     "decisions": "Decisions",
-    "minutes": "Minutes"
+    "minutes": "Minutes",
+    "purchaseOrders": "Purchase orders",
+    "vendorPurchaseOrders": "Purchase orders"
   },
   "roles": {
     "REQUESTER": "Requester",
@@ -81,7 +83,8 @@
     "VOTING": "Voting",
     "NO_DECISION": "No decision",
     "UNANSWERED": "Unanswered",
-    "PUBLISHED": "Published"
+    "PUBLISHED": "Published",
+    "PENDING_COMMITTEE": "Pending committee"
   },
   "common": {
     "none": "—",
@@ -164,7 +167,9 @@
         "deadlineSoon": "The deadline for {number} is {deadline}. You have not submitted a proposal yet",
         "extended": "The deadline for {number} moved to {deadline}",
         "closed": "{number} closed: {received} of {minimum} proposals received",
-        "cancelled": "{number} was cancelled: {reason}"
+        "cancelled": "{number} was cancelled: {reason}",
+        "completed": "{number} is completed. Lines you won: {lines}",
+        "notAwarded": "{number} is completed. Not awarded"
       },
       "decision": {
         "opened": "{decisionType} decision opened on {number}. Vote by {deadline}",
@@ -179,6 +184,13 @@
       "finalOffer": {
         "requested": "{number}: you are asked for a final offer by {deadline}. {message}",
         "closed": "{number}: the final-offer round closed with {responded} of {chosen} responses"
+      },
+      "po": {
+        "created": "{number} for {vendor} ({total} excluding VAT) is waiting for your approval",
+        "rejected": "{number} was rejected: {reason}",
+        "fullyApproved": "{number} ({total} excluding VAT) was approved by the committee",
+        "accepted": "{number} was accepted by the vendor",
+        "declined": "{number} was declined by the vendor: {reason}"
       }
     }
   },
@@ -197,7 +209,9 @@
       "sourcingsBelowMinimum": "{count, plural, =0 {No sourcings below the minimum} one {# sourcing below the minimum} other {# sourcings below the minimum}}",
       "invitationsToAnswer": "{count, plural, =0 {No invitations to answer} one {# invitation to answer} other {# invitations to answer}}",
       "proposalsToSubmit": "{count, plural, =0 {No proposals to submit} one {# proposal to submit} other {# proposals to submit}}",
-      "votesWaiting": "{count, plural, =0 {No decisions waiting for your vote} one {# decision waiting for your vote} other {# decisions waiting for your vote}}"
+      "votesWaiting": "{count, plural, =0 {No decisions waiting for your vote} one {# decision waiting for your vote} other {# decisions waiting for your vote}}",
+      "posToApprove": "{count, plural, =0 {No POs to approve} one {# PO to approve} other {# POs to approve}}",
+      "posToAccept": "{count, plural, =0 {No POs to accept} one {# PO to accept} other {# POs to accept}}"
     },
     "newPr": "New PR"
   },
@@ -301,7 +315,10 @@
     "amountInvalid": "Enter an amount of 0 or more with up to 2 decimals",
     "finalOfferUsed": "The final-offer round has been used",
     "finalOfferHigher": "A final offer cannot be higher than your previous price",
-    "pickVendors": "Pick at least one vendor"
+    "pickVendors": "Pick at least one vendor",
+    "ownPurchaseOrder": "You cannot approve a PO for your own request or sourcing",
+    "sourcingHasPurchaseOrders": "This sourcing already has purchase orders; cancel its open lines instead",
+    "lineOnPurchaseOrder": "This line is already on a purchase order"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -969,7 +986,8 @@
       "invitations": "Invitations",
       "proposals": "Proposals",
       "comparison": "Comparison",
-      "qa": "Q&A"
+      "qa": "Q&A",
+      "purchaseOrders": "Purchase orders"
     },
     "invitees": {
       "title": "Invited vendors",
@@ -1085,7 +1103,8 @@
         "deadline": "Final-offer deadline",
         "message": "Message to the vendors",
         "send": "Send request"
-      }
+      },
+      "lockedLine": "On {number}"
     },
     "qa": {
       "title": "Questions and answers",
@@ -1108,6 +1127,10 @@
       "fileHint": "The file goes to the procurement specialist only.",
       "channelNote": "Questions go to the procurement specialist. Answers are published to every invited vendor without your company name.",
       "sent": "Your question was sent."
+    },
+    "purchaseOrders": {
+      "empty": "No purchase orders yet. They are created when the winner decision is approved.",
+      "cancelBlocked": "This sourcing has purchase orders. Cancel its open lines instead."
     }
   },
   "proposal": {
@@ -1335,7 +1358,22 @@
       "sspNote": "This vote also approves buying from a single source.",
       "sspJustification": "Justification",
       "sspFiles": "Justification files",
-      "noComparison": "The comparison is shown to Procurement Specialists, Committee Members and the Admin."
+      "noComparison": "The comparison is shown to Procurement Specialists, Committee Members and the Admin.",
+      "poTitle": "Purchase order sent to the committee",
+      "samePackage": "Same as the approved winner decision",
+      "differencesTitle": "Differences from the approved winner decision",
+      "diffLine": "{field}{item}: winner decision {winner}, PO {po}",
+      "diffFields": {
+        "vendor": "Vendor",
+        "quantity": "Quantity",
+        "unitPrice": "Unit price",
+        "total": "Line total",
+        "incoterm": "Incoterm",
+        "namedPlace": "Named place",
+        "deliveryMode": "Delivery mode",
+        "paymentTerm": "Payment term"
+      },
+      "noPo": "The purchase order is not available."
     }
   },
   "minutes": {
@@ -1377,5 +1415,70 @@
     "downloading": "Preparing the PDF…",
     "readOnly": "Minutes cannot be changed or deleted.",
     "generated": "Generated by e-Procurement"
+  },
+  "purchaseOrders": {
+    "title": "Purchase orders",
+    "empty": "Purchase orders appear here when a winner decision is approved.",
+    "emptyAction": "Go to sourcing",
+    "columns": {
+      "number": "Number",
+      "vendor": "Vendor",
+      "sourcing": "Sourcing",
+      "total": "Total excl. VAT",
+      "totalInclVat": "Total incl. VAT",
+      "status": "Status",
+      "created": "Created"
+    },
+    "fields": {
+      "vendor": "Vendor",
+      "sourcing": "Sourcing",
+      "winnerMinutes": "Winner minutes",
+      "decision": "PO decision",
+      "created": "Created",
+      "incoterm": "Incoterm",
+      "namedPlace": "Named place",
+      "deliveryMode": "Delivery mode",
+      "paymentTerm": "Payment term",
+      "reason": "Reason"
+    },
+    "lines": {
+      "title": "Lines",
+      "item": "Item",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "unitPrice": "Unit price",
+      "lineTotal": "Line total",
+      "deliveryDate": "Delivery date",
+      "place": "Delivery place"
+    },
+    "totals": {
+      "excl": "Total excluding VAT",
+      "vat": "VAT ({rate}%)",
+      "incl": "Total including VAT"
+    },
+    "priceNote": "Unit prices are the vendor's own prices excluding VAT. Extra costs used in the comparison are not part of the PO.",
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "reasons": {
+      "reject": "Reason for rejecting the PO",
+      "decline": "Reason for declining the PO"
+    },
+    "ownNote": "You cannot approve a PO for your own request or sourcing.",
+    "waitingForVendor": "This PO is waiting for the vendor's answer.",
+    "waitingForCommittee": "The committee is voting on this PO.",
+    "openDecision": "Open the PO decision",
+    "pdfTitle": "Purchase order",
+    "pdfGenerated": "Generated by e-Procurement",
+    "pdfStatus": "Status",
+    "pdfDate": "Date"
+  },
+  "vendorPurchaseOrders": {
+    "title": "Purchase orders",
+    "empty": "You have no purchase orders yet.",
+    "acceptNote": "Accepting confirms the order. Declining needs a reason."
   }
 }

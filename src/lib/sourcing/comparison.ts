@@ -37,6 +37,9 @@ export type ComparisonLine = {
   manual: boolean;
   justification: string | null;
   notLowest: boolean;
+  /** On a PO that is not REJECTED or DECLINED_BY_VENDOR: no new winner, no cancel, no extra costs (Slice 7). */
+  locked?: boolean;
+  poNumber?: string | null;
   cells: ComparisonCell[];
 };
 

@@ -20,7 +20,7 @@ export type NotificationRow = {
 export const BELL_COLUMNS = "id, event, params, record_number, is_read, created_at";
 export const BELL_MAX_ITEMS = 10;
 
-import { formatDateTime } from "./format";
+import { formatAmount, formatDateTime } from "./format";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -39,6 +39,8 @@ export function messageValues(
     if (key === "deadline" && typeof value === "string") out[key] = formatDateTime(value);
     else if (typeof value === "string" && ISO_DATE.test(value)) out[key] = formatDate(value);
     else if (key === "score" && value !== null && value !== "") out[key] = Number(value).toFixed(1);
+    // purchase orders: the total is stored as a number, shown as "60,000.00 AZN"
+    else if (key === "total" && value !== null && value !== "") out[key] = formatAmount(value);
     else if (key === "type" && label.has(`certificateTypes.${value}`)) out[key] = label.translate(`certificateTypes.${value}`);
     // committee decisions: the type and result are codes in the database, words on the screen
     else if (key === "decisionType" && label.has(`decisions.types.${value}`)) out[key] = label.translate(`decisions.types.${value}`);
