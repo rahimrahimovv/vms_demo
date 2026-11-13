@@ -12,7 +12,9 @@ import { StatusBadge } from "@/components/status-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { answerInvitation, saveProposal } from "../actions";
+import { FinalOfferForm, type FinalOfferLine } from "@/components/vendor/final-offer-form";
+import { VendorQa, type VendorQaItem } from "@/components/vendor/vendor-qa";
+import { answerInvitation, askQuestion, saveProposal, submitFinalOffer } from "../actions";
 
 type View = {
   id: string;
@@ -26,6 +28,7 @@ type View = {
   namedPlaceId: string;
   deliveryModeId: string;
   paymentTermId: string;
+  finalOffer: { deadline: string; message: string | null; respondedAt: string | null } | null;
   lines: {
     id: string; item: string; code: string; unit: string; quantity: number; deliveryDate: string;
     deliveryPlace: string; specification: string | null;
@@ -63,12 +66,17 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
     supabase.from("delivery_mode").select("id, name, is_active").order("name"),
     supabase.from("payment_term").select("id, name, is_active").order("name"),
   ]);
-  const [{ data: priceRows }, { data: docRows }] = proposal
-    ? await Promise.all([
-        supabase.from("proposal_line").select("sourcing_line_id, unit_price").eq("proposal_id", proposal.id).eq("round", 1),
-        supabase.from("file").select("id, file_name").eq("owner_type", "proposal").eq("owner_id", proposal.id).eq("kind", "technical_document"),
-      ])
-    : [{ data: [] }, { data: [] }];
+  const [{ data: allPrices }, { data: docRows }, { data: qaRows }] = await Promise.all([
+    proposal
+      ? supabase.from("proposal_line").select("sourcing_line_id, unit_price, round").eq("proposal_id", proposal.id)
+      : Promise.resolve({ data: [] as { sourcing_line_id: string; unit_price: number; round: number }[] }),
+    proposal
+      ? supabase.from("file").select("id, file_name").eq("owner_type", "proposal").eq("owner_id", proposal.id).eq("kind", "technical_document")
+      : Promise.resolve({ data: [] as { id: string; file_name: string }[] }),
+    supabase.rpc("vendor_qa", { p_sourcing: id }),
+  ]);
+  const priceRows = (allPrices ?? []).filter((r) => r.round === 1);
+  const finalRows = (allPrices ?? []).filter((r) => r.round === 2);
 
   const deadlinePassed = new Date(view.deadline) <= new Date();
   const open = view.status === "OPEN" && !deadlinePassed;
@@ -80,6 +88,15 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
   }));
   const total = lines.reduce((s, l) => (l.price ? s + Number(l.price) * l.quantity : s), 0);
   const submitted = proposal?.status === "SUBMITTED";
+  const finalOf = new Map(finalRows.map((r) => [r.sourcing_line_id, Number(r.unit_price)]));
+  // RFQ-08 AC2: a chosen vendor during an open final-offer round
+  const finalOfferOpen =
+    view.status === "FINAL_OFFER_ROUND" && view.finalOffer && new Date(view.finalOffer.deadline) > new Date();
+  const finalOfferLines: FinalOfferLine[] = lines
+    .filter((l) => l.price)
+    .map((l) => ({ id: l.id, item: l.item, unit: l.unit, quantity: l.quantity, previous: Number(l.price), final: finalOf.get(l.id) ?? null }));
+  // RFQ-03 AC1, AC5: asking while OPEN with an invitation that is not declined
+  const canAsk = open && view.invitationStatus !== "DECLINED";
 
   const active = <T extends { is_active: boolean }>(rows: T[] | null, value: (r: T) => string, label: (r: T) => string, current: string) =>
     (rows ?? []).filter((r) => r.is_active || value(r) === current).map((r) => ({ value: value(r), label: label(r) }));
@@ -196,13 +213,34 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
                   <TableCell className="whitespace-nowrap">{formatDate(l.deliveryDate)}</TableCell>
                   <TableCell>{l.deliveryPlace}</TableCell>
                   {proposal && (
-                    <TableCell className="text-right tabular-nums">{l.price ? formatAmount(l.price) : t("common.none")}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {l.price ? formatAmount(l.price) : t("common.none")}
+                      {finalOf.has(l.id) && (
+                        <span className="block text-xs text-muted-foreground">
+                          {t("proposal.finalOffer.newPrice")}: {formatAmount(finalOf.get(l.id)!)}
+                        </span>
+                      )}
+                    </TableCell>
                   )}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
+      )}
+
+      {finalOfferOpen && view.finalOffer && (
+        <FinalOfferForm
+          lines={finalOfferLines}
+          deadline={view.finalOffer.deadline}
+          message={view.finalOffer.message}
+          respondedAt={view.finalOffer.respondedAt}
+          action={submitFinalOffer.bind(null, id)}
+        />
+      )}
+
+      {view.invitationStatus !== "DECLINED" && (
+        <VendorQa items={(qaRows ?? []) as VendorQaItem[]} canAsk={canAsk} action={askQuestion.bind(null, id)} />
       )}
     </div>
   );
