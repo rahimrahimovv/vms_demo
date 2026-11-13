@@ -1,6 +1,6 @@
-# VMS Core: rules for Claude Code
+# e-Procurement: rules for Claude Code
 
-VMS Core is a generic, 1C-free procurement platform. This repo holds the MVP for the management demo (target 13 Nov 2026).
+e-Procurement is a generic, 1C-free procurement platform. This repo holds the MVP for the management demo (target 13 Nov 2026).
 The single source of truth for scope and acceptance criteria is `docs/backlog.md` (23 stories, Given/When/Then).
 If this file and the backlog disagree, the backlog wins; ask the BA.
 
@@ -28,7 +28,7 @@ If this file and the backlog disagree, the backlog wins; ask the BA.
 ## Design
 - UI kit: shadcn/ui on Tailwind, lucide icons, Inter font. Clean enterprise look.
 - Colors: white and light-grey surfaces, one brand colour (deep teal), neutral greys.
-- Layout: left sidebar (logo "VMS Core", menu by role), top bar (page title,
+- Layout: left sidebar (logo "e-Procurement", menu by role), top bar (page title,
   bell with unread count, user name and role). Demo bar slot above the top bar.
 - Home page for every role = "My tasks": cards with counts of items waiting for
   this user (e.g. "3 PRs to approve"), then the list.
@@ -71,6 +71,6 @@ Cut line when late: the "If time allows" list in the backlog's Scope section goe
 - Seed data must be synthetic only (see Demo Scenario Data in the backlog).
 
 ## Open questions (ask the BA before you depend on them)
-- Product name (working name: VMS Core).
+- Product name (working name: e-Procurement).
 - Tender threshold 50,000 AZN and RFQ bands 5,000 / 15,000 AZN still need client confirmation; keep them as Admin settings.
 - Proposed rules not yet confirmed: plan overrun is a warning only; one category per PR; only the sourcing owner acts on a sourcing; committee members cannot see other votes until the decision closes; one PO per winning vendor.

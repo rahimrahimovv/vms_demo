@@ -1,4 +1,4 @@
-# VMS Core (MVP)
+# e-Procurement (MVP)
 
 Generic, 1C-free procurement platform: one end-to-end procurement from vendor registration to a
 vendor-accepted purchase order, for the management demo (13 Nov 2026).

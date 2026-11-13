@@ -46,7 +46,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* VMS Core: white and light-grey surfaces, deep teal brand, neutral greys. Light only (desktop). */
+/* e-Procurement: white and light-grey surfaces, deep teal brand, neutral greys. Light only (desktop). */
 :root {
   --background: oklch(0.985 0.002 247); /* light-grey page */
   --foreground: oklch(0.21 0.006 286);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Boxes } from "lucide-react";
+import { LogoMark } from "@/components/layout/logo-mark";
 import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { RegisterForm, type RegisterFormState } from "@/components/vendor/register-form";
@@ -31,9 +31,7 @@ export default async function RegisterPage() {
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <Boxes className="size-5" aria-hidden />
-            </span>
+            <LogoMark className="size-9" iconClassName="size-6" />
             <span className="text-xl font-semibold tracking-tight">{t("app.name")}</span>
           </div>
           <Link href="/sign-in" className="text-sm font-medium text-primary hover:underline">
