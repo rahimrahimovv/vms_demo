@@ -279,3 +279,49 @@ at Submit; SUBMITTED and APPROVED vendors keep working.
 
 16. Test vendors of the click-through were removed from vms-dev. The helper `removeTestData` does not delete `file` rows that
     real uploads attach to a test user (`uploaded_by`); that was done by hand this time.
+
+## Slice 6 (13 Nov 2026)
+
+Backlog export of 13 Nov 2026 (e-Procurement rename), patched to match the answers of 13 Nov: `decision.package` in the ERD,
+the tie rule (RFQ-05 AC4), one low-competition reason per sourcing (RFQ-05 AC5, demo step 7), the Q&A file stays with the
+specialist (RFQ-03 AC2), the shared-owner flag in the comparison header (RFQ-05 AC3), REG-07 AC8 worded as the code works.
+Migrations `20261115100000_qa`, `20261115110000_evaluation`, `20261115120000_extra_costs`, `20261115130000_final_offer`.
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| RFQ-03 Q&A | done | AC1-AC6; vendor asks (2,000 characters, optional file for the specialist only), specialist publishes with an editable text, clarification without a question, original in History (audit reason) |
+| RFQ-05 Evaluation, comparison, proposed winner | done | AC1-AC7; pass/fail without prices, last mark confirms and opens PASSED prices; comparison as in the BA mockup; default winner, justification, tie rule; line cancel; low-competition reason; Send to committee |
+| RFQ-06 SSP | done | AC6-AC7 added: the vendor wins every priced line, unpriced lines are cancelled; "Single Source Purchase" label, justification and files in the winner decision |
+| RFQ-07 Extra costs | done | AC1-AC5; Customs, Delivery, Insurance, Other per unit; recalculated default winner and "No longer the lowest evaluated price"; locked from IN_COMMITTEE |
+| RFQ-08 Final offer | done | AC1-AC7; chosen vendors only, never higher, no response keeps the price, hidden until the round closes (deadline job), one round |
+| CMT-02 WINNER decision | AC2, AC9 done | package frozen in `decision.package` at Send and shown as frozen (Reopen keeps it); APPROVED -> WINNER_APPROVED; REJECTED -> COMPARISON with comments, rejected winners excluded per line. PO decisions (AC3, AC10) come with Slice 7 |
+| CMT-04 AC3 | done | second envelope at the end of the technical evaluation |
+
+### Decisions and deviations to confirm
+
+- A DISQUALIFIED mark is final (the Status Transition Model has no DISQUALIFIED -> PASSED); PASSED can still become DISQUALIFIED.
+- Prices of a proposal disqualified in COMPARISON are hidden from then on (`app.prices_visible` checks the status).
+- `decision.package` is readable only through `decision_package`, and only by Procurement Specialist, Committee Member and Admin
+  (column grants on `decision`); the Approver sees the decision without the comparison.
+- Submit on the vendor's final-offer form needs at least one price; "Keep my previous prices" is the explicit no-change answer.
+- After the last technical mark the page stays on the Proposals tab; the Comparison tab appears next to it.
+
+### Verified
+
+- `npm test`: 100 unit tests (adds comparison helpers with the backlog values and the 2-day default final-offer deadline).
+- `npm run test:rls`: 181 tests on vms-dev, all pass. New file `comparison.rls.test.ts` (16 tests, four vendors, a throwaway
+  committee, the demo committee restored): Q&A visibility and notifications; sealed prices per role during the technical
+  evaluation and the final-offer round; 33.04 with 18% VAT -> 28.00; 29.50 + 1.00 = 30.50; 28.00 -> 28.50 refused, -> 27.50 allowed;
+  tie -> earlier proposal; frozen package; Approver without prices; costs locked; APPROVED 2-1; REJECTED with exclusion; SSP.
+- Click-through in Edge at 1280 px on the dev server (vms-dev), demo users: Q&A, Continue below the minimum, technical
+  evaluation, comparison (Different terms, shared-owner flag, low-competition box), delivery cost, justification, final offer
+  (higher price refused, 28.90 accepted, hidden until the round closes), Send to committee, WINNER package, vote 2-1 ->
+  WINNER_APPROVED. It found two bugs, both fixed: empty optional values were sent as missing parameters, and React's form
+  reset after a refused final offer emptied the typed price.
+- vms-prod: **not migrated yet** (waiting for the BA's go).
+
+### Open issues
+
+17. Click-through sourcings SRC-2026-0209 (WINNER_APPROVED), SRC-2026-0243 and SRC-2026-0244 (IN_COMMITTEE, votes open for the
+    demo committee) stay on vms-dev; `scripts/dev-cleanup-sourcing.ts` removes them if wanted.
+18. vms-prod needs the 4 Slice 6 migrations before `main` is pushed (the new screens call the new functions).
