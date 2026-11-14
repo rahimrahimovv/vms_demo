@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, KeyRound, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,6 +24,7 @@ function initials(name: string) {
 /** User name and role in the top bar, with Sign out. */
 export function UserMenu({ fullName, roleLabels }: { fullName: string; roleLabels: string[] }) {
   const t = useTranslations("userMenu");
+  const router = useRouter();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-[14px] px-2 py-1 text-left hover:bg-white/60">
@@ -42,6 +44,10 @@ export function UserMenu({ fullName, roleLabels }: { fullName: string; roleLabel
         <ChevronDown className="size-4 text-muted-foreground" aria-hidden />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onSelect={() => router.push("/change-password")} data-testid="change-password-link">
+          <KeyRound className="size-4" aria-hidden />
+          {t("changePassword")}
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => signOut()}>
           <LogOut className="size-4" aria-hidden />
           {t("signOut")}

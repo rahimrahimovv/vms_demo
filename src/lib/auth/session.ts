@@ -11,6 +11,8 @@ export type CurrentUser = {
   roles: Role[];
   /** Set only for vendor users (REG-01). */
   vendorId: string | null;
+  /** PLT-03: set after a reset; every page, action and file route stops at the change-password form until it is cleared. */
+  mustChangePassword: boolean;
 };
 
 /**
@@ -25,7 +27,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const { data: user } = await supabase
     .from("app_user")
-    .select("id, company_id, full_name, email, is_active, vendor_id, user_role(role)")
+    .select("id, company_id, full_name, email, is_active, vendor_id, must_change_password, user_role(role)")
     .eq("id", userId)
     .maybeSingle();
 
@@ -41,5 +43,6 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     email: user.email,
     roles,
     vendorId: user.vendor_id ?? null,
+    mustChangePassword: user.must_change_password === true,
   };
 });

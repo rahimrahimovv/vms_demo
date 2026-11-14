@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
+import { mayUseApi } from "@/lib/auth/guard";
 import { canAccess } from "@/lib/auth/sections";
 import { createClient } from "@/lib/supabase/server";
 import { buildMinutesPdf, type MinutesView } from "@/lib/minutes/pdf";
@@ -12,6 +13,7 @@ import { buildMinutesPdf, type MinutesView } from "@/lib/minutes/pdf";
 export async function GET(_request: Request, ctx: RouteContext<"/api/minutes/[id]/pdf">) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!mayUseApi(user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 }); // PLT-03: password must change
   if (!canAccess(user.roles, "minutes")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await ctx.params;

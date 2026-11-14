@@ -5,12 +5,14 @@ import { createClient } from "@/lib/supabase/server";
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
 import { RecordHeader } from "@/components/record-header";
+import { HistoryTab } from "@/components/history-tab";
+import { ResetPasswordButton } from "@/components/reset-password-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { updateUser } from "../actions";
 import { UserForm } from "../user-form";
 
 export default async function EditUserPage({ params }: PageProps<"/admin/users/[id]">) {
-  const { allowed } = await checkSection("adminUsers");
+  const { user: admin, allowed } = await checkSection("adminUsers");
   if (!allowed) return <NoAccess />;
 
   const { id } = await params;
@@ -29,7 +31,14 @@ export default async function EditUserPage({ params }: PageProps<"/admin/users/[
 
   return (
     <div className="flex max-w-4xl flex-col gap-6">
-      <RecordHeader title={user.full_name} subtitle={user.email} status={user.is_active ? "ACTIVE" : "INACTIVE"} />
+      <RecordHeader
+        title={user.full_name}
+        subtitle={user.email}
+        status={user.is_active ? "ACTIVE" : "INACTIVE"}
+        actions={
+          !isVendor && user.is_active && user.id !== admin.id ? <ResetPasswordButton userId={user.id} name={user.full_name} /> : undefined
+        }
+      />
       {isVendor ? (
         <Alert>
           <AlertDescription>{t("users.errors.vendorAccount")}</AlertDescription>
@@ -49,6 +58,8 @@ export default async function EditUserPage({ params }: PageProps<"/admin/users/[
           }}
         />
       )}
+      {/* PLT-03: password changes and resets of this user (PASSWORD_CHANGED, PASSWORD_RESET) */}
+      <HistoryTab recordType="user" recordId={user.id} />
     </div>
   );
 }

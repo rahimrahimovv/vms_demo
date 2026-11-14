@@ -84,7 +84,10 @@
     "NO_DECISION": "No decision",
     "UNANSWERED": "Unanswered",
     "PUBLISHED": "Published",
-    "PENDING_COMMITTEE": "Pending committee"
+    "PENDING_COMMITTEE": "Pending committee",
+    "PASSWORD_CHANGED": "Password changed",
+    "PASSWORD_RESET": "Password reset",
+    "PROFILE_UPDATED": "Profile updated"
   },
   "common": {
     "none": "—",
@@ -118,10 +121,12 @@
     "errors": {
       "invalid": "Incorrect e-mail or password",
       "unavailable": "Sign-in is unavailable, try again"
-    }
+    },
+    "forgot": "Forgot your password? Ask your buyer or your administrator to reset it."
   },
   "userMenu": {
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "changePassword": "Change password"
   },
   "access": {
     "denied": "You do not have access to this page",
@@ -1563,5 +1568,36 @@
     "title": "Purchase orders",
     "empty": "You have no purchase orders yet.",
     "acceptNote": "Accepting confirms the order. Declining needs a reason."
+  },
+  "password": {
+    "title": "Change password",
+    "intro": "Enter your current password and choose a new one.",
+    "forcedNotice": "Choose a new password to continue.",
+    "back": "Back to My tasks",
+    "saved": "Password changed",
+    "fields": {
+      "current": "Current password",
+      "next": "New password",
+      "confirm": "Confirm new password",
+      "hint": "At least 8 characters",
+      "submit": "Change password"
+    },
+    "errors": {
+      "currentWrong": "The current password is incorrect",
+      "tooShort": "Use at least 8 characters",
+      "mismatch": "The passwords do not match",
+      "same": "Choose a different password"
+    },
+    "reset": {
+      "button": "Reset password",
+      "title": "Reset the password of {name}?",
+      "description": "The user is signed out and gets a temporary password.",
+      "confirm": "Reset password",
+      "revealTitle": "Temporary password",
+      "reveal": "It is shown only once. The user must change it at the next sign-in.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "Done"
+    }
   }
 }

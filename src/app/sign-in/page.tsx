@@ -14,6 +14,9 @@ export default async function SignInPage() {
       <h1 className="text-[22px] font-bold">{t("signIn.title")}</h1>
       <p className="text-[#3d4a50]">{t("signIn.subtitle")}</p>
       <SignInForm />
+      <p className="text-[13px] text-[#3d4a50]" data-testid="forgot-password">
+        {t("signIn.forgot")}
+      </p>
       <p className="pt-1.5 text-[13px] text-[#3d4a50]">
         {t("signIn.vendorPrompt")}{" "}
         <Link href="/register" className="font-semibold text-primary hover:underline" data-testid="register-link">

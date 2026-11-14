@@ -469,8 +469,8 @@ TBD
 10. **Given** an approved change to the Bank accounts section, **When** it applies, **Then** the vendor's bank accounts are replaced, exactly one stays main, and the History shows the change with the IBAN hidden except its last 4 characters.
 11. **Given** a vendor that changes its activity, brands, main goods, bank guarantee, certificates or contact persons (changes that need no approval), **When** it saves, **Then** an entry "Profile updated: \<section>" with the user and the time is added to the Registration history.
 12. **Given** the Registration history tab of the Profile and of the vendor card, **When** they open, **Then** they also list every change request with its status, decision, decider and comments.
-13. **Given** a vendor whose registration is DRAFT, SUBMITTED or RETURNED, **When** it edits its data, **Then** it edits it directly as in REG-07, and no change request is needed.
-14. **Given** a rejected registration, **When** a Procurement Specialist clicks Reopen on it and enters a comment, **Then** the registration becomes RETURNED and the vendor is notified.
+13. **Given** a vendor whose registration is DRAFT or RETURNED, **When** it edits its data, **Then** it edits it directly as in REG-07, and no change request is needed; a SUBMITTED registration is read-only.
+14. **Given** a rejected registration, **When** a Procurement Specialist opens it from the Vendors list (filter Rejected), clicks Reopen on the vendor card and enters a comment, **Then** the registration becomes RETURNED and the vendor is notified.
 
 ---
 

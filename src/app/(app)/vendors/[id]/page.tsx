@@ -14,6 +14,7 @@ import { HistoryTab } from "@/components/history-tab";
 import { StatusBadge } from "@/components/status-badge";
 import { FileList } from "@/components/file-list";
 import { DecisionPanel } from "@/components/decision-panel";
+import { ResetPasswordButton } from "@/components/reset-password-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -71,7 +72,11 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
   const none = t("common.none");
 
   const canDecide = user.roles.includes("PROCUREMENT_SPECIALIST") && vendor.status === "SUBMITTED";
-  const actions = canDecide ? (
+  // PLT-03 AC5: a Procurement Specialist resets the sign-in account of the vendor; an Admin cannot
+  const resetButton = user.roles.includes("PROCUREMENT_SPECIALIST") ? (
+    <ResetPasswordButton vendorId={vendor.id} name={vendor.legal_name} />
+  ) : null;
+  const decisionPanel = canDecide ? (
     <DecisionPanel
       action={decideRegistration.bind(null, vendor.id)}
       options={[
@@ -80,7 +85,14 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
         { value: "REJECT", label: t("decision.reject"), variant: "destructive", comment: "required", commentLabel: t("decision.reason") },
       ]}
     />
-  ) : undefined;
+  ) : null;
+  const actions =
+    resetButton || decisionPanel ? (
+      <>
+        {resetButton}
+        {decisionPanel}
+      </>
+    ) : undefined;
 
   return (
     <div className="flex flex-col gap-6">

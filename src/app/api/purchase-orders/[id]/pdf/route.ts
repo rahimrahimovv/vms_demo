@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
+import { mayUseApi } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { buildPoPdf } from "@/lib/purchase-orders/pdf";
 import type { PoView } from "@/lib/purchase-orders/types";
@@ -12,6 +13,7 @@ import type { PoView } from "@/lib/purchase-orders/types";
 export async function GET(_request: Request, ctx: RouteContext<"/api/purchase-orders/[id]/pdf">) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!mayUseApi(user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 }); // PLT-03: password must change
 
   const { id } = await ctx.params;
   const supabase = await createClient();

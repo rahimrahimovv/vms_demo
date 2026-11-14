@@ -3,10 +3,23 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, type CurrentUser } from "./session";
 import { canAccess, type SectionKey } from "./sections";
 
-/** For pages and server actions: the current user, or redirect to sign-in. */
-export async function requireUser(): Promise<CurrentUser> {
+/**
+ * The signed-in user, or redirect to sign-in. Does NOT apply the password gate: only the change-password
+ * page and its action use it. Everything else calls {@link requireUser}.
+ */
+export async function requireSignedIn(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
+  return user;
+}
+
+/**
+ * For pages and server actions: the current user, or redirect to sign-in. PLT-03 AC6: a user marked "must change
+ * password" gets the change-password form and nothing else until the password is changed.
+ */
+export async function requireUser(): Promise<CurrentUser> {
+  const user = await requireSignedIn();
+  if (user.mustChangePassword) redirect("/change-password");
   return user;
 }
 
@@ -19,13 +32,18 @@ export async function checkSection(key: SectionKey): Promise<{ user: CurrentUser
   return { user, allowed: canAccess(user.roles, key) };
 }
 
-/** For route handlers: 401 without a session, 403 without the role (NFR-003). */
+/** For route handlers that read the user themselves: false when the PLT-03 gate stops this user (answer 403). */
+export function mayUseApi(user: CurrentUser | null): user is CurrentUser {
+  return Boolean(user) && !user!.mustChangePassword;
+}
+
+/** For route handlers: 401 without a session, 403 without the role or while the password must change (NFR-003). */
 export async function guardApi(
   key: SectionKey,
 ): Promise<{ user: CurrentUser; response: null } | { user: null; response: Response }> {
   const user = await getCurrentUser();
   if (!user) return { user: null, response: Response.json({ error: "Unauthorized" }, { status: 401 }) };
-  if (!canAccess(user.roles, key)) {
+  if (!mayUseApi(user) || !canAccess(user.roles, key)) {
     return { user: null, response: Response.json({ error: "Forbidden" }, { status: 403 }) };
   }
   return { user, response: null };
