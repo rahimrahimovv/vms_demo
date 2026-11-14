@@ -81,9 +81,9 @@ async function main() {
   if (memberError) throw memberError;
   console.log("seeded committee: Elchin Karimov (Chair), Sevinj Guliyeva, Tural Ismayilov");
 
-  // REG-07 AC4: Beta Trade and Gamma Supply keep a legal representative with a sample proof-of-authority file.
+  // REG-07 AC4: Ege Tarim Kimya and Caspian Agrochem keep a legal representative with a sample proof-of-authority file.
   await seedProofFiles({ admin } as Context);
-  console.log("seeded sample proof-of-authority files for Beta Trade and Gamma Supply");
+  console.log("seeded sample proof-of-authority files for Ege Tarim Kimya and Caspian Agrochem");
 }
 
 main().catch((error) => {

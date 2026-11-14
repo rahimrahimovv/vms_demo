@@ -27,7 +27,7 @@ async function main() {
     console.log(`  ${before.rows} rows in ${before.tables} tables (audit trail and minutes included)`);
     console.log(`  ${before.authUsers} Auth users (all but the ${SCENARIO_START_USERS.length} seed users), ${before.sessions} sessions (everyone is signed out)`);
     console.log(`  ${before.storageObjects} uploaded files in Storage`);
-    console.log("Then the scenario start is restored: dictionaries, categories, items, plan line, users, committee, Beta Trade and Gamma Supply.");
+    console.log("Then the scenario start is restored: dictionaries, categories, items, plan line, users, committee, Ege Tarim Kimya and Caspian Agrochem.");
 
     await confirmByTyping(ctx, "reset this project");
     console.log("Resetting ...");

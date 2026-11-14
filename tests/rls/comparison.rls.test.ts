@@ -3,7 +3,7 @@
  * Throwaway users and four vendors on the AVL work on their own category, item and plan line; a throwaway committee
  * replaces the demo committee for the run and the demo committee is put back exactly as it was. Deadlines are moved
  * into the past with SQL and the jobs are run directly, as pg_cron does every minute. Test values are the backlog's
- * Calculation Rules examples (33.04 with 18% VAT -> 28.00; Beta Trade 29.50 + delivery 1.00 = 30.50; final offer
+ * Calculation Rules examples (33.04 with 18% VAT -> 28.00; Ege Tarim Kimya 29.50 + delivery 1.00 = 30.50; final offer
  * 28.00 -> 27.50 allowed, 28.00 -> 28.50 refused; tie -> earlier submitted proposal).
  */
 import { randomInt, randomUUID } from "node:crypto";
@@ -374,7 +374,7 @@ describe("Tender: technical evaluation, comparison, extra costs, final offer, wi
 
   it("RFQ-05 AC5-AC6, CMT-02 AC2: low-competition reason required; Send freezes the package and opens the WINNER vote", async () => {
     expect((await actors.specialist.client.rpc("sourcing_send_to_committee", { p_id: id, p_reason: "" })).error?.message).toBe("errors.lowCompetitionReason");
-    const sent = await actors.specialist.client.rpc("sourcing_send_to_committee", { p_id: id, p_reason: "Gamma Supply was disqualified; few qualified suppliers serve this region" });
+    const sent = await actors.specialist.client.rpc("sourcing_send_to_committee", { p_id: id, p_reason: "Caspian Agrochem was disqualified; few qualified suppliers serve this region" });
     expect(sent.error).toBeNull();
     expect((await sourcingRow(id)).status).toBe("IN_COMMITTEE");
     const [winner] = await decisionsOf(id, "WINNER");
@@ -383,7 +383,7 @@ describe("Tender: technical evaluation, comparison, extra costs, final offer, wi
     expect(award).toEqual([{ quantity: "2000.000", status: "ACTIVE", round: 2, proposal_id: pA }]);
 
     const pkg = (await actors.cm2.client.rpc("decision_package", { p_decision: winner.id })).data as { comparison: Comparison };
-    expect(pkg.comparison.sourcing.lowCompetitionReason).toMatch(/Gamma Supply was disqualified/);
+    expect(pkg.comparison.sourcing.lowCompetitionReason).toMatch(/Caspian Agrochem was disqualified/);
     expect(cellOf(pkg.comparison, 0, pB).extra).toBe(1);
     expect(pkg.comparison.disqualified[0].reason).toBe("Missing product certificate");
     expect(((await actors.approver.client.rpc("decision_package", { p_decision: winner.id })).data as { comparison: unknown }).comparison).toBeNull();
@@ -399,7 +399,7 @@ describe("Tender: technical evaluation, comparison, extra costs, final offer, wi
     const [winner] = await decisionsOf(id, "WINNER");
     await vote("cm1", winner.id, "FOR");
     await vote("cm2", winner.id, "FOR");
-    await vote("cm3", winner.id, "AGAINST", "Beta Trade delivers 5 days faster");
+    await vote("cm3", winner.id, "AGAINST", "Ege Tarim Kimya delivers 5 days faster");
     expect((await db.query("select status from public.decision where id = $1", [winner.id])).rows[0].status).toBe("APPROVED");
     expect((await sourcingRow(id)).status).toBe("WINNER_APPROVED");
     const audit = (await db.query("select reason from public.audit_entry where record_type = 'sourcing' and record_id = $1 and to_status = 'WINNER_APPROVED'", [id])).rows;
@@ -447,14 +447,14 @@ describe("Rejected winner, tie rule and the frozen package", () => {
   it("CMT-02 AC9, RFQ-05 AC7: REJECTED returns to COMPARISON with comments; the rejected winner is excluded; the old package stays as frozen", async () => {
     expect((await actors.specialist.client.rpc("sourcing_send_to_committee", { p_id: id, p_reason: "" })).error).toBeNull();
     const [first] = await decisionsOf(id, "WINNER");
-    await vote("cm1", first.id, "AGAINST", "Ask Beta Trade for the delivery schedule");
+    await vote("cm1", first.id, "AGAINST", "Ask Ege Tarim Kimya for the delivery schedule");
     await vote("cm2", first.id, "AGAINST", "Too slow");
     await vote("cm3", first.id, "FOR");
     expect((await sourcingRow(id)).status).toBe("COMPARISON");
     const c = (await comparison("specialist", id))!;
     expect(cellOf(c, 0, pA).excluded).toBe(true);
     expect(c.lines[0]).toMatchObject({ defaultProposalId: pB, eligibleCount: 1 });
-    expect(c.committeeComments.map((x) => x.comment).sort()).toEqual(["Ask Beta Trade for the delivery schedule", "Too slow"]);
+    expect(c.committeeComments.map((x) => x.comment).sort()).toEqual(["Ask Ege Tarim Kimya for the delivery schedule", "Too slow"]);
     const [line] = await lineIds(id);
     expect((await actors.specialist.client.rpc("award_choose", { p_line: line, p_proposal: pA, p_justification: "x" })).error?.message).toBe("errors.vendorNotEligible");
     const frozen = ((await actors.cm1.client.rpc("decision_package", { p_decision: first.id })).data as { comparison: Comparison }).comparison;

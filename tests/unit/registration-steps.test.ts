@@ -28,7 +28,7 @@ const TODAY = "2026-11-10";
 function account(overrides: Partial<AccountValues> = {}): AccountValues {
   return {
     vendorType: "LOCAL_COMPANY",
-    legalName: "Alpha Agro LLC",
+    legalName: "Kura Agro Supply MMC",
     voen: "1234567890",
     foreignTaxNumber: "",
     countryCode: "AZ",
@@ -42,7 +42,7 @@ function account(overrides: Partial<AccountValues> = {}): AccountValues {
 }
 
 describe("REG-01 short account form", () => {
-  it("accepts the Alpha Agro scenario values", () => {
+  it("accepts the Kura Agro Supply scenario values", () => {
     expect(validateAccount(account())).toEqual({});
   });
 

@@ -2,7 +2,7 @@
  * RLS and workflow tests for Slice 2 (REG-01..REG-06, NFR-001, NFR-011) against vms-dev.
  * Two throwaway vendors (A and B), a Procurement Specialist, a Requester and an Admin; everything
  * they create (vendors, files, notifications, audit entries) is removed afterwards.
- * The seeded questionnaire, categories, Beta Trade and Gamma Supply are read, never changed.
+ * The seeded questionnaire, categories, Ege Tarim Kimya and Caspian Agrochem are read, never changed.
  */
 import { randomInt, randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -364,7 +364,7 @@ describe("REG-01 / REG-02 registration workflow", () => {
 });
 
 describe("REG-05 questionnaire and grade", () => {
-  // Backlog Scenario A: Alpha Agro scores 78.0 -> B (weights 3,1,2,2,2,3,2,1,2,2).
+  // Backlog Scenario A: Kura Agro Supply scores 78.0 -> B (weights 3,1,2,2,2,3,2,1,2,2).
   const ALPHA = [
     "More than 5 years", "More than 50", "3 or more", "Yes", "No",
     "Yes", "No formal control", "Rented warehouse", "Yes", "No",
@@ -579,7 +579,7 @@ describe("REG-06 profile, certificates and the vendor card", () => {
     const { data } = await actors.specialist.client.rpc("vendor_shared_owners", { p_vendor: actors.vendorA.vendorId });
     expect((data as { vendor_id: string }[]).map((r) => r.vendor_id)).toEqual([actors.vendorB.vendorId]);
     const { data: seeded } = await actors.specialist.client.rpc("vendor_shared_owners", { p_vendor: BETA });
-    expect((seeded as { legal_name: string }[]).map((r) => r.legal_name)).toEqual(["Gamma Supply LLC"]);
+    expect((seeded as { legal_name: string }[]).map((r) => r.legal_name)).toEqual(["Caspian Agrochem MMC"]);
     const { data: forVendor } = await actors.vendorA.client.rpc("vendor_shared_owners", { p_vendor: actors.vendorA.vendorId });
     expect(forVendor).toEqual([]);
   });

@@ -6,7 +6,7 @@ import { config } from "dotenv";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import pg from "pg";
 
-export const COMPANY_ID = "00000000-0000-4000-8000-000000000001"; // Demo Agro LLC, see app.seed_base()
+export const COMPANY_ID = "00000000-0000-4000-8000-000000000001"; // Agro Holding MMC, see app.seed_base()
 export const BETA_TRADE_ID = "00000000-0000-4000-8000-000000000502";
 export const GAMMA_SUPPLY_ID = "00000000-0000-4000-8000-000000000503";
 const BUCKET = "files";
@@ -20,7 +20,7 @@ export type SeedUser = {
   committee?: "CHAIR" | "MEMBER";
 };
 
-/** Backlog "Seeded accounts": the scenario start keeps exactly these 9 users (Alpha Agro is not seeded). */
+/** Backlog "Seeded accounts": the scenario start keeps exactly these 9 users (Kura Agro Supply is not seeded). */
 export const SCENARIO_START_USERS: SeedUser[] = [
   { email: "leyla@demo-agro.test", fullName: "Leyla Mammadova", roles: ["REQUESTER"] },
   { email: "rashad@demo-agro.test", fullName: "Rashad Aliyev", roles: ["APPROVER"] },
@@ -28,7 +28,7 @@ export const SCENARIO_START_USERS: SeedUser[] = [
   { email: "elchin@demo-agro.test", fullName: "Elchin Karimov", roles: ["COMMITTEE_MEMBER"], committee: "CHAIR" },
   { email: "sevinj@demo-agro.test", fullName: "Sevinj Guliyeva", roles: ["COMMITTEE_MEMBER"], committee: "MEMBER" },
   { email: "tural@demo-agro.test", fullName: "Tural Ismayilov", roles: ["COMMITTEE_MEMBER"], committee: "MEMBER" },
-  { email: "admin@demo-agro.test", fullName: "Demo Admin", roles: ["ADMIN"] },
+  { email: "admin@demo-agro.test", fullName: "Aygun Rzayeva", roles: ["ADMIN"] },
   { email: "sales@beta-trade.test", fullName: "Selin Demir", roles: ["VENDOR"], vendorId: BETA_TRADE_ID },
   { email: "office@gamma-supply.test", fullName: "Orkhan Valiyev", roles: ["VENDOR"], vendorId: GAMMA_SUPPLY_ID },
 ];

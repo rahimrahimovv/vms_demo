@@ -113,8 +113,8 @@ It prints the target project reference and what it is about to delete, refuses i
 6 characters of the project reference**. It deletes every row of every table in `public` (audit trail and minutes included; only
 `demo_flag` and `demo_attempt` stay), all Auth users except the 9 seed users, every session (everyone is signed out) and every uploaded
 file in the `files` bucket. It restores the scenario start (dictionaries, categories, items, the 500,000.00 AZN plan line, the 7 internal
-users and the demo committee, Beta Trade and Gamma Supply with owners, bank accounts and sample proof files, settings, vendor logins with
-the demo password), restarts document numbers at 0001 and leaves one `RESET` line in the audit trail. Alpha Agro does not exist
+users and the demo committee, Ege Tarim Kimya and Caspian Agrochem with owners, bank accounts and sample proof files, settings, vendor logins with
+the demo password), restarts document numbers at 0001 and leaves one `RESET` line in the audit trail. Kura Agro Supply does not exist
 afterwards, so its e-mail can register again. The database part is one transaction (`app.demo_reset`, TRUNCATE): a failure there changes
 nothing; the Auth and Storage clean-up that follows can be repeated by running the command again. Immutability triggers are never
 disabled or changed. The env file needs `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_DB_URL` and `DEMO_SEED_PASSWORD`.

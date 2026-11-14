@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { cellFor, fewestEligible, needsJustification, price, proposalsReceived, type Comparison, type ComparisonCell, type ComparisonLine } from "@/lib/sourcing/comparison";
 import { bakuLocalInDays } from "@/lib/sourcing/dates";
 
-// Backlog Calculation Rules: Alpha Agro 33.04 with 18% VAT -> 28.00 (final offer 27.50), Beta Trade 29.50 + delivery 1.00 = 30.50.
+// Backlog Calculation Rules: Kura Agro Supply 33.04 with 18% VAT -> 28.00 (final offer 27.50), Ege Tarim Kimya 29.50 + delivery 1.00 = 30.50.
 const cell = (proposalId: string, unitExclVat: number, extra = 0): ComparisonCell => ({
   proposalId, proposalLineId: `${proposalId}-l`, round: 1, entered: unitExclVat, unitExclVat, firstExclVat: null,
   extra, evaluated: unitExclVat + extra, lineTotal: unitExclVat * 2000, excluded: false, costs: [],

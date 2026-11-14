@@ -17,7 +17,7 @@ const SEED_EMAILS = [
   ["elchin@demo-agro.test", "Elchin Karimov", ["COMMITTEE_MEMBER"], null, "CHAIR"],
   ["sevinj@demo-agro.test", "Sevinj Guliyeva", ["COMMITTEE_MEMBER"], null, "MEMBER"],
   ["tural@demo-agro.test", "Tural Ismayilov", ["COMMITTEE_MEMBER"], null, "MEMBER"],
-  ["admin@demo-agro.test", "Demo Admin", ["ADMIN"], null, null],
+  ["admin@demo-agro.test", "Aygun Rzayeva", ["ADMIN"], null, null],
   ["sales@beta-trade.test", "Selin Demir", ["VENDOR"], "00000000-0000-4000-8000-000000000502", null],
   ["office@gamma-supply.test", "Orkhan Valiyev", ["VENDOR"], "00000000-0000-4000-8000-000000000503", null],
 ] as const;
@@ -134,7 +134,7 @@ describe("app.demo_reset inside a rolled-back transaction", () => {
       expect(audit.rows).toEqual([{ record_type: "demo", to_status: "RESET", reason: "Reset to scenario start" }]);
       expect((await db.query("select count(*)::int as n from public.doc_counter")).rows[0].n).toBe(0); // numbers restart at 0001
       expect((await db.query("select count(*)::int as n from auth.sessions")).rows[0].n).toBe(0); // everyone is signed out
-      expect((await db.query("select count(*)::int as n from public.vendor where legal_name ilike 'Alpha Agro%'")).rows[0].n).toBe(0);
+      expect((await db.query("select count(*)::int as n from public.vendor where legal_name ilike 'Kura Agro Supply%'")).rows[0].n).toBe(0);
       expect((await db.query("select count(*)::int as n from public.vendor_bank_account where vendor_id = '00000000-0000-4000-8000-000000000502'")).rows[0].n).toBe(2);
       const chair = await db.query("select u.email from public.committee_member m join public.app_user u on u.id = m.user_id where m.is_chair");
       expect(chair.rows).toEqual([{ email: "elchin@demo-agro.test" }]);

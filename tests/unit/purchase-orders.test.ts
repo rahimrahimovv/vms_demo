@@ -10,7 +10,7 @@ const po: PoView = {
   status: "FULLY_APPROVED",
   createdAt: "2026-11-16T08:30:00Z",
   reason: null,
-  vendor: { id: "22222222-2222-4222-8222-222222222222", name: "Alpha Agro (Ə İ ş)" },
+  vendor: { id: "22222222-2222-4222-8222-222222222222", name: "Kura Agro Supply (Ə İ ş)" },
   sourcing: { id: "33333333-3333-4333-8333-333333333333", number: "SRC-2026-0001" },
   ownerId: "owner",
   requesterId: "requester",
@@ -40,8 +40,8 @@ describe("PO totals as shown", () => {
   });
 
   it("shows the PO total in notifications as AZN", () => {
-    const values = messageValues({ vendor: "Alpha Agro", total: 56000 }, po.number, { has: () => false, translate: (k) => k }, formatDate);
-    expect(values).toMatchObject({ number: "PO-2026-0001", vendor: "Alpha Agro", total: "56,000.00 AZN" });
+    const values = messageValues({ vendor: "Kura Agro Supply", total: 56000 }, po.number, { has: () => false, translate: (k) => k }, formatDate);
+    expect(values).toMatchObject({ number: "PO-2026-0001", vendor: "Kura Agro Supply", total: "56,000.00 AZN" });
   });
 });
 

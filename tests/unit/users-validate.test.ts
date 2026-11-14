@@ -41,7 +41,7 @@ describe("PLT-01 AC1: new user form", () => {
 });
 
 describe("editing a user", () => {
-  const base = { fullName: "Demo Admin", email: "admin@demo-agro.test", password: "", isActive: true };
+  const base = { fullName: "Aygun Rzayeva", email: "admin@demo-agro.test", password: "", isActive: true };
 
   it("an Admin cannot remove their own Admin role", () => {
     const errors = validateUserUpdate({ ...base, roles: ["REQUESTER"] }, { targetId: "a", currentUserId: "a" });
