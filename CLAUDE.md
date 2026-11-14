@@ -19,13 +19,17 @@ Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are 
 4. Row-level security on every table. A vendor reads only its own records (NFR-001).
 5. Sealed proposals: before the deadline no internal user gets prices, vendor names or files from the UI or the API (NFR-002).
 6. Secrets never go into git. `.env.local` is in `.gitignore`. The Supabase secret key is used only in server code.
-7. Every top-level table has `company_id`.
+7. Every top-level table has `company_id`. One deliberate exception: `demo_attempt` (hash of an IP plus a failed-attempt counter for the demo
+   code, server-only, no policies) and its one-row sibling `demo_flag` carry none; they are infrastructure of the demo gate, not business data.
 8. Every status change writes an `audit_entry` row (NFR-011).
 9. Status names exactly as in the backlog's Status Transition Model. Do not invent new statuses.
 10. Separation of duties (#83): nobody approves their own PR or a PO for their own PR; the sourcing owner never votes in that sourcing's committee decisions.
 11. Files: PDF, JPG, PNG, DOCX, XLSX only, max 10 MB, checked on the server.
 12. Locale: Asia/Baku time zone, dates like `06 Nov 2026`, amounts like `60,000.00 AZN`, currency AZN only.
-13. Demo tools (role switcher, Fill sample, End deadline now, Reset demo) work only when `DEMO_MODE=true`; otherwise their endpoints return "Not available".
+13. Demo tools (Switch user, End deadline now) work only when `DEMO_MODE=true` AND the browser is unlocked with the demo code (`DEMO_ACCESS_CODE`,
+    signed httpOnly cookie, 8 hours); otherwise every demo action answers "Not available" and no demo control is rendered (D-022). Resetting and
+    loading demo data are developer commands (`npm run demo:reset`, `npm run demo:load`), never a web button, endpoint or server action (D-023); each
+    needs `demo_flag` enabled in that database and the last 6 characters of the project reference typed. Fill sample is not in this release.
 
 ## Design
 - UI kit: shadcn/ui on Tailwind, lucide icons, Inter font. Clean enterprise look.
@@ -81,11 +85,11 @@ Each slice ends deployed and clickable on the Vercel link. Never break an earlie
 | 6 | RFQ-03, RFQ-05, RFQ-07, RFQ-08 | Q&A, technical pass/fail (two envelopes), comparison with extra costs and evaluated price, final offer round, proposed winner and winner vote |
 | 7 | PO-01 to PO-03 | PO per winning vendor, Approver then committee, vendor accepts or declines |
 | 7b | PLT-03, REG-08 | Change and reset passwords (temporary password shown once, must change password); vendor change requests for core company data approved by a Procurement Specialist; "Registration rejected" page and Reopen; "Profile updated" log |
-| 8a | DEMO-01, DEMO-02 | Demo bar, Fill sample, seed and reset to scenario start; full scenario rehearsed |
-| 8b | DEMO-03 | Second load mode: populated demo data, created through the application's own functions, with a self-check |
+| 8a | DEMO-01, DEMO-02 | Demo code unlock, demo bar (Switch user, End deadline now, Lock), `npm run demo:reset` (seed and reset to scenario start, a developer command); full scenario rehearsed |
+| 8b | DEMO-03 | `npm run demo:load`: populated demo data, created through the application's own functions, with a self-check |
 
-Status (17 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 7b (PLT-03, REG-08) done on vms-dev and deployed after the production step in `docs/PROGRESS.md`; Slice 8a (DEMO-01, DEMO-02) and 8b (DEMO-03) not
-started. Open items are in `docs/PROGRESS.md`.
+Status (18 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 7b (PLT-03, REG-08) done on vms-dev and deployed after the production step in `docs/PROGRESS.md`; Slice 8a (DEMO-01, DEMO-02) built on vms-dev,
+not yet on vms-prod or `main` on Vercel (see `docs/PROGRESS.md`); 8b (DEMO-03) not started. Open items are in `docs/PROGRESS.md`.
 
 The data model for every slice is in place from Slice 2 (all ERD tables, RLS and status audit); each slice adds its screens and the functions that change status.
 

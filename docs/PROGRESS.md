@@ -426,7 +426,7 @@ Staged; each stage is committed so a new session can resume from here.
 | 1 | Tokens, fixed page layer, floating sidebar and top bar, logo, favicon, PDF accent #1D4E89 | done |
 | 2 | Shared components: card, tabs (segmented), buttons, badges (sky for pending), table, dialog, popovers, inputs, alert, panels | done |
 | 3 | Pages: sign-in and register, vendor home (draft and approved), My tasks per role (Specialist, Requester, Approver, Committee Member, Admin), comparison and record header (type pill) | done |
-| 4 | Remaining screens through shared components, final sweep, screenshots against the boards, CLAUDE.md Design section, build and push | done (see Verified below) |
+| 4 | Remaining screens through shared components, final sweep, screenshots against the boards, CLAUDE.md Design section, build and push | done (the contrast numbers and the kept differences follow below; the section has no separate "Verified" subsection) |
 
 Contrast (computed, worst case = the surface over the lightest page colour #EDE9F8 and the darkest #A3BFE3, plus a dark brand button for
 surfaces that sit over content):
@@ -475,7 +475,7 @@ and "Load populated demo data"; Slice 8 is not started, so nothing to change yet
 
 ### Open items
 
-1. **Slice 8a** (DEMO-01, DEMO-02): demo bar, Fill sample, seed and reset: not started. **Slice 8b** (DEMO-03, populated demo data): not started.
+1. **Slice 8a** (DEMO-01, DEMO-02): built on vms-dev on 18 Nov 2026, see the "Slice 8a" section at the end (real reset run, browser click-through and the production step are pending). **Slice 8b** (DEMO-03, populated demo data): not started.
 2. **Node.js version on Vercel** should be 24.x; check the project setting (and `engines` in `package.json`, none today).
 3. **Staged uploads**: files nobody claims stay under `staging/` in the bucket; no cleanup job (see Slice 5 open issue 9).
 4. **Full RLS suite after the last migration** (`20261116110000_po_respond_released`) has not been run as one pass; run it on vms-dev.
@@ -525,3 +525,52 @@ Migrations `20261117100000_passwords` and `20261117110000_change_requests` (RLS 
 21. Replaced registration documents: the database rows are replaced in the approval transaction, the storage objects are deleted afterwards; a failure
     there leaves an orphan object. Same family as open item 9 (staged uploads without a cleanup job).
 22. **Final rehearsal must cover the Slice 7b UI flows**: change own password; Admin resets an internal user; Procurement Specialist resets a vendor (temporary password shown once, forced change at sign-in); vendor change request approved, returned, rejected and withdrawn; rejected vendor sees only "Registration rejected"; Reopen. Also check on production that the password gate does not block normal users.
+
+## Slice 8a: DEMO-01 and DEMO-02, the hybrid way (18 Nov 2026)
+
+Scope change of 18 Nov 2026 (backlog patched: DEMO-01 AC1 and AC3, DEMO-02 AC1, DEMO-03 AC1, the Scope line, D-022, new D-023; the wording of
+the patch is the developer's reading of the BA's description, so check it against the BA's next export): the browser has only the unlock, Switch
+user, End deadline now and Lock; resetting and loading are developer commands. **Fill sample, the Reset and Load buttons and every web endpoint for
+them are not built** (nothing of them was ever written). Commits: DEMO-01 a04a5c8 and e550c6e, DEMO-02 6be9488 and 4cd8210. Migrations
+`20261118100000_demo_access`, `20261118110000_demo_end_deadline`, `20261118120000_demo_reset` (vms-dev only).
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| DEMO-01 AC1, AC2, AC5 | done on vms-dev | `/demo-access` form (demo code compared in constant time, 5 failures per IP lock it for 15 minutes), signed httpOnly cookie for 8 hours bound to the code, demo bar (glass strip) with Switch user (magic-link token redeemed by the server, no e-mail, no password) and Lock; with demo mode off or locked nothing renders and the actions answer "Not available" |
+| DEMO-01 AC4 | done on vms-dev | End deadline now in the bar, only on a sourcing record that is OPEN or in a running final-offer round; sets the deadline to now and runs `app.close_due_sourcings()` in the same call (immediate) |
+| DEMO-01 AC3 | not in this release | Fill sample stays a later addition (D-023) |
+| DEMO-02 | done on vms-dev, real run pending | `npm run demo:reset`: prints the project reference and what it deletes, refuses unless `demo_flag` is enabled, waits for the last 6 characters of the project reference; one TRUNCATE transaction (`app.demo_reset`) seeds the 9 users through `app.demo_seed`, ends all sessions, leaves one RESET audit line; then deletes Auth users not in the list, every Storage object, and restores the sample proof files. Immutability triggers are never touched. The user list is a parameter of `resetToUsers` (`scripts/lib/demo-data.ts`) for Slice 8b |
+| DEMO-03 | not started | `npm run demo:load` is a placeholder ("not built yet") |
+
+`supabase/seed.sql` now only calls `app.seed_base()`; the seed data moved into that function (change it with a migration). `scripts/seed-users.ts`
+takes its user list and proof-file code from `scripts/lib/demo-data.ts`.
+
+### Verified
+
+- `npm run typecheck`, lint (3 old warnings), `npm test`: 137 unit tests (4 new for the unlock cookie).
+- `npm run test:rls` on vms-dev, the new and changed files: `demo-access` (attempt limit, window restart, anon and authenticated refused), `demo-reset`
+  (11: nobody but the owner can execute the demo functions; the flag guard; no truncate trigger, rule or restrictive policy; both immutability triggers
+  enabled; the whole reset inside a transaction that is rolled back: scenario-start counts, one RESET line, numbers from 0001, no sessions, Beta Trade with
+  two bank accounts, Chair; a failing seed rolls everything back; the command with a wrong or missing confirmation and with the flag off changes nothing;
+  `demo:load` changes nothing), plus the End deadline tests in `sourcing` (OPEN, under 10 s, server key only) and `comparison` (final-offer round).
+  The full RLS suite as one pass after these migrations has not been run.
+- The demo flag is **enabled on vms-dev**. A wrong confirmation was refused (nothing changed).
+
+### Not done (needs the developer)
+
+1. **The real `npm run demo:reset` on vms-dev has not been run.** The tool that ran it for me was blocked on purpose: the typed confirmation is the
+   developer's. Run it, then run the full RLS suite once (the tests rely on the seeded demo users) and check timing (target 30 s) and the printed counts.
+2. **No browser click-through of the unlock, Switch user, Lock and End deadline now.** No Chrome here and a dev server of the developer's already holds
+   port 3000 without the demo variables. Run `npm run dev` with `DEMO_MODE=true`, `DEMO_ACCESS_CODE`, `DEMO_SESSION_SECRET` in `.env.local` and click the
+   happy path (it belongs in the final rehearsal with the Slice 7b flows, open item 22).
+3. vms-prod: **not migrated**, flag **not enabled**, `main` **not pushed** (by instruction). Before the production step: migrate with `ENV_FILE=.env.production.local npm run db:push`,
+   set `DEMO_MODE`, `DEMO_ACCESS_CODE` and `DEMO_SESSION_SECRET` on Vercel (nothing else; `DEMO_SEED_PASSWORD` stays local), enable the flag only if a production reset is wanted.
+
+### Open issues
+
+23. **Staged uploads are not cleaned up** (open item 3 and issue 9): files nobody claims stay under `staging/` in the bucket. The daily clean-up was dropped from
+    Slice 8a (18 Nov 2026); the demo reset empties the whole bucket. A real roll-out needs a daily job (a Vercel Cron route protected by `CRON_SECRET`, or a database job
+    that calls the Storage API).
+24. The demo bar's "End deadline now" asks the server every 10 seconds while a sourcing page is open (the layout stays mounted between pages).
+25. A reset ends every Auth session, but an access token already issued keeps working until it expires (about an hour), like issue 20; the unlock cookie survives a reset by design.
+26. `docs/backlog.md` carries the developer's wording of the D-023 patch (see above); replace it with the BA's text at the next export.
