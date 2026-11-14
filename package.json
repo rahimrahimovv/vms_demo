@@ -11,7 +11,9 @@
     "test": "vitest run tests/unit",
     "test:rls": "vitest run tests/rls",
     "db:push": "node scripts/db-push.mjs",
-    "db:seed": "node scripts/db-push.mjs --seed && tsx scripts/seed-users.ts"
+    "db:seed": "node scripts/db-push.mjs --seed && tsx scripts/seed-users.ts",
+    "demo:reset": "tsx scripts/demo-reset.ts",
+    "demo:load": "tsx scripts/demo-load.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
