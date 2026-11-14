@@ -11,10 +11,11 @@ e-Procurement is a generic, 1C-free procurement platform; this backlog covers th
 ### Backlog Hierarchy
 
 ```
-E-PROCUREMENT (Epic) - E2E procurement MVP, 32 stories
+E-PROCUREMENT (Epic) - E2E procurement MVP, 34 stories
 ├── PLT  Platform
 │   ├── PLT-01  Sign in and see only your role's screens
-│   └── PLT-02  Get in-app notifications; keep an audit trail
+│   ├── PLT-02  Get in-app notifications; keep an audit trail
+│   └── PLT-03  Change and reset passwords
 ├── MDM  Master data
 │   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes
 │   └── MDM-02  Admin maintains the category tree and item catalogue
@@ -25,7 +26,8 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 32 stories
 │   ├── REG-04  Specialist qualifies category; vendor joins AVL
 │   ├── REG-05  Vendor fills questionnaire; specialist confirms A–D grade
 │   ├── REG-06  Vendor keeps a company profile; buyers see the vendor card
-│   └── REG-07  Vendor completes the registration in steps
+│   ├── REG-07  Vendor completes the registration in steps
+│   └── REG-08  Vendor requests a change to core company data
 ├── PLN  Planning
 │   └── PLN-01  Admin maintains annual plan lines
 ├── PR   Purchase requisition
@@ -71,14 +73,14 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 **In scope (this release)**
 
 - Platform: e-mail and password sign-in, 5 internal roles plus Vendor, role-based screens, in-app notifications, audit trail of every status change.
-- Vendor onboarding: a short account form for local companies, individuals and foreign companies, then the vendor completes the registration in steps in its own cabinet (company details, owners, contact persons with at least one legal representative and a proof file, bank accounts, documents) and submits it; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; a company profile with owners, founding date, activity, brands, main goods, bank guarantee and a certificate register with 30-day expiry reminders, shown on one vendor card; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
+- Vendor onboarding: a short account form for local companies, individuals and foreign companies, then the vendor completes the registration in steps in its own cabinet (company details, owners, contact persons with at least one legal representative and a proof file, bank accounts, documents) and submits it; later changes to company data, owners, bank accounts and documents go through a change request that a Procurement Specialist approves (#99); users change their password and staff reset a forgotten one; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; a company profile with owners, founding date, activity, brands, main goods, bank guarantee and a certificate register with 30-day expiry reminders, shown on one vendor card; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
 - Planning: annual plan lines; every PR is linked to a plan line and shows the remaining amount.
 - Purchase requisition: lines picked from the item catalogue; single-level approval.
 - Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner.
 - Committee: configuration, a winner vote and a PO vote, numbered minutes for each decision.
 - Purchase order: one PO per winning vendor; Approver, then committee, then vendor acceptance.
 - Demo mode: role switcher, sample fill, end-deadline-now, reset; one seeded scenario and a populated demo dataset in a second load mode.
-- High-urgency items delivered (23 of 46): #1 (plan lines only), #9, #15, #16 (limit and justification; the committee approves it in the winner vote), #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #106 (certificate register with 30-day reminders), #110, plus #54 (owners), #97 (bank guarantee) and #100 (activity and brands).
+- High-urgency items delivered (24 of 46): #1 (plan lines only), #9, #15, #16 (limit and justification; the committee approves it in the winner vote), #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #106 (certificate register with 30-day reminders), #110, plus #54 (owners), #97 (bank guarantee), #99 (bank-detail change request, approved by the Procurement Specialist because the MVP has no Finance role) and #100 (activity and brands).
 
 **If time allows (cut first when late)**
 
@@ -98,7 +100,7 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 
 - Screens for several PRs in one sourcing, splitting a line's quantity across vendors, the blacklist workflow and department review of the questionnaire (the data model already supports them); e-mail notifications (#114); Azerbaijani UI; bilingual minutes and chair sign-off (#46).
 - Committee approval of method, justifications, strategy, documents and extensions (#18, #17, #21, #25, #35); approval routing by amount (#43).
-- Due diligence (#52), bank-detail change approval (#99), performance actions and blacklist (#57, #59), committee and compliance reports (#81, #82), plan versus actual and method in the plan (#2, #4).
+- Due diligence (#52), performance actions and blacklist (#57, #59), committee and compliance reports (#81, #82), plan versus actual and method in the plan (#2, #4).
 
 **Platforms & languages**
 
@@ -162,6 +164,34 @@ TBD
 4. **Given** any status change on a vendor registration, category application, plan line, PR, sourcing, invitation, proposal, committee decision or PO, **When** it is saved, **Then** an audit entry stores the user, the date and time (Asia/Baku), the previous status, the new status and the reason or comment when one was required.
 5. **Given** a record a user can open, **When** they open its History tab, **Then** its audit entries are listed newest first.
 6. **Given** any audit entry, **When** any user, including the Admin, tries to change or delete it, **Then** the action is refused.
+
+---
+
+### PLT-03 - Users Change Their Password And Authorised Staff Reset It
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | PLT-03 |
+| **Story title** | A signed-in user changes their own password, and a user who cannot sign in gets a temporary password from the right person. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | any signed-in user, an Admin and a Procurement Specialist |
+| **I want to...** | change my password, and reset the password of someone who is locked out |
+| **So that...** | nobody is stuck, although the system sends no e-mail |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a signed-in user of any role, **When** they open their user menu and choose Change password, **Then** a form asks for the current password, the new password and its confirmation.
+2. **Given** the form, **When** it is submitted with a wrong current password, **Then** "The current password is incorrect" appears; with a new password shorter than 8 characters, "Use at least 8 characters"; with a confirmation that differs, "The passwords do not match"; with the same password as before, "Choose a different password"; nothing is changed in any of these cases.
+3. **Given** a valid form, **When** it is submitted, **Then** the password changes, the user stays signed in, "Password changed" appears, and an audit entry PASSWORD\_CHANGED records the user and the time (never the password).
+4. **Given** an Admin on Users, **When** they click Reset password on an internal user and confirm, **Then** a temporary password is shown once with a Copy button, the user's sessions end, the user is marked "must change password", and an audit entry PASSWORD\_RESET records who did it and for whom.
+5. **Given** a Procurement Specialist on a vendor card, **When** they click Reset password and confirm, **Then** the same happens for that vendor's sign-in account; an Admin cannot reset a vendor's password.
+6. **Given** a user marked "must change password", **When** they sign in with the temporary password, **Then** the Change password form opens and no other page opens until the password is changed.
+7. **Given** the sign-in page, **When** it is shown, **Then** it says "Forgot your password? Ask your buyer or your administrator to reset it." and has no reset link (no e-mail in this release).
+8. **Given** any reset or change, **When** it is stored, **Then** no password is saved in clear text, shown again or written to the audit trail.
 
 ---
 
@@ -266,7 +296,7 @@ TBD
 2. **Given** a SUBMITTED registration, **When** the specialist clicks Approve, **Then** the status becomes APPROVED and the vendor is notified and can open the qualification questionnaire (REG-05). \[revised\]
 3. **Given** a SUBMITTED registration, **When** the specialist clicks Return for correction, **Then** a comment is required; on confirm the status becomes RETURNED, the vendor is notified and sees the comment.
 4. **Given** a RETURNED registration, **When** the vendor edits it and clicks Submit, **Then** the status becomes SUBMITTED again and the specialist's earlier comment stays visible in History.
-5. **Given** a SUBMITTED registration, **When** the specialist clicks Reject, **Then** a reason is required; on confirm the status becomes REJECTED, the vendor is notified with the reason and the registration can no longer be edited or resubmitted.
+5. **Given** a SUBMITTED registration, **When** the specialist clicks Reject, **Then** a reason is required; on confirm the status becomes REJECTED, the vendor is notified with the reason and the vendor can no longer edit or resubmit it; when it signs in, it sees only a "Registration rejected" page with the reason and "Contact your buyer", and every other page redirects there; a Procurement Specialist can reopen a rejected registration with a comment (REG-08 AC14).
 6. **Given** a vendor whose registration is not APPROVED or who has no valid grade A, B or C, **When** they open Categories, **Then** "Your registration must be approved first" or "Complete the qualification questionnaire first" appears. \[revised\]
 
 ---
@@ -368,7 +398,7 @@ TBD
 
 1. **Given** a local or foreign company completing its registration (REG-07), **When** it fills the form, **Then** it must also give the founding date and at least one owner record for the company head, and may add founders and shareholders above 10% (full name, ID or registration number, share %, role Founder, Shareholder or Head); individuals skip this section (#54).
 2. **Given** owner records, **When** their shares add up to more than 100%, **Then** "Shares cannot exceed 100% in total" appears and nothing is saved.
-3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); it can also add, edit or remove bank accounts, keeping at least one and exactly one marked as main, and it can manage its contact persons, keeping at least one legal representative with a proof file; the Profile also has a "Registration history" tab with the audit entries of the registration (who submitted, approved or returned it, and the comments). \[revised\]
+3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); bank accounts change only through a change request (REG-08), and it can manage its contact persons, keeping at least one legal representative with a proof file; the Profile also has a "Registration history" tab with the audit entries of the registration (who submitted, approved or returned it, and the comments). \[revised\]
 4. **Given** the Certificates section, **When** the vendor adds a certificate with type (ISO 9001, ISO 14001, ISO 45001, HSE policy, Product certificate, Licence, Reference letter, Catalogue, Other), number, issuer, issue date, an optional expiry date and a file, **Then** it shows with the status VALID, EXPIRING or EXPIRED from the Calculation Rules (#106).
 5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); on the day after the expiry date it becomes EXPIRED and both are notified again. \[revised\]
 6. **Given** the vendor's home page, **When** it loads, **Then** it shows the grade with its valid-until date, the qualified categories, and a warning for every EXPIRING or EXPIRED certificate.
@@ -407,6 +437,40 @@ TBD
 9. **Given** the Review and submit step, **When** any step is not complete, **Then** Submit is disabled and the incomplete steps are listed with links; **When** all steps are complete and the vendor clicks Submit, **Then** the status becomes SUBMITTED, every step becomes read-only, every Procurement Specialist is notified, and Qualification and Categories stay locked until the registration is approved.
 10. **Given** a RETURNED registration, **When** the vendor opens its home page, **Then** the specialist's comment shows on top, all steps are editable again and Submit works as in criterion 9 (REG-02 AC4).
 11. **Given** a SUBMITTED registration, **When** the vendor opens a step, **Then** it is read-only until the specialist returns the registration. Once the registration is APPROVED, the Registration page no longer appears in the vendor's menu; it shows only while the registration is DRAFT, SUBMITTED, RETURNED or REJECTED, and the registration history moves to the Profile (REG-06).
+
+---
+
+### REG-08 - Vendor Requests A Change To Core Company Data
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | REG-08 |
+| **Story title** | After approval, a vendor changes its company details, owners, bank accounts or documents only through a request that a Procurement Specialist approves. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Vendor, and Procurement Specialist |
+| **I want to...** | ask for a change to core data and have it checked before it applies |
+| **So that...** | buyers rely on verified data, bank details cannot be swapped silently and owner changes stay visible (#54, #99) |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** an APPROVED vendor on Profile, **When** it clicks Request a change on one of the sections Company details, Owners, Bank accounts or Documents, **Then** a form opens with the current values, the vendor edits them, must write a reason, and for a change of legal name, tax number, owners or bank accounts must attach a supporting file ("Attach a supporting document").
+2. **Given** a vendor with an open request in a section, **When** it tries to start another one in the same section, **Then** "A request for this section is already open" appears; requests in different sections may run in parallel.
+3. **Given** a filled request, **When** the vendor clicks Submit, **Then** the request becomes SUBMITTED, a snapshot of the current values is stored beside the proposed ones, every Procurement Specialist is notified, and the vendor sees "Change pending approval" on the section while the current data stays in force.
+4. **Given** a proposed tax number that is not 10 digits (local) or is already used by another vendor, **When** the vendor submits, **Then** "VÖEN must be 10 digits" or "A vendor with this tax number is already registered" appears and nothing is stored (#91); the owner shares, bank account and file rules of REG-07 apply to their sections too.
+5. **Given** a SUBMITTED request, **When** a Procurement Specialist opens Change requests, **Then** the list shows vendor, section, submitted date and age, and the request page shows each changed field with the current and the proposed value side by side, the reason and the files.
+6. **Given** a SUBMITTED request, **When** the specialist clicks Approve, **Then** the proposed values replace the current ones in one step, the request becomes APPROVED, the vendor is notified, the tax-number and shared-owner checks run again and a failed check refuses the approval with its message.
+7. **Given** a SUBMITTED request, **When** the specialist clicks Return for correction or Reject, **Then** a comment or a reason is required; the request becomes RETURNED or REJECTED, the current data is unchanged and the vendor is notified with the text; a RETURNED request can be edited and submitted again.
+8. **Given** a SUBMITTED or RETURNED request, **When** the vendor clicks Withdraw, **Then** the request becomes WITHDRAWN and the section is free again.
+9. **Given** an approved change to the Owners section, **When** shares or people differ, **Then** the "Shares an owner with" flags are recalculated at once (REG-06 AC8).
+10. **Given** an approved change to the Bank accounts section, **When** it applies, **Then** the vendor's bank accounts are replaced, exactly one stays main, and the History shows the change with the IBAN hidden except its last 4 characters.
+11. **Given** a vendor that changes its activity, brands, main goods, bank guarantee, certificates or contact persons (changes that need no approval), **When** it saves, **Then** an entry "Profile updated: \<section>" with the user and the time is added to the Registration history.
+12. **Given** the Registration history tab of the Profile and of the vendor card, **When** they open, **Then** they also list every change request with its status, decision, decider and comments.
+13. **Given** a vendor whose registration is DRAFT, SUBMITTED or RETURNED, **When** it edits its data, **Then** it edits it directly as in REG-07, and no change request is needed.
+14. **Given** a rejected registration, **When** a Procurement Specialist clicks Reopen on it and enters a comment, **Then** the registration becomes RETURNED and the vendor is notified.
 
 ---
 
@@ -1046,12 +1110,16 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | View a vendor card, including owners | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
 | View a sourcing record, read-only (sealed data stays sealed until its opening rule) | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ (own invitation only) |
+| Change own password | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Reset a forgotten password (temporary password) | ❌ | ❌ | ✅ (vendor accounts) | ❌ | ✅ (internal users) | ❌ |
+| Request a change to company data, owners, bank accounts or documents | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Decide a change request; reopen a rejected registration | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
 Owner means the Procurement Specialist who started the sourcing; other specialists can read it. Demo tools (DEMO-01) are open to everyone, and only while demo mode is on.
 
 ## Status Transition Model
 
-Eleven entities carry a status; the sourcing is the one with loops, so it is drawn, and every entity's allowed transitions are listed below.
+Twelve entities carry a status; the sourcing is the one with loops, so it is drawn, and every entity's allowed transitions are listed below.
 
 &#91;embedded content: sourcing lifecycle · 11 statuses, opening and final-offer steps\]
 
@@ -1105,6 +1173,23 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | SUBMITTED | APPROVED | Approve | Procurement Specialist |  |
 | SUBMITTED | RETURNED | Return for correction | Procurement Specialist | Comment required |
 | SUBMITTED | REJECTED | Reject | Procurement Specialist | Reason required; final |
+
+**Vendor registration, reopened**
+
+| From | To | Trigger | Allowed roles | Notes |
+| --- | --- | --- | --- | --- |
+| REJECTED | RETURNED | Reopen | Procurement Specialist | Comment required; the vendor is notified (REG-08 AC14) |
+
+**Vendor change request**
+
+| From | To | Trigger | Allowed roles | Notes |
+| --- | --- | --- | --- | --- |
+| (none) | SUBMITTED | Submit | Vendor | Reason and files; the current data stays in force |
+| SUBMITTED, RETURNED | WITHDRAWN | Withdraw | Vendor | The section is free again |
+| SUBMITTED | APPROVED | Approve | Procurement Specialist | Proposed values replace the current ones in one step; tax-number and shared-owner checks run again |
+| SUBMITTED | RETURNED | Return for correction | Procurement Specialist | Comment required |
+| SUBMITTED | REJECTED | Reject | Procurement Specialist | Reason required; final |
+| RETURNED | SUBMITTED | Resubmit | Vendor |  |
 
 **Qualification questionnaire**
 
@@ -1211,6 +1296,9 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | Final-offer round closed | Sourcing owner | In-app | Responses received versus vendors chosen | No |
 | Certificate expires in 30 days | Vendor, all Procurement Specialists | In-app | Vendor, certificate type, expiry date | No |
 | Certificate expired | Vendor, all Procurement Specialists | In-app | Vendor, certificate type | No |
+| Change request submitted | All Procurement Specialists | In-app | Vendor, section, link | No |
+| Change request decided | Vendor | In-app | Section, decision, comment or reason | No |
+| Registration reopened | Vendor | In-app | The specialist's comment | No |
 
 ## Non-Functional Requirements
 
@@ -1353,6 +1441,8 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-017 | The Approver sees a WINNER decision but not the comparison inside it; the Approver who is also the owner of the sourcing cannot approve its PO | CMT-02, PO-02 |
 | D-018 | Audit entries and minutes are immutable. The demo reset clears them only through a guarded server function that works when demo mode is on | NFR-011, DEMO-02 |
 | D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
+| D-020 | After approval, core company data (legal name, tax number, address, director, founding date, VAT status, owners, bank accounts, documents) changes only through a change request that a Procurement Specialist approves; other profile data changes freely and is logged | REG-08 |
+| D-021 | Users change their own password; an Admin resets internal users and a Procurement Specialist resets vendors with a temporary password, because the release sends no e-mail | PLT-03 |
 
 **Assumptions in force**
 
@@ -1365,6 +1455,7 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | A-023 | Committee members see who has voted, but not how, until the decision closes |
 | A-024 | Business days for voting periods are Monday to Friday; public holidays are not counted |
 | A-025 | An Individual (sole trader) vendor needs no legal representative; its main contact is enough |
+| A-026 | The Procurement Specialist approves bank-detail changes because the MVP has no Finance role; a Finance role can take over later (#99) |
 
 Assumptions A-020 to A-025 were proposed by the analyst assistant and accepted by default; confirm them with the client before a real roll-out. Further assumptions made during the build are recorded in docs/PROGRESS.md of the repository.
 
@@ -1380,6 +1471,7 @@ Assumptions A-020 to A-025 were proposed by the analyst assistant and accepted b
 | Q-006 | Is a Tax Service API available for the VÖEN check (#91)? Until then a mistyped or borrowed VÖEN can block a company's own registration | Client | Open |
 | Q-007 | Vercel's free plan is for non-commercial use; which plan does a client roll-out need | Management | Open |
 | Q-008 | How to release the tax number of an abandoned incomplete registration | Business Analyst | Later phase |
+| Q-009 | Which role approves bank-detail changes in a real roll-out (Finance, Treasury or Security)? | Client | Open |
 
 ## Figma
 
@@ -1387,7 +1479,7 @@ TBD
 
 ## ERD
 
-Forty-four tables cover the release; every top-level table carries `company_id` so more buying companies can be added later. Paste the block into dbdiagram.io.
+Forty-five tables cover the release; every top-level table carries `company_id` so more buying companies can be added later. Paste the block into dbdiagram.io.
 
 ```dbml
 // e-Procurement MVP - paste into https://dbdiagram.io
@@ -1403,6 +1495,7 @@ Table app_user {
   vendor_id uuid [ref: > vendor.id, note: 'set only for vendor users']
   full_name varchar [not null]
   email varchar [unique, not null]
+  must_change_password boolean [default: false, note: 'set after a temporary password']
   is_active boolean [default: true]
   created_at timestamp
 }
@@ -1514,6 +1607,22 @@ Table vendor_contact {
   created_at timestamp
 }
 
+Table vendor_change_request {
+  id uuid [primary key]
+  company_id uuid [ref: > company.id, not null]
+  vendor_id uuid [ref: > vendor.id, not null, note: 'one open request per vendor and section']
+  section varchar [not null, note: 'COMPANY_DETAILS | OWNERS | BANK_ACCOUNTS | DOCUMENTS']
+  status varchar [not null, note: 'SUBMITTED | RETURNED | APPROVED | REJECTED | WITHDRAWN']
+  reason text [not null]
+  current_values jsonb [note: 'snapshot taken at submit']
+  proposed_values jsonb [not null]
+  review_comment text
+  decided_by uuid [ref: > app_user.id]
+  decided_at timestamp
+  submitted_at timestamp
+  created_at timestamp
+}
+
 Table vendor_bank_account {
   id uuid [primary key]
   vendor_id uuid [ref: > vendor.id, not null]
@@ -1547,9 +1656,9 @@ Table vendor_certificate {
 Table file {
   id uuid [primary key]
   company_id uuid [ref: > company.id, not null]
-  owner_type varchar [not null, note: 'vendor | vendor_contact | vendor_brand | vendor_certificate | questionnaire_answer | category_application | requisition | sourcing | proposal | question | minutes | purchase_order']
+  owner_type varchar [not null, note: 'vendor | vendor_contact | vendor_change_request | vendor_brand | vendor_certificate | questionnaire_answer | category_application | requisition | sourcing | proposal | question | minutes | purchase_order']
   owner_id uuid [not null]
-  kind varchar [note: 'charter | id_card | registration_certificate | vat_certificate | proof_of_authority | licence | technical_document | justification | attachment | pdf']
+  kind varchar [note: 'charter | id_card | registration_certificate | vat_certificate | proof_of_authority | change_support | licence | technical_document | justification | attachment | pdf']
   file_name varchar [not null]
   mime_type varchar [not null]
   size_bytes integer [not null, note: 'max 10485760']
@@ -1870,7 +1979,7 @@ Table audit_entry {
   record_type varchar [not null]
   record_id uuid [not null]
   from_status varchar
-  to_status varchar [not null]
+  to_status varchar [not null, note: 'a status, or an event such as PASSWORD_CHANGED, PASSWORD_RESET or PROFILE_UPDATED']
   user_id uuid [ref: > app_user.id]
   reason text
   created_at timestamp [not null]
