@@ -64,7 +64,7 @@ The MVP proves that a client without 1C can run a full, auditable procurement in
 |  |  |
 | --- | --- |
 | Problem | The current VMS depends on 1C for requisitions, master data and PO hand-off, and carries PrimeCotton-specific rules, so it cannot be offered to clients without 1C. The client's gap analysis lists 114 requirements; 46 are marked High-Urgent and many are not covered (Q&A, committee minutes, decline of invitations, disqualification). Today clarifications and comparisons happen in e-mail and Excel, outside the audit trail. |
-| Success metric | On the management demo (target Nov 13, 2026), one seeded scenario (2,000 bags of fertiliser, 60,000.00 AZN, Tender) runs on the public link from vendor registration to a vendor-accepted PO with zero errors, and each of the 6 roles works in its own account and screen. Measured by a full rehearsal on demo day minus 1 and the live run. Adoption and time-saved metrics are deferred to a pilot. |
+| Success metric | On the management demo (target Nov 13, 2026), one seeded scenario (a requisition of 80,000.00 AZN with two fertiliser lines, Tender) runs on the public link from vendor registration to a vendor-accepted PO with zero errors, and each of the 6 roles works in its own account and screen. Measured by a full rehearsal on demo day minus 1 and the live run. Adoption and time-saved metrics are deferred to a pilot. |
 
 ## Scope
 
@@ -469,8 +469,8 @@ TBD
 10. **Given** an approved change to the Bank accounts section, **When** it applies, **Then** the vendor's bank accounts are replaced, exactly one stays main, and the History shows the change with the IBAN hidden except its last 4 characters.
 11. **Given** a vendor that changes its activity, brands, main goods, bank guarantee, certificates or contact persons (changes that need no approval), **When** it saves, **Then** an entry "Profile updated: \<section>" with the user and the time is added to the Registration history.
 12. **Given** the Registration history tab of the Profile and of the vendor card, **When** they open, **Then** they also list every change request with its status, decision, decider and comments.
-13. **Given** a vendor whose registration is DRAFT or RETURNED, **When** it edits its data, **Then** it edits it directly as in REG-07, and no change request is needed; a SUBMITTED registration is read-only.
-14. **Given** a rejected registration, **When** a Procurement Specialist opens it from the Vendors list (filter Rejected), clicks Reopen on the vendor card and enters a comment, **Then** the registration becomes RETURNED and the vendor is notified.
+13. **Given** a vendor whose registration is DRAFT or RETURNED, **When** it edits its data, **Then** it edits it directly as in REG-07, and no change request is needed; while the registration is SUBMITTED, its data is read-only.
+14. **Given** a rejected registration, **When** a Procurement Specialist clicks Reopen on its vendor card (the Vendors list has a Rejected filter) and enters a comment, **Then** the registration becomes RETURNED and the vendor is notified.
 
 ---
 
@@ -959,7 +959,7 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode is switched on by an environment setting, **When** any page loads, **Then** a demo bar shows Switch user, Reset to scenario start and Load populated demo data (DEMO-03).
+1. **Given** demo mode is switched on by an environment setting and the presenter has entered the demo code (DEMO\_ACCESS\_CODE; the browser session stays unlocked for 8 hours, and without it every demo endpoint answers "Not available"), **When** any page loads, **Then** a demo bar shows Switch user, Reset to scenario start and Load populated demo data (DEMO-03).
 2. **Given** the demo bar, **When** the presenter picks a seeded user from Switch user, **Then** the session changes to that user without a password and the page reloads with that user's menu.
 3. **Given** a scenario form (registration, category application, PR, sourcing, proposal, question, answer, vote, decline reason), **When** the presenter clicks Fill sample, **Then** the form fills with the values in Demo Scenario Data and nothing is saved until the presenter clicks Save or Submit.
 4. **Given** an OPEN sourcing, **When** the presenter clicks End deadline now, **Then** the deadline becomes the current time and the sourcing closes within 10 seconds as in RFQ-04.
@@ -1399,14 +1399,14 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 
 1. Alpha Agro LLC creates an account on the Register page (about 8 fields, 2 minutes), then completes the five registration steps (company details, owners, contact persons, bank accounts, documents) in its own cabinet with Fill sample, with Kamran Aliyev as the legal representative (sample power of attorney PDF) and one AZN main bank account, as a local company, VAT payer, founded 15 Mar 2012, owned by Kamran Aliyev (head, 60%) and Sabina Huseynova (40%), with sample charter and VAT certificate PDFs; the specialist approves. Alpha Agro then fills the qualification questionnaire, scores 78.0, and the specialist confirms grade B. Its profile lists the activity Distributor, the fictional brands AgroMax and NitroGrow, and an ISO 9001 certificate that expires in 20 days, so the EXPIRING badge and the reminder show at once.
 2. Alpha Agro applies for Fertilisers with a sample licence PDF; the specialist qualifies it.
-3. Leyla creates a PR on the plan line: 2,000 bags × 30.00 AZN, delivery in 30 days to "Central warehouse"; value 60,000.00 AZN. Rashad approves.
-4. Nigar starts sourcing: Tender (60,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
+3. Leyla creates a PR on the plan line with two lines: 2,000 bags of "Ammonium nitrate 34.4%, 50 kg bag" × 30.00 AZN = 60,000.00 and 500 L of "Foliar fertiliser, 1 L" × 40.00 AZN = 20,000.00, delivery in 30 days to "Central warehouse"; value 80,000.00 AZN. Rashad approves.
+4. Nigar starts sourcing: Tender (80,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
 5. Beta Trade asks "Can delivery be split into two shipments?"; Nigar answers "Yes, two shipments before the delivery date."
-6. Proposals: Alpha Agro 33.04 AZN/bag including 18% VAT, DDP Central warehouse (28.00 excluding VAT, 56,000.00, 20 days); Beta Trade 29.50 without VAT, CIP Baku port (59,000.00, 15 days, flagged "Different terms: Incoterm, named place"); Gamma Supply 27.00 without VAT, DDP Central warehouse (54,000.00, 25 days, technical document without the product certificate). The presenter clicks End deadline now.
-7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per bag to Beta Trade (port to warehouse), so its evaluated price is 30.50, and requests a final offer from both: Alpha Agro lowers to 27.50 excluding VAT (32.45 with VAT), Beta Trade keeps 29.50. Only 2 of 3 proposals are eligible, so Nigar writes the low-competition reason; Alpha Agro is the lowest evaluated bid and is sent to the committee.
+6. First proposals, per bag and per litre: Alpha Agro 33.04 and 48.38 including 18% VAT (28.00 and 41.00 excluding VAT), DDP Central warehouse, 20 days; Beta Trade 29.50 and 40.00 without VAT, CIP Baku port, 15 days, flagged "Different terms: Incoterm, named place"; Gamma Supply 27.00 and 38.00 without VAT, DDP Central warehouse, 25 days, technical document without the product certificate. The presenter clicks End deadline now.
+7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per unit to Beta Trade on both lines (port to warehouse), and requests a final offer from both: Alpha Agro lowers the bags to 27.50 excluding VAT (32.45 with VAT) and keeps 41.00 for the litres; Beta Trade lowers the litres to 39.00 and keeps 29.50 for the bags. The evaluated prices are 27.50 against 30.50 for the bags and 41.00 against 40.00 for the litres, so Alpha Agro is proposed for the bags and Beta Trade for the litres. Only 2 of 3 proposals are eligible, so Nigar writes the low-competition reason and sends both winners to the committee.
 8. Winner vote: Elchin For, Sevinj For, Tural Against ("Beta Trade delivers 5 days faster") → APPROVED 2 to 1, minutes MIN-2026-002.
-9. PO-2026-0001 to Alpha Agro, 55,000.00 AZN excluding VAT, 64,900.00 AZN with 18% VAT; Rashad approves; PO vote 3 to 0, "Same as the approved winner decision", minutes MIN-2026-003.
-10. Alpha Agro accepts the PO; the sourcing and the PR become COMPLETED; Beta Trade and Gamma Supply receive "Not awarded".
+9. Two POs are created: PO-2026-0001 to Alpha Agro, 55,000.00 AZN excluding VAT (2,000 × 27.50), 64,900.00 AZN with 18% VAT; PO-2026-0002 to Beta Trade, 19,500.00 AZN (500 × 39.00). Rashad approves both; each PO vote is 3 to 0, "Same as the approved winner decision", minutes MIN-2026-003 and MIN-2026-004.
+10. Alpha Agro and Beta Trade accept their POs; the sourcing and the PR become COMPLETED; Gamma Supply receives "Not awarded" and the two winners receive the lines they won.
 
 **Scenario B: Single Source Purchase (optional, about 3 minutes)**
 
@@ -1443,6 +1443,7 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
 | D-020 | After approval, core company data (legal name, tax number, address, director, founding date, VAT status, owners, bank accounts, documents) changes only through a change request that a Procurement Specialist approves; other profile data changes freely and is logged | REG-08 |
 | D-021 | Users change their own password; an Admin resets internal users and a Procurement Specialist resets vendors with a temporary password, because the release sends no e-mail | PLT-03 |
+| D-022 | Demo tools (Switch user, Fill sample, End deadline now, Reset, Load) work only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account or wipe data | DEMO-01 |
 
 **Assumptions in force**
 
@@ -1467,7 +1468,7 @@ Assumptions A-020 to A-025 were proposed by the analyst assistant and accepted b
 | Q-002 | Product name | Management | e-Procurement chosen; confirm with management |
 | Q-003 | Demo date; 20 Nov 2026 was proposed | Management | Open |
 | Q-004 | Tender threshold 50,000 AZN, RFQ bands 5,000 and 15,000 AZN, single-source limit 1,000 AZN, and the grade bands | Client | To confirm; all are Admin settings |
-| Q-005 | Does the demo PR keep one line, or two lines (ammonium nitrate and foliar fertiliser) to show split winners | Business Analyst | Open |
+| Q-005 | Closed: the demo PR has two lines (ammonium nitrate and foliar fertiliser), so the winners differ per line | Business Analyst | Open |
 | Q-006 | Is a Tax Service API available for the VÖEN check (#91)? Until then a mistyped or borrowed VÖEN can block a company's own registration | Client | Open |
 | Q-007 | Vercel's free plan is for non-commercial use; which plan does a client roll-out need | Management | Open |
 | Q-008 | How to release the tax number of an abandoned incomplete registration | Business Analyst | Later phase |
