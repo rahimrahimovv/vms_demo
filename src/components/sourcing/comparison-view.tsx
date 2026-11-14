@@ -73,7 +73,7 @@ export function ComparisonView({
 
   return (
     <div className="flex flex-col gap-5" data-testid="comparison">
-      <section aria-label={t("requiredTerms")} className="flex flex-wrap items-center gap-x-3 gap-y-2 surface-glass px-5 py-4">
+      <section aria-label={t("requiredTerms")} className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 surface-glass px-[18px] py-2.5">
         <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("requiredTerms")}</span>
         {[s.requiredIncoterm && `Incoterm ${s.requiredIncoterm}`, s.requiredPlace, s.requiredMode, s.requiredPaymentTerm]
           .filter(Boolean)
@@ -130,7 +130,7 @@ export function ComparisonView({
       )}
 
       <section aria-label={t("title")} className="surface-solid overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[rgba(23,38,43,0.08)] px-[18px] py-2.5">
           <h3 className="text-base font-semibold">{t("title")}</h3>
           <p className="text-xs text-muted-foreground">{t("hint")}</p>
         </div>
@@ -156,12 +156,12 @@ export function ComparisonView({
         <p className="border-t bg-muted/50 px-5 py-3 text-xs text-muted-foreground">{t("footer")}</p>
       </section>
 
-      <div className="flex flex-wrap gap-5">
-        <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-3 surface-glass p-5" data-testid="po-preview">
+      <div className="flex flex-wrap gap-4">
+        <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-glass px-[18px] py-4" data-testid="po-preview">
           <h3 className="text-base font-semibold">{t("poTitle", { count: data.purchaseOrders.length })}</h3>
           {data.purchaseOrders.length === 0 && <p className="text-sm text-muted-foreground">{t("poNone")}</p>}
           {data.purchaseOrders.map((po) => (
-            <div key={po.proposalId} className="flex flex-wrap justify-between gap-2 surface-inner px-3.5 py-3">
+            <div key={po.proposalId} className="flex flex-wrap justify-between gap-2 surface-inner px-3 py-2">
               <div>
                 <div className="font-semibold">{po.name}</div>
                 <div className="text-xs text-muted-foreground">{t("poLine", { count: po.lines, incoterm: po.incoterm, place: po.namedPlace ?? "" })}</div>
@@ -172,11 +172,11 @@ export function ComparisonView({
           <p className="text-xs text-muted-foreground">{t("poNote")}</p>
         </section>
 
-        <section aria-label={t("disqualifiedTitle", { count: data.disqualified.length })} className="flex min-w-[420px] flex-1 flex-col gap-3 surface-glass p-5" data-testid="disqualified">
+        <section aria-label={t("disqualifiedTitle", { count: data.disqualified.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-glass px-[18px] py-4" data-testid="disqualified">
           <h3 className="text-base font-semibold">{t("disqualifiedTitle", { count: data.disqualified.length })}</h3>
           {data.disqualified.length === 0 && <p className="text-sm text-muted-foreground">{t("disqualifiedNone")}</p>}
           {data.disqualified.map((d) => (
-            <div key={d.proposalId} className="flex items-start gap-3 surface-inner px-3.5 py-3">
+            <div key={d.proposalId} className="flex items-start gap-3 surface-inner px-3 py-2">
               <Lock className="mt-0.5 size-4.5 shrink-0 text-muted-foreground" aria-hidden />
               <div>
                 <div className="font-semibold">
@@ -217,11 +217,11 @@ function VendorHeader({
       <div className="flex flex-col gap-1.5">
         <div className="flex items-start justify-between gap-2">
           {link ? (
-            <Link href={`/vendors/${v.vendorId}`} className="text-[15px] font-semibold text-primary hover:underline">
+            <Link href={`/vendors/${v.vendorId}`} className="text-sm font-semibold text-primary hover:underline">
               {v.name}
             </Link>
           ) : (
-            <span className="text-[15px] font-semibold">{v.name}</span>
+            <span className="text-sm font-semibold">{v.name}</span>
           )}
           {editable && disqualify && (
             <ActionDialog

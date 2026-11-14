@@ -73,7 +73,7 @@ export default async function SourcingListPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xl font-semibold tracking-tight">{t("sourcing.title")}</h2>
+      <h2 className="px-2 text-2xl font-bold">{t("sourcing.title")}</h2>
       {rows.length === 0 ? (
         <EmptyState message={t("sourcing.empty")} action={startButton} />
       ) : (

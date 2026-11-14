@@ -27,32 +27,43 @@ If this file and the backlog disagree, the backlog wins; ask the BA.
 
 ## Design
 - UI kit: shadcn/ui on Tailwind, lucide icons, Inter font. Clean enterprise look.
-- Colors: white and light-grey surfaces, one brand colour (deep teal), neutral greys.
-- Layout: left sidebar (logo "e-Procurement", menu by role), top bar (page title,
+- Colors: light glass surfaces on a pale blue page, one brand colour (Midnight Navy #1D4E89), neutral greys.
+- Layout: floating left sidebar (logo "e-Procurement", menu by role), top bar (page title,
   bell with unread count, user name and role). Demo bar slot above the top bar.
 - Home page for every role = "My tasks": cards with counts of items waiting for
   this user (e.g. "3 PRs to approve"), then the list.
 - Record pages: header with number, status badge and main actions on the right;
   tabs Details, Files, History (audit), and Q&A where relevant.
-- Status badges: grey = draft, blue = in progress or pending, amber = returned
+- Status badges: grey = draft, sky = in progress or pending, amber = returned
   or waiting for a decision, green = approved or completed, red = rejected or cancelled.
 - Tables: sortable columns, amounts right-aligned as 60,000.00 AZN.
 - Forms: two columns, required fields marked, the backlog's exact error
   messages under the field.
 - Vendor portal: same app, simpler menu, with a progress checklist
-  (Registration, Questionnaire, Categories) and a Profile page.
+  (Registration, Qualification, Categories) and a Profile page.
 - Every empty list shows one sentence and the main action button.
-- Style (13 Nov 2026), applied through shared tokens and components, never screen by screen. Keep the teal brand colour and
-  the rounded corners.
-  - Dark sidebar, tokens `--sidebar*` in `globals.css`: background #0E2F2C, text #D7E6E3, section labels #8FB3AD, active item
-    #1D5A54 with white text at weight 600, logo square #2E8F85 with the white shield, product name white, no right border.
-    Every text and background pair keeps at least 4.5:1 (the white shield on the logo square is a graphic at 3.9:1, accepted).
-  - Compact density, tokens `--density-*` in `globals.css`: table rows about 36 px, table text 13 px, cell padding 8 x 12 px,
-    gap between cards, tables and panels 14 px, page padding 16 px top and 32 px at the sides, big prices in the comparison
-    table 18 px. Use the shared `Table` components (or the same tokens in custom tables); a page stack `main > .flex-col` and
-    tab panels get the 14 px gap from one rule, so do not set another gap on them.
-  - Form fields, buttons and tap targets stay comfortable: at least 36 px high (`--control-h`); do not shrink them. Only the
-    small inline row actions (button sizes `xs` and `sm`) are smaller.
+- Style (14 Nov 2026): "light glass", Midnight Navy palette, applied through shared tokens and components in `globals.css`, never
+  screen by screen. The boards "Midnight navy: ..." on the design canvas are the reference for look and layout.
+  - Palette tokens: primary #1D4E89; button gradient #2A62A8 to #1D4E89 with glow rgba(29,78,137,0.35); links #1D4E89; dark text on tint
+    #143A68; tint #E4EEFB; focus ring #3E78C2 (2 px, offset 2 px); muted text #4A5961. Page background is a fixed layer
+    (`body::before`): gradient 135deg #DCE7F6 to #E6EEFB to #EDE9F8 plus three soft blobs. No teal anywhere (favicon, logo, PDFs use #1D4E89).
+  - Glass (translucent, blurred, thin light border, soft shadow, faint inner highlight) is for: the floating sidebar (16 px from the edges,
+    224 px wide, radius 26, rgba(15,32,56,0.84), labels #A9BBD8, text #E1E9F5, active item rgba(255,255,255,0.18)), the top bar pill (radius
+    22, white 0.72), cards (radius 22, white 0.58, class `surface-glass` or the `Card` component), notice banners (`surface-warning`),
+    tabs (segmented control), dialogs (radius 28, white 0.78), popovers (white 0.88) and the demo bar slot. Content starts 256 px from the left
+    and keeps 16 px from the other edges.
+  - Solid (about 88 % white, no blur) is for data tables and lists (`surface-solid`), and form inputs (86 % white, border rgba(23,38,43,0.45)).
+    Never put `backdrop-filter` on table rows, cells or long scrolling lists; blur radii stay 20 to 30 px.
+  - Buttons: primary = gradient with glow (`brand-button`), secondary = glass pill (`surface-pill`); radius 20 px, height 36 px (40 px large).
+    Sizes `xs` and `sm` stay small for inline row actions.
+  - Status badges: pending / in progress (PENDING_APPROVAL, SUBMITTED, COMPARISON, TECHNICAL_EVALUATION, VOTING and the like) are sky
+    (#E0F2F7 on #0B5566), never the brand blue; draft grey, returned and waiting amber, approved green, rejected red; grade badges brand blue.
+  - Contrast: every text keeps 4.5:1 over the worst case of its surface (the lightest and the darkest page colour, and a dark button for
+    surfaces that sit over content). The alphas above are measured values; do not lower them. Fallbacks are in `globals.css`:
+    `prefers-reduced-transparency`, `prefers-contrast: more` and no `backdrop-filter` turn every glass token into a solid colour.
+  - Compact density stays, tokens `--density-*`: table rows about 36 px, table text 13 px, cell padding 8 x 12 px, gap between cards, tables and
+    panels 14 px, big prices in the comparison table 18 px. A page stack `main > .flex-col` and tab panels get the 14 px gap from one rule, so do
+    not set another gap on them. Form fields and buttons stay at least 36 px high (`--control-h`).
 
 ## Build order (vertical slices)
 Each slice ends deployed and clickable on the Vercel link. Never break an earlier slice.

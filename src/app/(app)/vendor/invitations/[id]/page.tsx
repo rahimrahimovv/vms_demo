@@ -117,7 +117,7 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
     <div className="flex flex-col gap-6">
       <RecordHeader
         title={view.number}
-        subtitle={t(`sourcing.types.${view.type}`)}
+        tag={t(`sourcing.types.${view.type}`)}
         status={view.status === "OPEN" ? view.invitationStatus : view.status}
         actions={actions}
       />

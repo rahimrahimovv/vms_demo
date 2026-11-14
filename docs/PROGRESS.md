@@ -425,8 +425,8 @@ Staged; each stage is committed so a new session can resume from here.
 | --- | --- | --- |
 | 1 | Tokens, fixed page layer, floating sidebar and top bar, logo, favicon, PDF accent #1D4E89 | done |
 | 2 | Shared components: card, tabs (segmented), buttons, badges (sky for pending), table, dialog, popovers, inputs, alert, panels | done |
-| 3 | Pages: sign-in and register, vendor home (draft and approved), My tasks per role, comparison | in progress |
-| 4 | Remaining screens, final sweep, screenshots against the boards, CLAUDE.md Design section, build and push | not started |
+| 3 | Pages: sign-in and register, vendor home (draft and approved), My tasks per role (Specialist, Requester, Approver, Committee Member, Admin), comparison and record header (type pill) | done |
+| 4 | Remaining screens through shared components, final sweep, screenshots against the boards, CLAUDE.md Design section, build and push | done (see Verified below) |
 
 Contrast (computed, worst case = the surface over the lightest page colour #EDE9F8 and the darkest #A3BFE3, plus a dark brand button for
 surfaces that sit over content):
@@ -438,3 +438,19 @@ surfaces that sit over content):
 - Popovers 0.88: muted 5.9:1. Solid table panels 0.88: muted 6.0:1.
 - Badges: sky 7.3, amber 7.9, green 6.6, grade blue 7.5, grey 8.1, red 7.6. Button text white on #2A62A8 6.2:1.
 - Fallbacks (prefers-reduced-transparency, prefers-contrast: more, no backdrop-filter): every glass token becomes a solid colour; no blur.
+
+New UI strings (existing ones unchanged except one agreed rename): home greeting and waiting count, card labels and links, record-type pills,
+Admin shortcut cards, Recent notifications; vendor home count-card hints, stage counts, grade validity sentence; registration approval note.
+Rename: vendorHome.steps.questionnaire "Questionnaire" -> "Qualification". VOTING moved from amber to the sky tone (pending), as the brief lists it.
+The status tone key `blue` is now `sky` in `src/lib/status.ts`.
+
+Kept differences from the boards (and why):
+- Top bar white 0.72 instead of 0.52 and dialogs 0.78 instead of 0.5: the mockup values fail 4.5:1 over content (numbers above).
+- Input border rgba(23,38,43,0.45) instead of 0.2: 0.2 is 1.5:1; 0.45 is 2.7:1, the closest that still looks like glass.
+- Sidebar keeps its menu icons (the boards have none): they are part of the existing menu.
+- My tasks for the Specialist has five count cards (the boards show four): the extra card is Category applications, an existing story card.
+  The unread-notification card is now the number in the greeting (its test id and text stay, visually hidden).
+- Vendor draft cabinet shows two locked cards (Qualification, Categories), as the brief says; the board also shows Invitations and Purchase orders.
+- Solid panels (tables, lists) use no blur at all instead of "little blur": at 88 % white it is invisible and costs scrolling frames.
+- Page background blobs are radial gradients, not blur filters: same look, no GPU cost.
+- The sticky top bar stays sticky (existing behaviour) so it needs the higher alpha above.

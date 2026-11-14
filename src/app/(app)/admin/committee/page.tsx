@@ -35,7 +35,7 @@ export default async function CommitteePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xl font-semibold tracking-tight">{t("committee.title")}</h2>
+      <h2 className="px-2 text-2xl font-bold">{t("committee.title")}</h2>
       {candidates.length === 0 ? (
         <EmptyState
           message={t("committee.noCandidates")}

@@ -289,7 +289,8 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
     <div className="flex flex-col gap-6">
       <RecordHeader
         title={s.number}
-        subtitle={`${t(`sourcing.types.${s.type}`)} · ${reason}`}
+        tag={t(`sourcing.types.${s.type}`)}
+        subtitle={reason || undefined}
         status={s.status}
         actions={actions}
       />

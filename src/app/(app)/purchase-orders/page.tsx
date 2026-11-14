@@ -45,7 +45,7 @@ export default async function PurchaseOrdersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xl font-semibold tracking-tight">{t("purchaseOrders.title")}</h2>
+      <h2 className="px-2 text-2xl font-bold">{t("purchaseOrders.title")}</h2>
       {rows.length === 0 ? (
         <EmptyState
           message={t("purchaseOrders.empty")}

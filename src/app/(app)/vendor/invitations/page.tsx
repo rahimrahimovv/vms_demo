@@ -51,7 +51,7 @@ export default async function VendorInvitationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-xl font-semibold tracking-tight">{t("nav.vendorInvitations")}</h2>
+      <h2 className="px-2 text-2xl font-bold">{t("nav.vendorInvitations")}</h2>
       {rows.length === 0 ? (
         <EmptyState message={t("invitations.empty")} />
       ) : (

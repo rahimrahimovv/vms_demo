@@ -120,7 +120,7 @@
   --glass-tab-active-bg: rgba(255, 255, 255, 0.92);
   --glass-inner: rgba(255, 255, 255, 0.7); /* rows inside a glass card */
   --glass-overlay: rgba(15, 32, 56, 0.25);
-  --glass-overlay-blur: blur(4px);
+  --glass-overlay-blur: blur(2px);
   --field-bg: rgba(255, 255, 255, 0.86);
 
   /* Floating sidebar (dark glass). Text 8.5:1, labels 5.4:1, active item 6.1:1 over the lightest page colour. */
