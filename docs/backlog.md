@@ -11,7 +11,7 @@ e-Procurement is a generic, 1C-free procurement platform; this backlog covers th
 ### Backlog Hierarchy
 
 ```
-E-PROCUREMENT (Epic) - E2E procurement MVP, 31 stories
+E-PROCUREMENT (Epic) - E2E procurement MVP, 32 stories
 ├── PLT  Platform
 │   ├── PLT-01  Sign in and see only your role's screens
 │   └── PLT-02  Get in-app notifications; keep an audit trail
@@ -51,7 +51,8 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 31 stories
 │   └── PO-03   Vendor accepts or declines the PO
 └── DEMO Demo mode
     ├── DEMO-01 Presenter uses demo tools
-    └── DEMO-02 System seeds and resets the demo scenario
+    ├── DEMO-02 System seeds and resets the demo scenario
+    └── DEMO-03 System loads the populated demo data
 ```
 
 ## Context & Goal
@@ -76,7 +77,7 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 - Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner.
 - Committee: configuration, a winner vote and a PO vote, numbered minutes for each decision.
 - Purchase order: one PO per winning vendor; Approver, then committee, then vendor acceptance.
-- Demo mode: role switcher, sample fill, end-deadline-now, reset; one seeded scenario.
+- Demo mode: role switcher, sample fill, end-deadline-now, reset; one seeded scenario and a populated demo dataset in a second load mode.
 - High-urgency items delivered (23 of 46): #1 (plan lines only), #9, #15, #16 (limit and justification; the committee approves it in the winner vote), #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #106 (certificate register with 30-day reminders), #110, plus #54 (owners), #97 (bank guarantee) and #100 (activity and brands).
 
 **If time allows (cut first when late)**
@@ -367,7 +368,7 @@ TBD
 
 1. **Given** a local or foreign company completing its registration (REG-07), **When** it fills the form, **Then** it must also give the founding date and at least one owner record for the company head, and may add founders and shareholders above 10% (full name, ID or registration number, share %, role Founder, Shareholder or Head); individuals skip this section (#54).
 2. **Given** owner records, **When** their shares add up to more than 100%, **Then** "Shares cannot exceed 100% in total" appears and nothing is saved.
-3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); it can also add, edit or remove bank accounts, keeping at least one and exactly one marked as main, and it can manage its contact persons, keeping at least one legal representative with a proof file. The Profile also has a 'Registration history' tab with the audit entries of the registration (who submitted, approved or returned it, and the comments). \[revised\]
+3. **Given** the vendor on Profile, **When** it edits the profile at any time, **Then** it can set the main activity (Manufacturer, Distributor, Official dealer, Service provider, Trader, Other), brands represented (each with "Official dealer: Yes / No" and an optional dealer letter), up to 20 main goods, and bank guarantee capacity (Yes / No; types Bid, Advance payment, Performance; maximum amount and currency) (#97, #100); it can also add, edit or remove bank accounts, keeping at least one and exactly one marked as main, and it can manage its contact persons, keeping at least one legal representative with a proof file; the Profile also has a "Registration history" tab with the audit entries of the registration (who submitted, approved or returned it, and the comments). \[revised\]
 4. **Given** the Certificates section, **When** the vendor adds a certificate with type (ISO 9001, ISO 14001, ISO 45001, HSE policy, Product certificate, Licence, Reference letter, Catalogue, Other), number, issuer, issue date, an optional expiry date and a file, **Then** it shows with the status VALID, EXPIRING or EXPIRED from the Calculation Rules (#106).
 5. **Given** a certificate that expires in 30 days, **When** the daily job runs, **Then** the vendor and every Procurement Specialist are notified once ("\<type> certificate of \<vendor> expires on \<date>"); on the day after the expiry date it becomes EXPIRED and both are notified again. \[revised\]
 6. **Given** the vendor's home page, **When** it loads, **Then** it shows the grade with its valid-until date, the qualified categories, and a warning for every EXPIRING or EXPIRED certificate.
@@ -402,7 +403,7 @@ TBD
 5. **Given** the Bank accounts step, **When** the vendor adds accounts, **Then** it needs at least one account (bank name, IBAN or account number up to 34 letters and digits, SWIFT, currency from the Currencies dictionary) and exactly one marked as main; otherwise "Add at least one bank account", "Mark exactly one account as main" or "IBAN must be up to 34 letters and digits" appears.
 6. **Given** the Documents step, **When** it opens, **Then** a Local company must upload the charter or state-registry extract, and the VAT payer certificate when VAT payer is Yes ("Upload the VAT payer certificate"); an Individual must upload the ID card file; a Foreign company must upload the registration certificate (#86, #90, #91).
 7. **Given** any file, **When** it is not PDF, JPG, PNG, DOCX or XLSX, or is larger than 10 MB, **Then** "Use PDF, JPG, PNG, DOCX or XLSX up to 10 MB" appears and the file is not stored; several files can be chosen at once and go straight to storage.
-8. **Given** a vendor on any step, **When** it clicks Save and continue, **Then** everything entered is saved even if some fields are empty, the next step opens even if this step is incomplete (it stays In progress and shows the messages of its fields when the vendor opens it again), and the step is marked Complete only when all its required fields are valid; if owner or bank account rows are incomplete and cannot be stored, a confirmation "Some rows are incomplete and will not be saved. Continue?" appears before the next step opens. Clicking Back saves the same way and loses nothing. \[revised\]
+8. **Given** a vendor on any step, **When** it clicks Save and continue, **Then** everything entered is saved even if some fields are empty, and the next step opens; the messages of that step's fields appear when the vendor opens the step again, and the step stays In progress and is marked Complete only when all its required fields are valid. Clicking Back loses nothing; if the step has owner or bank account rows that are incomplete and cannot be stored, a confirmation "Some rows are incomplete and will not be saved. Continue?" appears before the next step opens.
 9. **Given** the Review and submit step, **When** any step is not complete, **Then** Submit is disabled and the incomplete steps are listed with links; **When** all steps are complete and the vendor clicks Submit, **Then** the status becomes SUBMITTED, every step becomes read-only, every Procurement Specialist is notified, and Qualification and Categories stay locked until the registration is approved.
 10. **Given** a RETURNED registration, **When** the vendor opens its home page, **Then** the specialist's comment shows on top, all steps are editable again and Submit works as in criterion 9 (REG-02 AC4).
 11. **Given** a SUBMITTED registration, **When** the vendor opens a step, **Then** it is read-only until the specialist returns the registration. Once the registration is APPROVED, the Registration page no longer appears in the vendor's menu; it shows only while the registration is DRAFT, SUBMITTED, RETURNED or REJECTED, and the registration history moves to the Profile (REG-06).
@@ -560,7 +561,7 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** an OPEN sourcing and a vendor whose invitation is INVITED or ACCEPTED, **When** the vendor sends a question of up to 2,000 characters with an optional file, **Then** it is stored as UNANSWERED, the sourcing owner is notified and the vendor sees it as "Awaiting answer".
-2. **Given** an UNANSWERED question, **When** the specialist writes an answer and clicks Publish, **Then** the question and answer become visible to every vendor whose invitation is not DECLINED, without the asker's company name, and those vendors are notified; a file attached to the question stays with the specialist and is never published, and answers and clarifications are text only. \[revised\]
+2. **Given** an UNANSWERED question, **When** the specialist writes an answer and clicks Publish, **Then** the question and answer become visible to every vendor whose invitation is not DECLINED, without the asker's company name, and those vendors are notified; the file the asker attached stays visible only to the sourcing owner and is never published, and answers and clarifications are text only.
 3. **Given** an UNANSWERED question, **When** the specialist edits the question text before publishing, **Then** the edited text is published and the original stays visible only to the specialist and in History.
 4. **Given** an OPEN sourcing, **When** the specialist publishes a clarification without a question, **Then** it appears in the Q&A list and the same vendors are notified.
 5. **Given** a sourcing that is no longer OPEN, **When** a vendor opens Q&A, **Then** asking is disabled with "Questions are closed" and published items stay readable.
@@ -590,7 +591,7 @@ TBD
 3. **Given** a CLOSED sourcing below the minimum, **When** the owner opens it, **Then** it shows "Below minimum: N of M proposals" with three actions: Extend, Continue, Cancel.
 4. **Given** Extend, **When** the owner sets a new deadline later than now and a reason, **Then** the sourcing returns to OPEN, invited vendors that have not declined are notified of the new deadline, and the extension count rises by 1; after 2 extensions (Admin setting) Extend is disabled with "Maximum number of extensions reached".
 5. **Given** Continue, **When** the owner enters a reason, **Then** the sourcing moves on as in criterion 2 and the reason is stored for the committee package (#26); with 0 proposals Continue is not offered.
-6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision closes as NO\_DECISION with the rule "Sourcing cancelled", and its minutes record the cancellation reason; a sourcing that has a PO other than REJECTED or DECLINED\_BY\_VENDOR cannot be cancelled ("This sourcing already has purchase orders; cancel its open lines instead"), and the owner cancels its open lines instead. \[revised\]
+6. **Given** a sourcing in DRAFT, OPEN, CLOSED, TECHNICAL\_EVALUATION or COMPARISON, **When** the owner clicks Cancel and enters a reason, **Then** it becomes CANCELLED, invited vendors that have not declined are notified with the reason (#34), and the PR returns to APPROVED; an open OPENING decision closes as NO\_DECISION with the rule "Sourcing cancelled", and its minutes record the cancellation reason. A sourcing that has a purchase order other than REJECTED or DECLINED\_BY\_VENDOR cannot be cancelled ("This sourcing already has purchase orders; cancel its open lines instead"). \[revised\]
 
 ---
 
@@ -612,10 +613,10 @@ TBD
 **Acceptance Criteria** (Given / When / Then)
 
 1. **Given** a Tender in TECHNICAL\_EVALUATION, **When** the owner, seeing the technical documents but no prices, marks each submitted proposal PASSED or DISQUALIFIED, **Then** DISQUALIFIED requires a reason (e.g. "Missing certificate"), and once every proposal is marked the sourcing moves to COMPARISON and the prices of PASSED proposals open (#33). \[revised\]
-2. **Given** an RFQ or Tender in COMPARISON, **When** the owner disqualifies a proposal with a reason, **Then** it leaves the comparison and the reason is kept (#33); DISQUALIFIED is final, in the technical evaluation too, and its prices are never shown again. \[revised\]
-3. **Given** COMPARISON, **When** the owner opens the comparison table, **Then** rows are the lines, columns are the eligible vendors, each cell shows unit price and line total excluding VAT (a price entered with VAT is divided by 1 + VAT rate) and the evaluated unit price with extra costs (RFQ-07), with the vendor's Incoterm, named place, delivery mode and payment term and a "Different terms" warning naming each one that differs from the required value, the lowest evaluated unit price per line is highlighted, delivery days, validity and grade show per vendor, the flag "Shares an owner with \<vendor>" shows in the vendor's column header (REG-06 AC8), and disqualified proposals are listed below with their reasons. \[revised\]
-4. **Given** the comparison table, **When** it loads, **Then** each line's proposed winner defaults to the lowest eligible evaluated unit price (RFQ-07), and on a tie the earlier submitted proposal; choosing another vendor requires a justification, except another vendor tied at the lowest price; a line with no eligible offer can only be cancelled with a reason. \[revised\]
-5. **Given** a line with fewer eligible proposals than the minimum and no reason stored yet, **When** the owner clicks Send to committee, **Then** a low-competition reason is required (#26); the sourcing keeps one reason, and a reason already given on Continue (RFQ-04) is shown and may be edited. \[revised\]
+2. **Given** an RFQ or Tender in COMPARISON, **When** the owner disqualifies a proposal with a reason, **Then** it leaves the comparison, its prices are hidden from that moment, the reason is kept and the disqualification cannot be undone (#33).
+3. **Given** COMPARISON, **When** the owner opens the comparison table, **Then** rows are the lines, columns are the eligible vendors, each cell shows unit price and line total excluding VAT (a price entered with VAT is divided by 1 + VAT rate) and the evaluated unit price with extra costs (RFQ-07), with the vendor's Incoterm, named place, delivery mode and payment term and a "Different terms" warning naming each one that differs from the required value, the lowest evaluated unit price per line is highlighted, delivery days, validity, grade and, where it applies, the flag "Shares an owner with \<vendor>" show per vendor, and disqualified proposals are listed below with their reasons. \[revised\]
+4. **Given** the comparison table, **When** it loads, **Then** each line's proposed winner defaults to the lowest eligible evaluated unit price (RFQ-07), and on a tie to the earlier submitted proposal, so choosing the other tied vendor needs no justification; choosing another vendor requires a justification, and a line with no eligible offer can only be cancelled with a reason. \[revised\]
+5. **Given** a line with fewer eligible proposals than the minimum and no reason stored yet, **When** the owner clicks Send to committee, **Then** a low-competition reason is required (#26).
 6. **Given** every line has a proposed winner or is cancelled, **When** the owner clicks Send to committee, **Then** the sourcing becomes IN\_COMMITTEE and a winner decision opens (CMT-02) with the comparison table, disqualifications, justifications and any low-competition reason.
 7. **Given** lines sent back after a rejection (winner decision rejected, PO rejected or declined), **When** the owner opens COMPARISON, **Then** the previous winner of those lines is marked and excluded, and the owner proposes the next vendor or cancels the line with a reason.
 
@@ -872,7 +873,7 @@ TBD
 1. **Given** a PO in FULLY\_APPROVED, **When** the vendor opens Purchase orders, **Then** it is listed with its lines and total and can be downloaded as a PDF in English.
 2. **Given** a FULLY\_APPROVED PO, **When** the vendor clicks Accept, **Then** it becomes ACCEPTED and the owner and the Requester are notified.
 3. **Given** a FULLY\_APPROVED PO, **When** the vendor clicks Decline, **Then** a reason is required; on confirm the PO becomes DECLINED\_BY\_VENDOR, the owner is notified and its lines return to the sourcing's COMPARISON.
-4. **Given** every line of a sourcing is either on an ACCEPTED PO or cancelled, **When** the last such change is saved, **Then** the sourcing (in WINNER\_APPROVED, or in COMPARISON with at least one ACCEPTED PO) becomes COMPLETED, the PR becomes COMPLETED and every vendor with a submitted proposal gets a result notice listing the lines it won, or "Not awarded" (#41).
+4. **Given** every line of a sourcing is either on an ACCEPTED PO or cancelled, **When** the last such change is saved, **Then** the sourcing becomes COMPLETED, the PR becomes COMPLETED and every vendor with a submitted proposal gets a result notice listing the lines it won, or "Not awarded" (#41).
 5. **Given** a vendor, **When** they open Purchase orders, **Then** only their own company's POs are listed.
 
 ---
@@ -894,7 +895,7 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode is switched on by an environment setting, **When** any page loads, **Then** a demo bar shows Switch user and Reset demo.
+1. **Given** demo mode is switched on by an environment setting, **When** any page loads, **Then** a demo bar shows Switch user, Reset to scenario start and Load populated demo data (DEMO-03).
 2. **Given** the demo bar, **When** the presenter picks a seeded user from Switch user, **Then** the session changes to that user without a password and the page reloads with that user's menu.
 3. **Given** a scenario form (registration, category application, PR, sourcing, proposal, question, answer, vote, decline reason), **When** the presenter clicks Fill sample, **Then** the form fills with the values in Demo Scenario Data and nothing is saved until the presenter clicks Save or Submit.
 4. **Given** an OPEN sourcing, **When** the presenter clicks End deadline now, **Then** the deadline becomes the current time and the sourcing closes within 10 seconds as in RFQ-04.
@@ -919,10 +920,95 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode, **When** the presenter clicks Reset demo, **Then** a dialog says "This deletes all data and restores the demo scenario" and needs a confirm click.
+1. **Given** demo mode, **When** the presenter clicks Reset to scenario start, **Then** a dialog says "This deletes all data and restores the demo scenario" and needs a confirm click.
 2. **Given** the presenter confirms, **When** the reset runs, **Then** within 30 seconds all data is deleted and the seed in Demo Scenario Data is restored, and every user is signed out.
 3. **Given** a finished reset, **When** the presenter signs in as Vendor A, **Then** Vendor A does not exist yet and the registration page opens empty, so the scenario starts at step 1.
 4. **Given** the seed, **When** it is loaded, **Then** it holds no real person, company, VÖEN or bank account; all values are synthetic.
+
+---
+
+### DEMO-03 - System Loads The Populated Demo Data
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | DEMO-03 |
+| **Story title** | A second load mode fills every module with synthetic records in many states, complete and incomplete, so the system looks lived-in. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Presenter |
+| **I want to...** | load a ready, populated system with one click |
+| **So that...** | management and guests can open any screen and see real-looking work in progress, without anyone typing data by hand |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** demo mode, **When** the presenter clicks "Load populated demo data" in the demo bar and confirms the dialog "This deletes all data and loads the populated demo data", **Then** within 60 seconds all data is replaced by the Populated Data Catalogue below and every user is signed out; "Reset to scenario start" (DEMO-02) stays the other mode.
+2. **Given** the load, **When** it runs, **Then** every record is created through the application's own database functions, in dependency order, so each one has its audit entries, notifications, document numbers and minutes as if users had done the steps; no table is filled by a direct insert that skips the rules.
+3. **Given** any date in the data, **When** it is created, **Then** it is relative to the load time; every open deadline and every voting deadline is at least 2 days ahead so nothing closes during a demo session, and closed or decided records carry past dates in a sensible order.
+4. **Given** the data, **When** it is read, **Then** it holds only synthetic people, companies, tax numbers, IBANs and files; sample files are small generated PDFs.
+5. **Given** the populated data, **When** the live scenario (Scenario A of Demo Scenario Data) is run on top of it, **Then** it still works: Alpha Agro does not exist, the plan line "Spring fertiliser programme" has at least 100,000.00 AZN remaining, the two demo catalogue items exist, and document numbers continue after the seeded ones.
+6. **Given** each role, **When** it signs in after the load, **Then** My tasks shows at least one card with a count and the bell has at least 3 unread notifications that fit the role; every seeded vendor can sign in with the demo password.
+7. **Given** the load ends, **When** the self-check runs, **Then** it verifies that every status is allowed by the Status Transition Model, every status change has an audit entry, the counts match the catalogue, and no sealed price or vendor name is returned to a role that must not see it; the demo bar then shows "Loaded: N vendors, N PRs, N sourcings, N decisions, N POs", or the first failed check.
+8. **Given** demo mode is off, **When** anyone calls the load, **Then** it answers "Not available" with no effect.
+
+**Populated Data Catalogue**
+
+*Vendors (15; Alpha Agro stays unregistered).* Vendors are qualified in one to three categories, so that every category a sourcing uses has at least three qualified vendors.
+
+| Vendor | Type | State to show |
+| --- | --- | --- |
+| Beta Trade Ltd | Foreign (Türkiye) | Grade A, 2 bank accounts, shares an owner with Gamma Supply (base seed) |
+| Gamma Supply LLC | Local | Grade C (base seed) |
+| Delta Seeds LLC | Local | Grade A |
+| Epsilon Machinery GmbH | Foreign (Germany) | Grade B |
+| Zeta Irrigation LLC | Local | Grade B; one category qualification EXPIRED |
+| Eta Agrochem LLC | Local | Grade C; ISO 9001 certificate expires in 12 days (EXPIRING); licence on file |
+| Theta Services (Rashad Hasanov) | Individual | Registration APPROVED; questionnaire SUBMITTED, waiting for the grade |
+| Pi Agro LLC | Local | Grade B; two category applications PENDING |
+| Iota Packaging LLC | Local | Registration SUBMITTED, waiting for approval |
+| Kappa Fertilizers LLC | Local | Registration SUBMITTED, waiting for approval; shares an owner with Gamma Supply |
+| Lambda Alet Ltd | Foreign (Türkiye) | Registration SUBMITTED, waiting for approval |
+| Mu Trade LLC | Local | Registration RETURNED with the specialist's comment |
+| Nu Services LLC | Local | Registration REJECTED with a reason |
+| Xi Components LLC | Local | Registration DRAFT, stopped after step 2 (incomplete) |
+| Omicron Supply LLC | Local | Grade D twice, standing HOLD for 4 more months |
+
+Also one EXPIRED certificate on any vendor, and categories with and without "Licence proof required" in use.
+
+*Requisitions (19).*
+
+| Status | Count | Note |
+| --- | --- | --- |
+| DRAFT | 1 | Without lines |
+| PENDING\_APPROVAL | 2 | One exceeds the remaining plan amount, so the plan warning shows |
+| RETURNED | 1 | With the Approver's comment |
+| REJECTED | 1 | With a reason |
+| APPROVED | 3 | Ready for sourcing (Irrigation, Fertilisers, and the PR of the cancelled sourcing S12) |
+| IN\_SOURCING | 10 | One for each of S1 to S10 |
+| COMPLETED | 1 | The PR of S11 |
+
+*Sourcings (12).*
+
+| ID | Method and type | Category, value (AZN) | State to show |
+| --- | --- | --- | --- |
+| S1 | Competitive RFQ | Irrigation systems, 6,000 | DRAFT: invitees listed, not published |
+| S2 | Competitive RFQ | Seeds, 12,000 | OPEN, deadline in 2 days, 4 invited: 2 submitted, 1 accepted without a proposal, 1 declined with a reason |
+| S3 | Competitive Tender | Spare parts, 85,000 | OPEN, deadline in 9 days, 1 proposal so far; Q&A with 1 published and 1 UNANSWERED question |
+| S4 | Competitive RFQ | Fertilisers, 20,000 | CLOSED below minimum (2 of 3): Extend, Continue and Cancel available |
+| S5 | Competitive Tender | Irrigation systems, 150,000 | AWAITING\_OPENING, 4 proposals, OPENING vote in progress with 1 of 3 votes cast |
+| S6 | Competitive Tender | Plant protection, 64,000 | TECHNICAL\_EVALUATION after the opening approved 3 to 0; 3 proposals, 1 marked PASSED |
+| S7 | Competitive RFQ | Spare parts, 9,500 | COMPARISON after a WINNER decision was REJECTED 1 to 2; the rejected winner is excluded; an extra cost (Customs, 0.40 per unit) is added |
+| S8 | Competitive RFQ | Seeds, 28,000 | FINAL\_OFFER\_ROUND: 2 vendors asked, 1 responded, new prices hidden |
+| S9 | Single Source Purchase | Fertilisers, 4,000 | IN\_COMMITTEE with the justification and a file; WINNER vote with 2 of 3 votes cast, 1 Against with a comment |
+| S10 | Competitive Tender | Seeds, 72,000 | WINNER\_APPROVED 3 to 0 with 3 POs: FULLY\_APPROVED awaiting the vendor, PENDING\_COMMITTEE with the PO vote at 1 of 3, PENDING\_APPROVAL awaiting the Approver |
+| S11 | Competitive RFQ | Fertilisers, 14,000 | COMPLETED; its PO ACCEPTED; result notices sent |
+| S12 | Competitive Tender | Spare parts, 55,000 | CANCELLED with a reason; its OPENING vote closed as NO\_DECISION (SOURCING\_CANCELLED) |
+
+*Decisions and minutes.* Six closed decisions with numbered minutes MIN-2026-001 to MIN-2026-006 (S6 opening, S7 rejected winner, S10 winner, S11 winner, S11 PO, S12 cancelled opening) and three open votes (S5 opening, S9 winner, S10 PO).
+
+*Notifications.* Every user has at least 3 unread notifications and some read ones, matching the records above.
 
 ---
 
@@ -950,7 +1036,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | See proposal prices after the deadline | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
 | Disqualify, compare, propose the winner | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Vote on winner and PO decisions | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
-| Approve or reject a PO (not for own PR or sourcing) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Approve or reject a PO (not for own PR or own sourcing) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Accept or decline a PO | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
@@ -989,7 +1075,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | IN\_COMMITTEE | WINNER\_APPROVED | Winner decision APPROVED | System | POs created |
 | IN\_COMMITTEE | COMPARISON | Winner decision REJECTED | System | Rejected winners excluded |
 | WINNER\_APPROVED | COMPARISON | A PO is REJECTED or DECLINED\_BY\_VENDOR | System | Only that PO's lines |
-| WINNER\_APPROVED, COMPARISON | COMPLETED | Every line is on an ACCEPTED PO or cancelled, with at least one ACCEPTED PO | System | PR becomes COMPLETED; from COMPARISON when the owner cancels the last open line or the last pending PO is accepted |
+| WINNER\_APPROVED | COMPLETED | Every line is on an ACCEPTED PO or cancelled, with at least one ACCEPTED PO; this also applies from COMPARISON after a PO was rejected or declined, when the owner cancels the last open line or the last pending PO is accepted | System | PR becomes COMPLETED |
 | DRAFT, OPEN, CLOSED, AWAITING\_OPENING, TECHNICAL\_EVALUATION, COMPARISON, FINAL\_OFFER\_ROUND | CANCELLED | Cancel | Owner | Reason; vendors notified; PR back to APPROVED |
 
 **Vendor standing**
@@ -1229,7 +1315,7 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 4. Nigar starts sourcing: Tender (60,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
 5. Beta Trade asks "Can delivery be split into two shipments?"; Nigar answers "Yes, two shipments before the delivery date."
 6. Proposals: Alpha Agro 33.04 AZN/bag including 18% VAT, DDP Central warehouse (28.00 excluding VAT, 56,000.00, 20 days); Beta Trade 29.50 without VAT, CIP Baku port (59,000.00, 15 days, flagged "Different terms: Incoterm, named place"); Gamma Supply 27.00 without VAT, DDP Central warehouse (54,000.00, 25 days, technical document without the product certificate). The presenter clicks End deadline now.
-7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per bag to Beta Trade (port to warehouse), so its evaluated price is 30.50, and requests a final offer from both: Alpha Agro lowers to 27.50 excluding VAT (32.45 with VAT), Beta Trade keeps 29.50. Alpha Agro is the lowest evaluated bid; with 2 of 3 eligible proposals Nigar writes the low-competition reason ("Gamma Supply was disqualified; few qualified fertiliser suppliers serve this region") and sends it to the committee.
+7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per bag to Beta Trade (port to warehouse), so its evaluated price is 30.50, and requests a final offer from both: Alpha Agro lowers to 27.50 excluding VAT (32.45 with VAT), Beta Trade keeps 29.50. Only 2 of 3 proposals are eligible, so Nigar writes the low-competition reason; Alpha Agro is the lowest evaluated bid and is sent to the committee.
 8. Winner vote: Elchin For, Sevinj For, Tural Against ("Beta Trade delivers 5 days faster") → APPROVED 2 to 1, minutes MIN-2026-002.
 9. PO-2026-0001 to Alpha Agro, 55,000.00 AZN excluding VAT, 64,900.00 AZN with 18% VAT; Rashad approves; PO vote 3 to 0, "Same as the approved winner decision", minutes MIN-2026-003.
 10. Alpha Agro accepts the PO; the sourcing and the PR become COMPLETED; Beta Trade and Gamma Supply receive "Not awarded".
@@ -1239,6 +1325,61 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 1. Leyla creates a PR on the same plan line: 100 litres of "Foliar fertiliser, 1 L" × 40.00 AZN = 4,000.00 AZN; Rashad approves.
 2. Nigar starts sourcing with the method Single Source Purchase, picks Beta Trade from the Fertilisers AVL and, because 4,000.00 is above 1,000.00, adds the justification "Only official distributor of the registered brand" with a sample dealer letter PDF.
 3. Beta Trade submits 39.00 AZN per litre; the presenter ends the deadline; the committee sees the "Single Source Purchase" label and approves 3 to 0; the PO follows the same path as Scenario A.
+
+## Decisions, Assumptions And Open Questions
+
+This section records the decisions confirmed by the Business Analyst, the assumptions in force and what is still open, so that the next person starts from the same ground.
+
+**Decisions (confirmed)**
+
+| ID | Decision | Where it shows |
+| --- | --- | --- |
+| D-001 | e-Procurement is a new, generic platform built from scratch. There is no 1C or other ERP integration | Scope |
+| D-002 | The first release is a demo for management and foreign guests: English UI and documents, desktop only, no e-mail, SMS or OTP, synthetic data only | Scope, NFR-005, NFR-007 |
+| D-003 | Stack: Next.js on Vercel; Supabase for the database with row-level security, sign-in and file storage; code in a private GitHub repository | Integrations |
+| D-004 | Six roles: Requester, Approver, Procurement Specialist, Committee Member, Admin (internal) and Vendor | Role Matrix |
+| D-005 | Method is Competitive bidding (a Tender from the value threshold, otherwise an RFQ) or Single Source Purchase (a justification and a file above 1,000 AZN) | RFQ-01, RFQ-06 |
+| D-006 | The committee votes three times: opening of a Tender, the winner and the PO. Quorum is more than half of the eligible voters, simple majority, the Chair decides a tie, at least 3 members in an odd number; the sourcing owner never votes; Against needs a comment | CMT-01 to CMT-04 |
+| D-007 | A Tender has two envelopes: prices open only after the technical pass or fail; prices of a disqualified proposal are never shown; a disqualification is final | CMT-04, RFQ-05 |
+| D-008 | The winner is the lowest eligible evaluated price (price excluding VAT plus extra costs per unit). The specialist may pick another vendor with a written justification; committee members cannot propose alternatives | RFQ-05, RFQ-07 |
+| D-009 | One final-offer round; a final price is never higher than the previous one | RFQ-08 |
+| D-010 | One PO per winning vendor; the Approver, then the committee, approve it; the vendor accepts or declines | PO-01 to PO-03 |
+| D-011 | Qualification: a questionnaire scored into grade A (85 and above), B (70), C (50) or D (below 50), valid 12 months; a second D in a row puts the vendor on HOLD for 6 months; the AVL needs a valid grade A, B or C | REG-04, REG-05 |
+| D-012 | Registration: a short account form creates the account at once without approval; the vendor completes the profile in steps (company details, owners, contact persons with a legal representative and proof, bank accounts, documents) and submits it for approval; Qualification and Categories open after approval | REG-01, REG-07 |
+| D-013 | Terms are dropdowns from Admin dictionaries (Incoterms 2020, payment terms, delivery places and modes, currencies); categories form a tree | MDM-01, MDM-02 |
+| D-014 | Demo data has two load modes: scenario start and populated demo data | DEMO-02, DEMO-03 |
+| D-015 | Product name e-Procurement; look: Midnight Navy palette (brand blue #1D4E89), light glass style (translucent dark sidebar, top bar, cards and dialogs over a soft gradient; data tables stay solid and fall back to solid colours when the browser or the user asks for reduced transparency), compact tables, rounded corners, shield-and-check logo | CLAUDE.md, Design |
+| D-016 | One buying company now; every table carries company\_id so more can be added later | PLT-01 |
+| D-017 | The Approver sees a WINNER decision but not the comparison inside it; the Approver who is also the owner of the sourcing cannot approve its PO | CMT-02, PO-02 |
+| D-018 | Audit entries and minutes are immutable. The demo reset clears them only through a guarded server function that works when demo mode is on | NFR-011, DEMO-02 |
+| D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
+
+**Assumptions in force**
+
+| ID | Assumption |
+| --- | --- |
+| A-014 | No confirmation e-mails in this release; the server creates every account as already confirmed |
+| A-020 | A plan line that is exceeded only warns; it does not block the PR |
+| A-021 | A PR belongs to one plan line and therefore one category |
+| A-022 | Only the owner of a sourcing acts on it; other specialists read it |
+| A-023 | Committee members see who has voted, but not how, until the decision closes |
+| A-024 | Business days for voting periods are Monday to Friday; public holidays are not counted |
+| A-025 | An Individual (sole trader) vendor needs no legal representative; its main contact is enough |
+
+Assumptions A-020 to A-025 were proposed by the analyst assistant and accepted by default; confirm them with the client before a real roll-out. Further assumptions made during the build are recorded in docs/PROGRESS.md of the repository.
+
+**Open questions**
+
+| ID | Question | Owner | Status |
+| --- | --- | --- | --- |
+| Q-001 | Who approves this backlog (name and title)? | Business Analyst | Open |
+| Q-002 | Product name | Management | e-Procurement chosen; confirm with management |
+| Q-003 | Demo date; 20 Nov 2026 was proposed | Management | Open |
+| Q-004 | Tender threshold 50,000 AZN, RFQ bands 5,000 and 15,000 AZN, single-source limit 1,000 AZN, and the grade bands | Client | To confirm; all are Admin settings |
+| Q-005 | Does the demo PR keep one line, or two lines (ammonium nitrate and foliar fertiliser) to show split winners | Business Analyst | Open |
+| Q-006 | Is a Tax Service API available for the VÖEN check (#91)? Until then a mistyped or borrowed VÖEN can block a company's own registration | Client | Open |
+| Q-007 | Vercel's free plan is for non-commercial use; which plan does a client roll-out need | Management | Open |
+| Q-008 | How to release the tax number of an abandoned incomplete registration | Business Analyst | Later phase |
 
 ## Figma
 
@@ -1661,7 +1802,7 @@ Table decision {
   purchase_order_id uuid [ref: > purchase_order.id, note: 'set for PO decisions']
   status varchar [not null, note: 'VOTING | APPROVED | REJECTED | NO_DECISION']
   result_rule varchar [note: 'MAJORITY | CHAIR_CASTING_VOTE | NO_QUORUM | TIE_WITHOUT_CHAIR | SOURCING_CANCELLED']
-  package jsonb [note: 'WINNER: the committee package frozen at Send to committee; Reopen vote reuses it']
+  package jsonb [note: 'frozen copy of what the committee votes on; a reopened vote reuses it']
   opened_at timestamp
   deadline timestamp
   closed_at timestamp
