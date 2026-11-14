@@ -241,6 +241,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 14px; /* the boards use 14 px / 1.45 as the base */
+    line-height: 1.45;
   }
   /* Fixed page layer: gradient plus three soft blobs. Radial gradients instead of blur filters: same look, no GPU cost. */
   body::before {
@@ -357,6 +359,7 @@ main [data-slot="tabs-content"].flex-col {
 .surface-pill {
   background: var(--glass-pill-bg);
   border: 1px solid var(--glass-pill-border);
+  box-shadow: 0 1px 3px rgba(23, 38, 43, 0.14); /* keeps the pill visible on a solid table row */
 }
 .brand-button {
   background: var(--brand-gradient);

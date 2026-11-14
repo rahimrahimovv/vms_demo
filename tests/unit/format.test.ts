@@ -32,3 +32,17 @@ describe("formatAmount", () => {
     expect(formatAmount(input)).toBe(expected);
   });
 });
+
+import { formatAge } from "@/lib/format";
+
+describe("formatAge", () => {
+  const now = new Date("2026-11-14T12:00:00Z");
+  it("uses days, hours and minutes", () => {
+    expect(formatAge("2026-11-13T12:00:00Z", now)).toBe("1 day ago");
+    expect(formatAge("2026-11-14T07:00:00Z", now)).toBe("5 hours ago");
+    expect(formatAge("2026-11-14T11:30:00Z", now)).toBe("30 minutes ago");
+  });
+  it("never goes below one minute", () => {
+    expect(formatAge("2026-11-14T12:00:00Z", now)).toBe("1 minute ago");
+  });
+});

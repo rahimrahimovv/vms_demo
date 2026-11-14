@@ -213,7 +213,68 @@
       "posToApprove": "{count, plural, =0 {No POs to approve} one {# PO to approve} other {# POs to approve}}",
       "posToAccept": "{count, plural, =0 {No POs to accept} one {# PO to accept} other {# POs to accept}}"
     },
-    "newPr": "New PR"
+    "newPr": "New PR",
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "waitingCount": "{count, plural, =0 {Nothing is waiting for you.} one {# item is waiting for you.} other {# items are waiting for you.}}",
+    "open": "Open",
+    "recentTitle": "Recent notifications",
+    "recentEmpty": "No notifications yet.",
+    "unreadLabel": "Unread notifications",
+    "cardLabels": {
+      "registrations": "Registrations to review",
+      "questionnaires": "Questionnaires to review",
+      "applications": "Category applications to decide",
+      "prsToApprove": "PRs to approve",
+      "prsReturned": "PRs returned to you",
+      "prsReadyForSourcing": "Approved PRs ready for sourcing",
+      "sourcingsBelowMinimum": "Sourcings below the minimum",
+      "votesWaiting": "Decisions waiting for your vote",
+      "posToApprove": "POs to approve"
+    },
+    "cardLinks": {
+      "registrations": "Open vendors",
+      "questionnaires": "Open questionnaires",
+      "applications": "Open applications",
+      "prsToApprove": "Open requisitions",
+      "prsReturned": "Open requisitions",
+      "prsReadyForSourcing": "Open requisitions",
+      "sourcingsBelowMinimum": "Open sourcing",
+      "votesWaiting": "Open decisions",
+      "posToApprove": "Open purchase orders"
+    },
+    "recordTypes": {
+      "vendor": "Registration",
+      "vendor_standing": "Vendor",
+      "questionnaire_response": "Qualification",
+      "category_application": "Category",
+      "requisition": "Requisition",
+      "plan_line": "Plan",
+      "sourcing": "Sourcing",
+      "decision": "Decision",
+      "purchase_order": "Purchase order"
+    },
+    "adminCards": {
+      "users": {
+        "label": "Users",
+        "link": "Manage users"
+      },
+      "committee": {
+        "label": "Committee members",
+        "link": "Open committee"
+      },
+      "items": {
+        "label": "Catalogue items",
+        "link": "Open items"
+      },
+      "categories": {
+        "label": "Categories",
+        "link": "Open categories"
+      }
+    }
   },
   "errors": {
     "required": "This field is required",
@@ -484,7 +545,9 @@
       "questionnaire": "Qualification",
       "categories": "Categories"
     },
-    "incompleteRowsConfirm": "Some rows are incomplete and will not be saved. Continue?"
+    "incompleteRowsConfirm": "Some rows are incomplete and will not be saved. Continue?",
+    "afterApproval": "After approval",
+    "approvalNote": "Qualification and Categories open after the specialist approves your registration."
   },
   "bankAccounts": {
     "title": "Bank accounts",
@@ -599,14 +662,31 @@
     "openProfile": "Open profile",
     "steps": {
       "registration": "Registration",
-      "questionnaire": "Questionnaire",
+      "questionnaire": "Qualification",
       "categories": "Categories"
     },
     "stepHints": {
       "registration": "Company data and documents, approved by procurement",
       "questionnaire": "Qualification questions and an A–D grade",
       "categories": "Apply for the categories you supply"
-    }
+    },
+    "cardHints": {
+      "invitationsToAnswer": "{count, plural, =0 {Nothing waiting. A buyer's invitation appears here and in the bell.} one {A buyer is waiting for your answer.} other {Buyers are waiting for your answers.}}",
+      "proposalsToSubmit": "{count, plural, =0 {You have no open proposal to send.} one {Send it before the deadline.} other {Send them before the deadlines.}}",
+      "posToAccept": "{count, plural, =0 {No purchase order is waiting for your answer.} one {Accept it or decline it.} other {Accept them or decline them.}}"
+    },
+    "cardLabels": {
+      "invitationsToAnswer": "Invitations to answer",
+      "proposalsToSubmit": "Proposals to submit",
+      "posToAccept": "POs to accept"
+    },
+    "allComplete": "All three stages complete",
+    "stagesComplete": "{done} of {total} stages complete",
+    "qualifiedCount": "{count} qualified",
+    "gradeLeft": "{days, plural, =0 {Valid until today} one {# day left} other {# days left}}. Renew the questionnaire in the last 30 days.",
+    "afterApproval": "After approval",
+    "approvalNote": "Qualification and Categories open after the specialist approves your registration.",
+    "gradeBadge": "Grade {grade}"
   },
   "vendors": {
     "tabsLabel": "Vendor lists",

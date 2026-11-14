@@ -38,3 +38,23 @@ const amountFormat = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, 
 export function formatAmount(value: number | string): string {
   return `${amountFormat.format(Number(value))} AZN`;
 }
+
+/** "1 day ago", "5 hours ago": age of a timestamp for task lists (English, relative to `now`). */
+export function formatAge(value: Date | string, now: Date = new Date()): string {
+  const seconds = Math.max(0, Math.round((now.getTime() - new Date(value).getTime()) / 1000));
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ];
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "always" });
+  for (const [unit, size] of units) {
+    if (seconds >= size) return rtf.format(-Math.floor(seconds / size), unit);
+  }
+  return rtf.format(-1, "minute");
+}
+
+/** Hour of the day (0-23) in Asia/Baku, for the greeting. */
+export function bakuHour(now: Date = new Date()): number {
+  return Number(bakuParts(now).hour);
+}
