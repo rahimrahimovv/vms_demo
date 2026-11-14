@@ -1,8 +1,10 @@
 # e-Procurement: rules for Claude Code
 
-e-Procurement is a generic, 1C-free procurement platform. This repo holds the MVP for the management demo (target 13 Nov 2026).
-The single source of truth for scope and acceptance criteria is `docs/backlog.md` (23 stories, Given/When/Then).
+e-Procurement is a generic, 1C-free procurement platform. The product is called e-Procurement; the look is the Midnight Navy palette in the
+light glass style (see Design). This repo holds the MVP for the management demo (date to confirm, Q-003).
+The single source of truth for scope and acceptance criteria is `docs/backlog.md` (32 stories, Given/When/Then).
 If this file and the backlog disagree, the backlog wins; ask the BA.
+Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are in the backlog section "Decisions, Assumptions And Open Questions".
 
 ## Stack
 - Next.js (App Router, TypeScript), deployed on Vercel from the `main` branch.
@@ -78,7 +80,11 @@ Each slice ends deployed and clickable on the Vercel link. Never break an earlie
 | 5 | CMT-01 to CMT-04 | Committee setup, voting engine (opening, winner, PO decisions), numbered minutes PDF, tender opening approved by the committee |
 | 6 | RFQ-03, RFQ-05, RFQ-07, RFQ-08 | Q&A, technical pass/fail (two envelopes), comparison with extra costs and evaluated price, final offer round, proposed winner and winner vote |
 | 7 | PO-01 to PO-03 | PO per winning vendor, Approver then committee, vendor accepts or declines |
-| 8 | DEMO-01, DEMO-02 | Demo bar, Fill sample, seed and reset; full scenario rehearsed |
+| 8a | DEMO-01, DEMO-02 | Demo bar, Fill sample, seed and reset to scenario start; full scenario rehearsed |
+| 8b | DEMO-03 | Second load mode: populated demo data, created through the application's own functions, with a self-check |
+
+Status (14 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 8a (DEMO-01, DEMO-02) and 8b (DEMO-03) not
+started. Open items are in `docs/PROGRESS.md`.
 
 The data model for every slice is in place from Slice 2 (all ERD tables, RLS and status audit); each slice adds its screens and the functions that change status.
 
@@ -93,6 +99,7 @@ Cut line when late: the "If time allows" list in the backlog's Scope section goe
 - Seed data must be synthetic only (see Demo Scenario Data in the backlog).
 
 ## Open questions (ask the BA before you depend on them)
-- Product name (working name: e-Procurement).
-- Tender threshold 50,000 AZN and RFQ bands 5,000 / 15,000 AZN still need client confirmation; keep them as Admin settings.
-- Proposed rules not yet confirmed: plan overrun is a warning only; one category per PR; only the sourcing owner acts on a sourcing; committee members cannot see other votes until the decision closes; one PO per winning vendor.
+The full list is Q-001 to Q-008 in the backlog. Main ones:
+- Product name e-Procurement: chosen, management to confirm (Q-002).
+- Tender threshold 50,000 AZN, RFQ bands 5,000 / 15,000 AZN, single-source limit 1,000 AZN and grade bands need client confirmation; keep them as Admin settings (Q-004).
+- Assumptions A-020 to A-025 (plan overrun is a warning only; one category per PR; only the sourcing owner acts; committee members see who voted but not how until the decision closes; voting business days are Monday to Friday; an Individual vendor needs no legal representative) are in force but unconfirmed.

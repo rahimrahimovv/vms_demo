@@ -454,3 +454,31 @@ Kept differences from the boards (and why):
 - Solid panels (tables, lists) use no blur at all instead of "little blur": at 88 % white it is invisible and costs scrolling frames.
 - Page background blobs are radial gradients, not blur filters: same look, no GPU cost.
 - The sticky top bar stays sticky (existing behaviour) so it needs the higher alpha above.
+
+## Docs sync with the new backlog export (14 Nov 2026)
+
+Docs only; no code, test or database change. `docs/backlog.md` replaced by the BA's latest export (32 stories: DEMO-03 added; new section
+"Decisions, Assumptions And Open Questions": D-001 to D-019, A-014 and A-020 to A-025, Q-001 to Q-008). Other differences (RFQ-03 AC2, RFQ-04 AC6,
+RFQ-05 AC2 to AC5, REG-06 AC3, REG-07 AC8, PO-03 AC4 and the COMPLETED row of the Status Transition Model, role matrix wording, scenario step 7,
+ERD note) are wording or looser text; the code already behaves that way. DEMO-01 and DEMO-02 now name the buttons "Reset to scenario start"
+and "Load populated demo data"; Slice 8 is not started, so nothing to change yet.
+
+- PO-02 AC3 patched by hand in `docs/backlog.md`: the export had "You cannot approve a PO for your own request"; the file now reads "You cannot
+  approve a PO for your own request or sourcing", which is what the code shows (`errors.ownPurchaseOrder`). The BA fixed this in the source and
+  **will re-export later**; after that export, check that PO-02 AC3 keeps the "or sourcing" wording.
+
+### Status summary
+
+- Slices 0 to 7 done and live. Slice 7 went to production on 13 Nov 2026: vms-prod migrated (`20261116100000_purchase_orders`,
+  `20261116110000_po_respond_released`), `main` deployed, read-only smoke check passed (commits 77c4431, 273a8b0).
+- Vendor menu change (8c34814) and the redesign (stages 1 to 4, contrast numbers above) done.
+
+### Open items
+
+1. **Slice 8a** (DEMO-01, DEMO-02): demo bar, Fill sample, seed and reset: not started. **Slice 8b** (DEMO-03, populated demo data): not started.
+2. **Node.js version on Vercel** should be 24.x; check the project setting (and `engines` in `package.json`, none today).
+3. **Staged uploads**: files nobody claims stay under `staging/` in the bucket; no cleanup job (see Slice 5 open issue 9).
+4. **Full RLS suite after the last migration** (`20261116110000_po_respond_released`) has not been run as one pass; run it on vms-dev.
+5. **Throwaway vendor on vms-dev**: "Click Test LLC …" from the vendor menu click-through; delete it.
+6. Re-export of the backlog by the BA (PO-02 AC3 message, above).
+7. Confirm A-020 to A-025 and the open questions Q-001 to Q-008 with the client before a real roll-out.
