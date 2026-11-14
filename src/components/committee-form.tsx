@@ -46,7 +46,7 @@ export function CommitteeForm({
         {candidates.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("committee.noCandidates")}</p>
         ) : (
-          <ul className="divide-y rounded-lg border bg-card">
+          <ul className="surface-solid divide-y">
             {candidates.map((c) => {
               const selected = members.includes(c.id);
               return (
@@ -95,7 +95,7 @@ export function CommitteeForm({
         </p>
       )}
       {state.saved && !state.error && (
-        <p role="status" className="text-sm text-emerald-700" data-testid="committee-saved">
+        <p role="status" className="text-sm text-(--tone-green-fg)" data-testid="committee-saved">
           {t("committee.saved")}
         </p>
       )}

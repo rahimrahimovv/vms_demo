@@ -17,7 +17,7 @@ export async function buildPoPdf(po: PoView): Promise<Uint8Array> {
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const ink = rgb(0.09, 0.1, 0.12);
   const muted = rgb(0.4, 0.42, 0.45);
-  const teal = rgb(0.06, 0.4, 0.4);
+  const accent = rgb(0.114, 0.306, 0.537);
 
   let page: PDFPage = doc.addPage([PAGE.width, PAGE.height]);
   let y = PAGE.height - PAGE.margin;
@@ -37,11 +37,11 @@ export async function buildPoPdf(po: PoView): Promise<Uint8Array> {
   };
 
   // header: the product name first
-  draw(label("app.name"), PAGE.margin, 12, bold, teal);
+  draw(label("app.name"), PAGE.margin, 12, bold, accent);
   y -= 26;
   draw(label("purchaseOrders.pdfTitle"), PAGE.margin, 16, bold);
   y -= 22;
-  draw(po.number, PAGE.margin, 13, bold, teal);
+  draw(po.number, PAGE.margin, 13, bold, accent);
   y -= 26;
 
   const none = label("common.none");

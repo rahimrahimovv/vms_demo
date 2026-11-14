@@ -37,10 +37,10 @@ export type ComparisonActions = {
 
 const chip = "rounded-full px-2 py-px text-xs font-semibold";
 const CHIP = {
-  neutral: `${chip} bg-zinc-100 font-normal text-zinc-700`,
-  blue: `${chip} bg-sky-50 text-sky-800`,
-  green: `${chip} bg-emerald-50 text-emerald-800`,
-  amber: `${chip} bg-amber-50 text-amber-800`,
+  neutral: `${chip} bg-(--tone-grey-bg) font-normal text-(--tone-grey-fg)`,
+  blue: `${chip} bg-(--tone-sky-bg) text-(--tone-sky-fg)`,
+  green: `${chip} bg-(--tone-green-bg) text-(--tone-green-fg)`,
+  amber: `${chip} bg-(--tone-amber-bg) text-(--tone-amber-fg)`,
   brand: `${chip} bg-primary text-primary-foreground`,
 };
 
@@ -73,21 +73,21 @@ export function ComparisonView({
 
   return (
     <div className="flex flex-col gap-5" data-testid="comparison">
-      <section aria-label={t("requiredTerms")} className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-card px-5 py-4">
+      <section aria-label={t("requiredTerms")} className="flex flex-wrap items-center gap-x-3 gap-y-2 surface-glass px-5 py-4">
         <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("requiredTerms")}</span>
         {[s.requiredIncoterm && `Incoterm ${s.requiredIncoterm}`, s.requiredPlace, s.requiredMode, s.requiredPaymentTerm]
           .filter(Boolean)
           .map((x) => (
-            <span key={x as string} className="rounded-lg bg-muted px-2.5 py-1 text-sm">
+            <span key={x as string} className="rounded-full bg-(--glass-inner) px-2.5 py-0.5 text-sm">
               {x}
             </span>
           ))}
-        <span className="rounded-lg bg-muted px-2.5 py-1 text-sm">{t("minimumChip", { minimum: s.minimum })}</span>
-        {roundUsed && <span className="rounded-lg bg-muted px-2.5 py-1 text-sm">{t("finalOfferUsedChip")}</span>}
+        <span className="rounded-full bg-(--glass-inner) px-2.5 py-0.5 text-sm">{t("minimumChip", { minimum: s.minimum })}</span>
+        {roundUsed && <span className="rounded-full bg-(--glass-inner) px-2.5 py-0.5 text-sm">{t("finalOfferUsedChip")}</span>}
       </section>
 
       {s.status === "COMPARISON" && data.committeeComments.length > 0 && (
-        <section className="flex flex-col gap-2 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-900" data-testid="committee-comments">
+        <section className="flex flex-col gap-2 surface-warning px-5 py-4" data-testid="committee-comments">
           <p className="font-semibold">{t("committeeRejected")}</p>
           <ul className="list-disc pl-5 text-sm">
             {data.committeeComments.map((c) => (
@@ -98,20 +98,20 @@ export function ComparisonView({
       )}
 
       {roundOpen && s.finalOfferDeadline && (
-        <section className="rounded-xl border border-sky-200 bg-sky-50 px-5 py-4 text-sm text-sky-900" data-testid="round-open">
+        <section className="surface-glass border-sky-300 px-5 py-4 text-sm text-(--tone-sky-fg)" data-testid="round-open">
           {t("roundOpen", { deadline: formatDateTime(s.finalOfferDeadline) })}
         </section>
       )}
 
       {s.needsLowCompetitionReason && (
-        <section aria-label={t("lowCompetitionStored")} className="flex flex-col gap-2.5 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4" data-testid="low-competition">
-          <div className="flex items-center gap-2 font-semibold text-amber-900">
+        <section aria-label={t("lowCompetitionStored")} className="flex flex-col gap-2.5 surface-warning px-5 py-4" data-testid="low-competition">
+          <div className="flex items-center gap-2 font-semibold text-(--tone-amber-fg)">
             <AlertCircle className="size-4.5" aria-hidden />
             {t("lowCompetitionTitle", { count: fewestEligible(data), total: proposalsReceived(data), minimum: s.minimum })}
           </div>
           {editable && sendFormId ? (
             <>
-              <Label htmlFor="low-competition-reason" className="font-normal text-amber-900">
+              <Label htmlFor="low-competition-reason" className="font-normal text-(--tone-amber-fg)">
                 {t("lowCompetitionLabel", { minimum: s.minimum })}
               </Label>
               <Textarea
@@ -124,12 +124,12 @@ export function ComparisonView({
               />
             </>
           ) : (
-            s.lowCompetitionReason && <p className="text-sm whitespace-pre-wrap text-amber-950">{s.lowCompetitionReason}</p>
+            s.lowCompetitionReason && <p className="text-sm whitespace-pre-wrap text-(--tone-amber-fg)">{s.lowCompetitionReason}</p>
           )}
         </section>
       )}
 
-      <section aria-label={t("title")} className="overflow-hidden rounded-xl border bg-card">
+      <section aria-label={t("title")} className="surface-solid overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-4">
           <h3 className="text-base font-semibold">{t("title")}</h3>
           <p className="text-xs text-muted-foreground">{t("hint")}</p>
@@ -157,11 +157,11 @@ export function ComparisonView({
       </section>
 
       <div className="flex flex-wrap gap-5">
-        <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-3 rounded-xl border bg-card p-5" data-testid="po-preview">
+        <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-3 surface-glass p-5" data-testid="po-preview">
           <h3 className="text-base font-semibold">{t("poTitle", { count: data.purchaseOrders.length })}</h3>
           {data.purchaseOrders.length === 0 && <p className="text-sm text-muted-foreground">{t("poNone")}</p>}
           {data.purchaseOrders.map((po) => (
-            <div key={po.proposalId} className="flex flex-wrap justify-between gap-2 rounded-lg bg-muted/60 px-3.5 py-3">
+            <div key={po.proposalId} className="flex flex-wrap justify-between gap-2 surface-inner px-3.5 py-3">
               <div>
                 <div className="font-semibold">{po.name}</div>
                 <div className="text-xs text-muted-foreground">{t("poLine", { count: po.lines, incoterm: po.incoterm, place: po.namedPlace ?? "" })}</div>
@@ -172,18 +172,18 @@ export function ComparisonView({
           <p className="text-xs text-muted-foreground">{t("poNote")}</p>
         </section>
 
-        <section aria-label={t("disqualifiedTitle", { count: data.disqualified.length })} className="flex min-w-[420px] flex-1 flex-col gap-3 rounded-xl border bg-card p-5" data-testid="disqualified">
+        <section aria-label={t("disqualifiedTitle", { count: data.disqualified.length })} className="flex min-w-[420px] flex-1 flex-col gap-3 surface-glass p-5" data-testid="disqualified">
           <h3 className="text-base font-semibold">{t("disqualifiedTitle", { count: data.disqualified.length })}</h3>
           {data.disqualified.length === 0 && <p className="text-sm text-muted-foreground">{t("disqualifiedNone")}</p>}
           {data.disqualified.map((d) => (
-            <div key={d.proposalId} className="flex items-start gap-3 rounded-lg bg-muted/60 px-3.5 py-3">
-              <Lock className="mt-0.5 size-4.5 shrink-0 text-zinc-600" aria-hidden />
+            <div key={d.proposalId} className="flex items-start gap-3 surface-inner px-3.5 py-3">
+              <Lock className="mt-0.5 size-4.5 shrink-0 text-muted-foreground" aria-hidden />
               <div>
                 <div className="font-semibold">
                   {d.name}
                   {d.grade ? ` · ${t("grade", { grade: d.grade })}` : ""}
                 </div>
-                <div className="text-zinc-700">{t("disqualifiedReason", { reason: d.reason })}</div>
+                <div className="text-muted-foreground">{t("disqualifiedReason", { reason: d.reason })}</div>
               </div>
             </div>
           ))}
@@ -257,7 +257,7 @@ function VendorHeader({
           {v.includesVat && ` · ${t("vatNote", { rate: Number(v.vatRate) })}`}
         </div>
         {v.sharedOwners.length > 0 && (
-          <div className="text-xs font-medium text-amber-800" data-testid="shared-owner">
+          <div className="text-xs font-medium text-(--tone-amber-fg)" data-testid="shared-owner">
             {t("sharesOwner", { names: v.sharedOwners.join(", ") })}
           </div>
         )}
@@ -296,14 +296,14 @@ function LineRow({
           {t("lineMeta", { quantity: quantity(line.quantity), unit: line.unit, place: line.place ?? "", date: formatDate(line.deliveryDate) })}
         </div>
         <div className="text-xs text-muted-foreground">{t("estimate", { price: price(line.estimate), unit: line.unit })}</div>
-        {!active && <div className="mt-1 text-xs font-medium text-red-700">{t("lineCancelled", { reason: line.cancelReason ?? "" })}</div>}
-        {active && line.eligibleCount === 0 && <div className="mt-1 text-xs font-medium text-amber-800">{t("noEligibleOffer")}</div>}
+        {!active && <div className="mt-1 text-xs font-medium text-(--tone-red-fg)">{t("lineCancelled", { reason: line.cancelReason ?? "" })}</div>}
+        {active && line.eligibleCount === 0 && <div className="mt-1 text-xs font-medium text-(--tone-amber-fg)">{t("noEligibleOffer")}</div>}
         {active && line.manual && line.justification && (
-          <div className="mt-1 text-xs whitespace-pre-wrap text-zinc-700">{t("justification", { text: line.justification })}</div>
+          <div className="mt-1 text-xs whitespace-pre-wrap text-muted-foreground">{t("justification", { text: line.justification })}</div>
         )}
-        {active && line.notLowest && <div className="mt-1 text-xs font-semibold text-amber-800">{t("notLowest")}</div>}
+        {active && line.notLowest && <div className="mt-1 text-xs font-semibold text-(--tone-amber-fg)">{t("notLowest")}</div>}
         {active && line.locked && line.poNumber && (
-          <div className="mt-1 text-xs font-semibold text-emerald-800" data-testid="line-on-po">{t("lockedLine", { number: line.poNumber })}</div>
+          <div className="mt-1 text-xs font-semibold text-(--tone-green-fg)" data-testid="line-on-po">{t("lockedLine", { number: line.poNumber })}</div>
         )}
         {lineEditable && active && actions && (
           <div className="mt-2">
@@ -371,20 +371,20 @@ function PriceCell({
         });
 
   return (
-    <td className={cn("border-t px-(--density-cell-x) py-(--density-cell-y) align-top", lowest && "bg-primary/10")} data-testid="price-cell" data-lowest={lowest || undefined}>
+    <td className={cn("border-t px-(--density-cell-x) py-(--density-cell-y) align-top", lowest && "bg-accent")} data-testid="price-cell" data-lowest={lowest || undefined}>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-zinc-600">{label}</span>
+          <span className="text-xs text-muted-foreground">{label}</span>
           {lowest && <span className={CHIP.brand}>{t("lowestEvaluated")}</span>}
         </div>
         <div className={cn("text-(length:--density-price) font-bold tabular-nums", lowest && "text-primary")} data-testid="unit-price">
           {price(cell.unitExclVat)}
         </div>
-        {cell.firstExclVat !== null && <div className="text-xs text-zinc-600">{t("firstOffer", { price: price(cell.firstExclVat) })}</div>}
+        {cell.firstExclVat !== null && <div className="text-xs text-muted-foreground">{t("firstOffer", { price: price(cell.firstExclVat) })}</div>}
         {cell.round === 1 && asked && roundClosed && vendor.finalOffer?.respondedAt && (
           <div className="text-xs text-muted-foreground">{t("noChange")}</div>
         )}
-        <div className="text-xs text-zinc-600" data-testid="extra-costs">
+        <div className="text-xs text-muted-foreground" data-testid="extra-costs">
           {costText}
           {editable && actions && (
             <>
@@ -396,7 +396,7 @@ function PriceCell({
         <div className="font-semibold tabular-nums" data-testid="evaluated">
           {t("evaluated", { price: price(cell.evaluated), total: price(cell.lineTotal) })}
         </div>
-        {cell.excluded && <div className="text-xs font-semibold text-red-700">{t("rejected")}</div>}
+        {cell.excluded && <div className="text-xs font-semibold text-(--tone-red-fg)">{t("rejected")}</div>}
         {editable && actions && !cell.excluded ? (
           <WinnerRadio line={line} cell={cell} vendor={vendor} chosen={chosen} action={actions.chooseWinner} />
         ) : (
@@ -511,7 +511,7 @@ function CostsDialog({
           ) : (
             <ul className="flex flex-col gap-2">
               {cell.costs.map((c) => (
-                <li key={c.id} className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2 text-sm" data-testid="cost-row">
+                <li key={c.id} className="flex items-center justify-between gap-3 surface-inner px-3 py-2 text-sm" data-testid="cost-row">
                   <span>
                     {t("costs.item", { type: t(`costs.types.${c.type}`), amount: price(c.amount), unit: line.unit })}
                     {c.note && <span className="text-muted-foreground"> · {c.note}</span>}
@@ -553,7 +553,7 @@ function AddCostForm({ id, line, cell, action }: { id: string; line: ComparisonL
       <input type="hidden" name="proposal" value={cell.proposalId} />
       <div className="flex flex-col gap-1.5">
         <Label htmlFor={`${id}-type`}>{t("sourcing.comparison.costs.type")}</Label>
-        <select id={`${id}-type`} name="type" defaultValue="DELIVERY" className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm">
+        <select id={`${id}-type`} name="type" defaultValue="DELIVERY" className="h-8 rounded-[14px] border border-input bg-(--field-bg) px-2.5 text-sm">
           {(["CUSTOMS", "DELIVERY", "INSURANCE", "OTHER"] as const).map((k) => (
             <option key={k} value={k}>
               {t(`sourcing.comparison.costs.types.${k}`)}

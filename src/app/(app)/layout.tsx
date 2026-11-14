@@ -27,9 +27,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   ]);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen">
       <AppSidebar sections={sectionsFor(user.roles, vendorStatus)} />
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* Content starts 256 px from the left (16 + 224 + 16) and keeps 16 px from the other edges */}
+      <div className="flex min-w-0 flex-col gap-(--shell-gap) py-(--shell-gap) pr-(--shell-gap) pl-[calc(var(--shell-gap)*2+var(--sidebar-w))]">
         <DemoBarSlot />
         <TopBar
           userId={user.id}
@@ -38,7 +39,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           initialItems={(latest ?? []).map(toBellItem)}
           initialUnread={unread ?? 0}
         />
-        <main className="flex-1 px-(--density-page-x) py-(--density-page-y)">{children}</main>
+        <main className="flex-1 px-(--density-page-x)">{children}</main>
       </div>
     </div>
   );

@@ -77,7 +77,7 @@ export default async function VendorCategoriesPage() {
       {applications.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="text-base font-semibold">{t("categories.allApplications")}</h2>
-          <ul className="divide-y rounded-lg border bg-card" data-testid="applications">
+          <ul className="surface-solid divide-y" data-testid="applications">
             {applications.map((a) => {
               const shown = a.status === "QUALIFIED" && a.valid_until && a.valid_until < today ? "EXPIRED" : a.status;
               return (

@@ -75,7 +75,7 @@ export async function buildMinutesPdf(m: MinutesView): Promise<Uint8Array> {
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const ink = rgb(0.09, 0.1, 0.12);
   const muted = rgb(0.4, 0.42, 0.45);
-  const teal = rgb(0.06, 0.4, 0.4);
+  const accent = rgb(0.114, 0.306, 0.537);
 
   let page: PDFPage = doc.addPage([PAGE.width, PAGE.height]);
   let y = PAGE.height - PAGE.margin;
@@ -90,11 +90,11 @@ export async function buildMinutesPdf(m: MinutesView): Promise<Uint8Array> {
     page.drawText(pdfText(text), { x, y, size, font, color });
 
   // header
-  draw(label("app.name"), PAGE.margin, 10, bold, teal);
+  draw(label("app.name"), PAGE.margin, 10, bold, accent);
   y -= 24;
   draw(label("minutes.heading"), PAGE.margin, 16, bold);
   y -= 22;
-  draw(m.number, PAGE.margin, 13, bold, teal);
+  draw(m.number, PAGE.margin, 13, bold, accent);
   y -= 26;
 
   const fields: [string, string][] = [

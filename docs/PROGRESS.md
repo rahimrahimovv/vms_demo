@@ -415,3 +415,26 @@ Commit 8c34814. REG-07 AC11 and REG-06 AC3 patched in the backlog. No change to 
   does not, is redirected to the Profile and finds the history there); production check as Beta Trade after the deploy: menu without
   Registration, redirect to `/vendor/profile`, history tab present. The 99+ badge was not seen on screen (needs more than 99 unread).
 - Open: the click-through registered a throwaway vendor, "Click Test LLC …", on vms-dev.
+
+## Redesign: light glass, Midnight Navy (14 Nov 2026)
+
+Mockups: the design canvas boards "Midnight navy: Comparison / My tasks (specialist) / Vendor cabinet (draft) / Vendor home (approved) / Sign in".
+Staged; each stage is committed so a new session can resume from here.
+
+| Stage | Content | Status |
+| --- | --- | --- |
+| 1 | Tokens, fixed page layer, floating sidebar and top bar, logo, favicon, PDF accent #1D4E89 | done |
+| 2 | Shared components: card, tabs (segmented), buttons, badges (sky for pending), table, dialog, popovers, inputs, alert, panels | done |
+| 3 | Pages: sign-in and register, vendor home (draft and approved), My tasks per role, comparison | in progress |
+| 4 | Remaining screens, final sweep, screenshots against the boards, CLAUDE.md Design section, build and push | not started |
+
+Contrast (computed, worst case = the surface over the lightest page colour #EDE9F8 and the darkest #A3BFE3, plus a dark brand button for
+surfaces that sit over content):
+
+- Sidebar rgba(15,32,56,0.84): text #E1E9F5 8.5:1, labels #A9BBD8 5.4:1, active item white 6.1:1. No change needed.
+- Cards white 0.58: ink 12.1:1, muted #4A5961 5.65:1, brand ink 8.9:1, link 6.5:1. No change needed.
+- Top bar: the mockup's 0.52 gives the role text 3.6:1 over a dark button (it is sticky over content). Raised to 0.72: 5.5:1.
+- Dialog: the mockup's 0.5 gives muted text 2.7:1 over a dark button. Raised to 0.78: muted 4.9:1, ink 10.6:1.
+- Popovers 0.88: muted 5.9:1. Solid table panels 0.88: muted 6.0:1.
+- Badges: sky 7.3, amber 7.9, green 6.6, grade blue 7.5, grey 8.1, red 7.6. Button text white on #2A62A8 6.2:1.
+- Fallbacks (prefers-reduced-transparency, prefers-contrast: more, no backdrop-filter): every glass token becomes a solid colour; no blur.

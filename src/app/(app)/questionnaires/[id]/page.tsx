@@ -141,7 +141,7 @@ export default async function QuestionnaireReviewPage({ params }: PageProps<"/qu
           <TabsTrigger value="history">{t("record.tabs.history")}</TabsTrigger>
         </TabsList>
         <TabsContent value="details" className="pt-4">
-          <div className="overflow-hidden rounded-lg border bg-card">
+          <div className="surface-solid overflow-hidden">
             <Table data-testid="answers">
               <TableHeader className="bg-muted/60">
                 <TableRow>

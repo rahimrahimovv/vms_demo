@@ -81,12 +81,12 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
       return (
         <div className="flex flex-col gap-6">
           {loaded.vendor.status === "RETURNED" && loaded.vendor.review_comment && (
-            <Alert className="border-amber-300 bg-amber-50" data-testid="returned-comment">
+            <Alert className="surface-warning" data-testid="returned-comment">
               <AlertTitle>{t("registration.returnedTitle")}</AlertTitle>
               <AlertDescription>{loaded.vendor.review_comment}</AlertDescription>
             </Alert>
           )}
-          <Alert className="border-amber-300 bg-amber-50" data-testid="complete-profile-warning">
+          <Alert className="surface-warning" data-testid="complete-profile-warning">
             <TriangleAlert className="size-4" aria-hidden />
             <AlertDescription>{t("registration.warning")}</AlertDescription>
           </Alert>
@@ -119,7 +119,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
         ))}
       </div>
       {warnings.map((c) => (
-        <Alert key={c.id} variant={c.status === "EXPIRED" ? "destructive" : "default"} className={cn(c.status === "EXPIRING" && "border-amber-300 bg-amber-50")} data-testid="certificate-warning">
+        <Alert key={c.id} variant={c.status === "EXPIRED" ? "destructive" : "default"} className={cn(c.status === "EXPIRING" && "surface-warning")} data-testid="certificate-warning">
           <TriangleAlert className="size-4" aria-hidden />
           <AlertDescription>
             {t(c.status === "EXPIRED" ? "vendorHome.certificateExpired" : "vendorHome.certificateExpiring", {
@@ -150,7 +150,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
                       s.state === "current" && "border-primary",
                     )}
                   >
-                    <Icon className={cn("mt-0.5 size-5 shrink-0", s.state === "done" ? "text-emerald-600" : s.state === "current" ? "text-primary" : "text-muted-foreground")} aria-hidden />
+                    <Icon className={cn("mt-0.5 size-5 shrink-0", s.state === "done" ? "text-brand" : s.state === "current" ? "text-primary" : "text-muted-foreground")} aria-hidden />
                     <span className="flex flex-col gap-1">
                       <span className="text-sm font-medium">
                         {i + 1}. {t(`vendorHome.steps.${s.key}`)}

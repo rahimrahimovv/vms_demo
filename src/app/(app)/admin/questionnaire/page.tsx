@@ -40,7 +40,7 @@ export default async function AdminQuestionnairePage() {
       {questions.length === 0 ? (
         <EmptyState message={t("adminQuestionnaire.empty")} />
       ) : (
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="surface-solid overflow-hidden">
           <Table data-testid="questions">
             <TableHeader className="bg-muted/60">
               <TableRow>

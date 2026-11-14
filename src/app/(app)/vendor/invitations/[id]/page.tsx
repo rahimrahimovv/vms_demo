@@ -189,7 +189,7 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
           />
         </>
       ) : (
-        <div className="overflow-x-auto rounded-lg border bg-card">
+        <div className="surface-solid overflow-x-auto">
           <Table>
             <TableHeader className="bg-muted/60">
               <TableRow>

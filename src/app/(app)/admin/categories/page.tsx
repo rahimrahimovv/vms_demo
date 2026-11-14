@@ -74,7 +74,7 @@ export default async function CategoriesPage() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex justify-end">{addButton}</div>
-      <div className="overflow-hidden rounded-lg border bg-card">
+      <div className="surface-solid overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/60">
             <TableRow>

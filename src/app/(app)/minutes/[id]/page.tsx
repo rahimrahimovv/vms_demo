@@ -72,7 +72,7 @@ export default async function MinutesPage({ params }: PageProps<"/minutes/[id]">
 
       <section className="flex flex-col gap-3">
         <h3 className="text-base font-semibold">{t("minutes.voters")}</h3>
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="surface-solid overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/60">
               <TableRow>

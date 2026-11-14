@@ -142,7 +142,7 @@ export default async function VendorQualificationPage({ searchParams }: PageProp
       )}
 
       {open?.status === "RETURNED" && open.review_comment && (
-        <Alert className="border-amber-300 bg-amber-50" data-testid="returned-comment">
+        <Alert className="surface-warning" data-testid="returned-comment">
           <AlertTitle>{t("qualification.returnedTitle")}</AlertTitle>
           <AlertDescription>{open.review_comment}</AlertDescription>
         </Alert>
@@ -166,7 +166,7 @@ export default async function VendorQualificationPage({ searchParams }: PageProp
       {responses.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="text-base font-semibold">{t("qualification.attempts")}</h2>
-          <ul className="divide-y rounded-lg border bg-card">
+          <ul className="surface-solid divide-y">
             {responses.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-4 px-4 py-3 text-sm">
                 <span>{t("qualification.attempt", { number: r.attempt_no })}</span>

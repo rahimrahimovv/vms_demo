@@ -40,7 +40,7 @@ export async function PoBodyView({ body, fields }: { body: PoBody; fields?: Reac
 
       <section className="flex flex-col gap-3">
         <h3 className="text-base font-semibold">{t("lines.title")}</h3>
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="surface-solid overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/60">
               <TableRow>

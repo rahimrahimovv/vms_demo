@@ -295,7 +295,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       />
 
       {belowMinimum && (
-        <Alert className="border-amber-300 bg-amber-50" data-testid="below-minimum">
+        <Alert className="surface-warning" data-testid="below-minimum">
           <AlertTriangle className="size-4" aria-hidden />
           <AlertTitle>{t("sourcing.belowMinimum", { count: submitted, minimum: s.min_proposals })}</AlertTitle>
           <AlertDescription>{t(submitted > 0 ? "sourcing.belowMinimumHint" : "sourcing.belowMinimumNone")}</AlertDescription>
@@ -430,7 +430,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
             </Card>
           )}
 
-          <div className="overflow-x-auto rounded-lg border bg-card">
+          <div className="surface-solid overflow-x-auto">
             <Table>
               <TableHeader className="bg-muted/60">
                 <TableRow>
@@ -469,7 +469,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           {invitations.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t("sourcing.invitees.none")}</p>
           ) : (
-            <div className="overflow-hidden rounded-lg border bg-card">
+            <div className="surface-solid overflow-hidden">
               <Table>
                 <TableHeader className="bg-muted/60">
                   <TableRow>
@@ -496,7 +496,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
 
         {bidsOpen && (
           <TabsContent value="proposals" className="flex flex-col gap-3 pt-4">
-            <div className="overflow-hidden rounded-lg border bg-card">
+            <div className="surface-solid overflow-hidden">
               <Table>
                 <TableHeader className="bg-muted/60">
                   <TableRow>
@@ -620,7 +620,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
 
         {purchaseOrders.length > 0 && (
           <TabsContent value="purchaseOrders" className="pt-4">
-            <div className="overflow-hidden rounded-lg border bg-card">
+            <div className="surface-solid overflow-hidden">
               <Table>
                 <TableHeader className="bg-muted/60">
                   <TableRow>

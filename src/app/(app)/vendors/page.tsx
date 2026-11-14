@@ -105,15 +105,15 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
 
   return (
     <div className="flex flex-col gap-5">
-      <nav className="flex gap-1 border-b" aria-label={t("vendors.tabsLabel")}>
+      <nav className="flex w-fit gap-1 rounded-[18px] border border-(--glass-tabs-border) bg-(--glass-tabs-bg) p-1 backdrop-blur-md" aria-label={t("vendors.tabsLabel")}>
         {(["review", "incomplete", "all"] as const).map((key) => (
           <Link
             key={key}
             href={key === "review" ? "/vendors" : "/vendors?tab=" + key}
             aria-current={tab === key ? "page" : undefined}
             className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
-              tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+              "rounded-[14px] px-3.5 py-1.5 text-sm",
+              tab === key ? "bg-(--glass-tab-active-bg) font-semibold text-brand-ink shadow-[0_2px_8px_rgba(23,38,43,0.1)]" : "text-[#3d4a50] hover:text-foreground",
             )}
           >
             {t(`vendors.tabs.${key}`)}

@@ -54,10 +54,10 @@ export function SidebarNav({ groups }: { groups: NavGroup[] }) {
   const activeKey = sectionForPath(pathname)?.key;
 
   return (
-    <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-5" data-testid="main-menu">
+    <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-2 pt-1 pb-4" data-testid="main-menu">
       {groups.map((group) => (
         <div key={group.group} className="flex flex-col gap-1">
-          <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-sidebar-label">{group.label}</p>
+          <p className="px-2.5 pt-1 pb-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-sidebar-label">{group.label}</p>
           {group.items.map((item) => {
             const Icon = ICONS[item.icon];
             const active = item.key === activeKey;
@@ -68,8 +68,8 @@ export function SidebarNav({ groups }: { groups: NavGroup[] }) {
                 data-section={item.key}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-white",
-                  active && "bg-sidebar-accent font-semibold text-sidebar-accent-foreground hover:bg-sidebar-accent",
+                  "flex items-center gap-2.5 rounded-[14px] border border-transparent px-2.5 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-white/10 hover:text-white",
+                  active && "border-white/25 bg-sidebar-accent font-semibold text-sidebar-accent-foreground hover:bg-sidebar-accent",
                 )}
               >
                 <Icon className="size-4" aria-hidden />

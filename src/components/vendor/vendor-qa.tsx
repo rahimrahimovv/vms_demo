@@ -44,7 +44,7 @@ export function VendorQa({
   const err =(k: string) => (state.errors[k] ? t(state.errors[k]) : undefined);
 
   return (
-    <section className="flex flex-col gap-4 rounded-xl border bg-card p-5" data-testid="vendor-qa">
+    <section className="flex flex-col gap-4 surface-glass p-5" data-testid="vendor-qa">
       <div className="flex flex-col gap-1">
         <h3 className="text-base font-semibold">{t("sourcing.qa.title")}</h3>
         <p className="text-xs text-muted-foreground">{t("sourcing.qa.channelNote")}</p>
@@ -59,9 +59,9 @@ export function VendorQa({
           </div>
           {q.question && <p className="font-medium whitespace-pre-wrap">{q.question}</p>}
           {q.status === "PUBLISHED" ? (
-            <p className="rounded-lg bg-muted/60 px-3 py-2 text-sm whitespace-pre-wrap">{q.answer}</p>
+            <p className="surface-inner px-3 py-2 text-sm whitespace-pre-wrap">{q.answer}</p>
           ) : (
-            <p className="text-xs font-semibold text-amber-800">{t("sourcing.qa.awaiting")}</p>
+            <p className="text-xs font-semibold text-(--tone-amber-fg)">{t("sourcing.qa.awaiting")}</p>
           )}
         </article>
       ))}
@@ -73,7 +73,7 @@ export function VendorQa({
           </FormField>
           <FileField id="qa-file" name="file" label={t("sourcing.qa.attachment")} error={err("file")} />
           {state.errors.form && <p role="alert" className="text-xs font-medium text-destructive">{t(state.errors.form)}</p>}
-          {state.saved && <p className="text-xs text-emerald-700" data-testid="question-sent">{t("sourcing.qa.sent")}</p>}
+          {state.saved && <p className="text-xs text-(--tone-green-fg)" data-testid="question-sent">{t("sourcing.qa.sent")}</p>}
           <div>
             <Button type="submit" disabled={pending} data-testid="ask-question">
               {pending ? t("common.saving") : t("sourcing.qa.send")}

@@ -92,7 +92,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
       />
 
       {sharedWith.length > 0 && (
-        <Alert className="border-amber-300 bg-amber-50" data-testid="shared-owner">
+        <Alert className="surface-warning" data-testid="shared-owner">
           <Users className="size-4" aria-hidden />
           <AlertDescription>
             {sharedWith.map((s, i) => (
@@ -188,7 +188,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
 
               {/* REG-06 AC7: every bank account, the main one marked. */}
               <h3 className="mt-6 mb-2 text-sm font-medium">{t("bankAccounts.title")}</h3>
-              <div className="overflow-hidden rounded-md border">
+              <div className="surface-solid overflow-hidden">
                 <Table data-testid="bank-accounts">
                   <TableHeader className="bg-muted/60">
                     <TableRow>
@@ -217,7 +217,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
 
               {/* REG-06 AC7: contact persons, the legal representatives and their proof files marked. */}
               <h3 className="mt-6 mb-2 text-sm font-medium">{t("vendorCard.contacts")}</h3>
-              <div className="overflow-hidden rounded-md border">
+              <div className="surface-solid overflow-hidden">
                 <Table data-testid="contacts">
                   <TableHeader className="bg-muted/60">
                     <TableRow>
@@ -261,7 +261,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
         </TabsContent>
 
         <TabsContent value="owners" className="pt-4">
-          <div className="overflow-hidden rounded-lg border bg-card">
+          <div className="surface-solid overflow-hidden">
             <Table data-testid="owners">
               <TableHeader className="bg-muted/60">
                 <TableRow>
@@ -294,7 +294,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
         </TabsContent>
 
         <TabsContent value="certificates" className="pt-4">
-          <div className="overflow-hidden rounded-lg border bg-card">
+          <div className="surface-solid overflow-hidden">
             <Table>
               <TableHeader className="bg-muted/60">
                 <TableRow>
@@ -331,7 +331,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
         </TabsContent>
 
         <TabsContent value="categories" className="pt-4">
-          <div className="overflow-hidden rounded-lg border bg-card">
+          <div className="surface-solid overflow-hidden">
             <Table>
               <TableHeader className="bg-muted/60">
                 <TableRow>

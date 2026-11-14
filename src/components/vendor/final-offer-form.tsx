@@ -37,12 +37,12 @@ export function FinalOfferForm({
     start(async () => setState(await action(state, fd)));
   };
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4 rounded-xl border border-sky-200 bg-card p-5" data-testid="final-offer-form">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4 surface-glass border-sky-300 p-5" data-testid="final-offer-form">
       <div className="flex flex-col gap-1">
         <h3 className="text-base font-semibold">{t("proposal.finalOffer.title")}</h3>
         <p className="text-sm">{t("proposal.finalOffer.intro", { deadline: formatDateTime(deadline) })}</p>
         {message && <p className="text-sm text-muted-foreground">{t("proposal.finalOffer.message", { message })}</p>}
-        {respondedAt && <p className="text-xs text-emerald-700" data-testid="final-offer-responded">{t("proposal.finalOffer.responded", { date: formatDateTime(respondedAt) })}</p>}
+        {respondedAt && <p className="text-xs text-(--tone-green-fg)" data-testid="final-offer-responded">{t("proposal.finalOffer.responded", { date: formatDateTime(respondedAt) })}</p>}
       </div>
       <table className="w-full text-sm">
         <thead className="bg-muted/60 text-left">
@@ -81,7 +81,7 @@ export function FinalOfferForm({
       </table>
       <p className="text-xs text-muted-foreground">{t("proposal.finalOffer.hint")}</p>
       {state.errors.form && <p role="alert" className="text-xs font-medium text-destructive">{t(state.errors.form)}</p>}
-      {state.saved && <p className="text-xs text-emerald-700">{t("proposal.finalOffer.saved")}</p>}
+      {state.saved && <p className="text-xs text-(--tone-green-fg)">{t("proposal.finalOffer.saved")}</p>}
       <div className="flex gap-2">
         <Button type="submit" name="intent" value="submit" disabled={pending} data-testid="submit-final-offer">
           {t("proposal.finalOffer.submit")}

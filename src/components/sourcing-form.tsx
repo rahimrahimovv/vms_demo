@@ -151,7 +151,7 @@ export function SourcingForm({
       <section className="flex flex-col gap-3" data-testid="invitee-list">
         <h3 className="text-base font-semibold">{t("sourcing.invitees.title")}</h3>
         {type !== "SSP" && remaining < minimum && (
-          <Alert className="border-amber-300 bg-amber-50" data-testid="below-minimum-warning">
+          <Alert className="surface-warning" data-testid="below-minimum-warning">
             <AlertTriangle className="size-4" aria-hidden />
             <AlertDescription>{t("sourcing.invitees.belowMinimum", { count: remaining, minimum })}</AlertDescription>
           </Alert>
@@ -159,7 +159,7 @@ export function SourcingForm({
         {invitees.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("errors.noQualifiedVendors")}</p>
         ) : (
-          <ul className="divide-y rounded-lg border bg-card">
+          <ul className="surface-solid divide-y">
             {invitees.map((i) => (
               <li key={i.vendorId} className="flex items-center gap-3 px-4 py-2.5 text-sm">
                 {type !== "SSP" && (

@@ -64,7 +64,7 @@ export function RegistrationChecklist({
           const body = (
             <>
               <Icon
-                className={cn("mt-0.5 size-5 shrink-0", status === "COMPLETE" || status === "NOT_NEEDED" ? "text-emerald-600" : status === "IN_PROGRESS" ? "text-primary" : "text-muted-foreground")}
+                className={cn("mt-0.5 size-5 shrink-0", status === "COMPLETE" || status === "NOT_NEEDED" ? "text-brand" : status === "IN_PROGRESS" ? "text-primary" : "text-muted-foreground")}
                 aria-hidden
               />
               <span className="flex flex-col gap-0.5">

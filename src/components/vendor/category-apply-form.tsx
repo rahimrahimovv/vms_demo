@@ -42,7 +42,7 @@ export function CategoryApplyForm({
           <AlertDescription>{t("categories.applied", { count: state.created })}</AlertDescription>
         </Alert>
       )}
-      <div key={state.attempt ?? 0} className="overflow-hidden rounded-lg border bg-card">
+      <div key={state.attempt ?? 0} className="surface-solid overflow-hidden">
         <div className="grid grid-cols-[1fr_16rem_14rem] gap-4 border-b bg-muted/60 px-4 py-2 text-xs font-medium text-muted-foreground">
           <span>{t("categories.columns.category")}</span>
           <span>{t("categories.columns.licence")}</span>

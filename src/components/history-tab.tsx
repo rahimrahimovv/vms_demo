@@ -34,7 +34,7 @@ export async function HistoryTab({ recordType, recordId }: { recordType: string;
   if (entries.length === 0) return <EmptyState message={t("empty")} />;
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-card">
+    <div className="surface-solid overflow-hidden">
       <Table>
         <TableHeader className="bg-muted/60">
           <TableRow>

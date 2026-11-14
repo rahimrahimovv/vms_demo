@@ -18,7 +18,7 @@ export type RegisterFormState = {
 };
 
 const SELECT_CLASS =
-  "h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive";
+  "h-9 w-full rounded-[14px] border border-input bg-(--field-bg) px-3 text-sm outline-none aria-invalid:border-destructive";
 
 /** REG-01 AC1: the short account form (about 8 fields). */
 export function RegisterForm({

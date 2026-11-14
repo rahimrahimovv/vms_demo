@@ -60,7 +60,7 @@ export async function QaPanel({
         const shown = q.status === "PUBLISHED" ? q.publishedText : q.questionText;
         const edited = q.status === "PUBLISHED" && q.questionText && q.publishedText !== q.questionText;
         return (
-          <article key={q.id} className="flex flex-col gap-2 rounded-xl border bg-card p-4" data-testid="qa-item" data-status={q.status}>
+          <article key={q.id} className="flex flex-col gap-2 surface-glass p-4" data-testid="qa-item" data-status={q.status}>
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
               <span>
                 {q.vendorName ? t("askedBy", { vendor: q.vendorName, date: formatDateTime(q.askedAt) }) : t("publishedOn", { date: formatDateTime(q.publishedAt ?? q.askedAt) })}
@@ -75,7 +75,7 @@ export async function QaPanel({
                 {f.file_name}
               </a>
             ))}
-            {q.answer && <p className="rounded-lg bg-muted/60 px-3 py-2 text-sm whitespace-pre-wrap">{q.answer}</p>}
+            {q.answer && <p className="surface-inner px-3 py-2 text-sm whitespace-pre-wrap">{q.answer}</p>}
             {q.status === "UNANSWERED" && canAnswer && (
               <div>
                 <ActionDialog action={publish} trigger={t("publish")} triggerSize="sm" title={t("publish")} description={t("editHint")} hidden={{ question: q.id }} submitLabel={t("publish")} testId="publish-answer">

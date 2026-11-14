@@ -25,17 +25,17 @@ export function UserMenu({ fullName, roleLabels }: { fullName: string; roleLabel
   const t = useTranslations("userMenu");
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-muted">
-        <Avatar className="size-8">
-          <AvatarFallback className="bg-accent text-xs font-semibold text-accent-foreground">
+      <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-[14px] px-2 py-1 text-left hover:bg-white/60">
+        <Avatar className="size-[34px]">
+          <AvatarFallback className="bg-(--avatar-bg) text-[13px] font-semibold text-brand-ink">
             {initials(fullName)}
           </AvatarFallback>
         </Avatar>
         <span className="flex flex-col leading-tight">
-          <span className="text-sm font-medium" data-testid="user-name">
+          <span className="text-sm font-semibold" data-testid="user-name">
             {fullName}
           </span>
-          <span className="text-xs text-muted-foreground" data-testid="user-roles">
+          <span className="text-xs text-[#3d4a50]" data-testid="user-roles">
             {roleLabels.join(", ")}
           </span>
         </span>

@@ -55,7 +55,7 @@ export default async function RegistrationStepPage({ params }: PageProps<"/vendo
     <div className="flex flex-col gap-6">
       <RecordHeader title={vendor.legal_name} subtitle={t(`vendorTypes.${vendor.vendor_type}`)} status={vendor.status} />
       {vendor.status === "RETURNED" && vendor.review_comment && (
-        <Alert className="border-amber-300 bg-amber-50" data-testid="returned-comment">
+        <Alert className="surface-warning" data-testid="returned-comment">
           <AlertTitle>{t("registration.returnedTitle")}</AlertTitle>
           <AlertDescription>{vendor.review_comment}</AlertDescription>
         </Alert>

@@ -89,7 +89,7 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
 
   const planWarning =
     overPlan > 0 && pr.status !== "REJECTED" ? (
-      <Alert className="border-amber-300 bg-amber-50" data-testid="plan-warning">
+      <Alert className="surface-warning" data-testid="plan-warning">
         <AlertTriangle className="size-4" aria-hidden />
         <AlertDescription>{t("requisitions.planWarning", { amount: formatAmount(overPlan) })}</AlertDescription>
       </Alert>
@@ -147,7 +147,7 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
         </Alert>
       )}
       {pr.status === "RETURNED" && pr.decision_comment && (
-        <Alert className="border-amber-300 bg-amber-50" data-testid="returned-comment">
+        <Alert className="surface-warning" data-testid="returned-comment">
           <AlertTitle>{t("requisitions.returnedTitle")}</AlertTitle>
           <AlertDescription>{pr.decision_comment}</AlertDescription>
         </Alert>
@@ -208,7 +208,7 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
                   </dl>
                 </CardContent>
               </Card>
-              <div className="overflow-x-auto rounded-lg border bg-card">
+              <div className="surface-solid overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-muted/60">
                     <TableRow>

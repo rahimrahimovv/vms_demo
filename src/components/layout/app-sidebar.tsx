@@ -3,7 +3,10 @@ import { SECTION_GROUPS, type Section } from "@/lib/auth/sections";
 import { LogoMark } from "./logo-mark";
 import { SidebarNav } from "./sidebar-nav";
 
-/** Left sidebar: logo "e-Procurement" and the menu for the user's roles (PLT-01 AC4). */
+/**
+ * Floating dark-glass sidebar, 16 px from the edges: logo "e-Procurement" and the menu for the user's roles
+ * (PLT-01 AC4). Content starts 256 px from the left.
+ */
 export async function AppSidebar({ sections }: { sections: Section[] }) {
   const t = await getTranslations();
   const groups = SECTION_GROUPS
@@ -17,10 +20,10 @@ export async function AppSidebar({ sections }: { sections: Section[] }) {
     .filter((g) => g.items.length > 0);
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-divider px-5">
-        <LogoMark className="size-8 bg-sidebar-logo text-white" iconClassName="size-5" />
-        <span className="text-base font-semibold tracking-tight text-white">{t("app.name")}</span>
+    <aside className="shell-sidebar fixed top-(--shell-gap) bottom-(--shell-gap) left-(--shell-gap) z-30 flex w-(--sidebar-w) flex-col overflow-hidden text-sidebar-foreground">
+      <div className="flex items-center gap-2.5 px-5 pt-5 pb-3">
+        <LogoMark tone="sidebar" className="size-[30px]" iconClassName="size-4" />
+        <span className="text-[15px] font-bold text-white">{t("app.name")}</span>
       </div>
       <SidebarNav groups={groups} />
     </aside>

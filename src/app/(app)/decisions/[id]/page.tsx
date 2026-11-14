@@ -218,7 +218,7 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
                 )}
               </div>
               {pkg.comparison?.sourcing.type === "SSP" && (
-                <Card className="border-sky-200" data-testid="ssp-label">
+                <Card className="border-sky-300" data-testid="ssp-label">
                   <CardContent className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                       <Badge>{t("decisions.package.sspLabel")}</Badge>
@@ -261,7 +261,7 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
                       <AlertDescription>{t("decisions.package.samePackage")}</AlertDescription>
                     </Alert>
                   ) : (
-                    <Alert className="border-amber-300 bg-amber-50" data-testid="po-differences">
+                    <Alert className="surface-warning" data-testid="po-differences">
                       <AlertTitle>{t("decisions.package.differencesTitle")}</AlertTitle>
                       <AlertDescription>
                         <ul className="list-disc pl-5">
@@ -320,7 +320,7 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
 
           <section className="flex flex-col gap-3">
             <h3 className="text-base font-semibold">{t("decisions.voters.title")}</h3>
-            <div className="overflow-hidden rounded-lg border bg-card">
+            <div className="surface-solid overflow-hidden">
               <Table>
                 <TableHeader className="bg-muted/60">
                   <TableRow>

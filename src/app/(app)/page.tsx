@@ -150,7 +150,7 @@ export default async function HomePage() {
         {unread.length === 0 ? (
           <EmptyState message={t("home.empty")} action={mainAction} />
         ) : (
-          <ul className="divide-y rounded-lg border bg-card">
+          <ul className="surface-solid divide-y">
             {unread.map((row) => (
               <li key={row.id}>
                 <Link

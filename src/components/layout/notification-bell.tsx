@@ -82,9 +82,9 @@ export function NotificationBell({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
-          className="relative"
+          className="relative size-10 rounded-full"
           aria-label={t("bell.label", { count: unread })}
           data-testid="bell"
         >
@@ -92,7 +92,7 @@ export function NotificationBell({
           {unread > 0 && (
             <span
               data-testid="bell-count"
-              className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground"
+              className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground"
             >
               {bellBadge(unread)}
             </span>

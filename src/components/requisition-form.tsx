@@ -114,7 +114,7 @@ export function RequisitionForm({
         </div>
         {!plan && <p className="text-sm text-muted-foreground">{t("requisitions.pickPlanLineFirst")}</p>}
         {lines.length === 0 && (
-          <p className="rounded-lg border border-dashed bg-card px-4 py-6 text-center text-sm text-muted-foreground">
+          <p className="surface-glass border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
             {t("requisitions.noLines")}
           </p>
         )}
@@ -241,7 +241,7 @@ export function RequisitionForm({
           </span>
         </div>
         {excess > 0 && (
-          <Alert className="max-w-xl border-amber-300 bg-amber-50" data-testid="plan-warning">
+          <Alert className="max-w-xl surface-warning" data-testid="plan-warning">
             <AlertTriangle className="size-4" aria-hidden />
             <AlertDescription>{t("requisitions.planWarning", { amount: formatAmount(excess) })}</AlertDescription>
           </Alert>

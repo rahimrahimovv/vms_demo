@@ -6,5 +6,5 @@ import { isDemoMode } from "@/lib/demo";
  */
 export function DemoBarSlot() {
   if (!isDemoMode()) return null;
-  return <div id="demo-bar" data-testid="demo-bar-slot" />;
+  return <div id="demo-bar" data-testid="demo-bar-slot" className="surface-glass px-5 py-2 empty:hidden" />;
 }

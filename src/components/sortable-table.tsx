@@ -49,7 +49,7 @@ export function SortableTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-card">
+    <div className="surface-solid overflow-hidden">
       <Table>
         <TableHeader className="bg-muted/60">
           <TableRow>

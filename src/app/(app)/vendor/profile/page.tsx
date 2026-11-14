@@ -138,7 +138,7 @@ export default async function VendorProfilePage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {(brands ?? []).length > 0 && (
-            <ul className="divide-y rounded-md border" data-testid="brands">
+            <ul className="surface-solid divide-y" data-testid="brands">
               {(brands ?? []).map((b) => (
                 <li key={b.id} className="flex items-center justify-between gap-4 px-4 py-2.5 text-sm">
                   <span className="flex flex-col gap-1">
@@ -167,7 +167,7 @@ export default async function VendorProfilePage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {(certificates ?? []).length > 0 && (
-            <div className="overflow-hidden rounded-md border">
+            <div className="surface-solid overflow-hidden">
               <Table data-testid="certificates">
                 <TableHeader className="bg-muted/60">
                   <TableRow>
