@@ -36,6 +36,7 @@ describe("Role Matrix sections", () => {
       "vendors",
       "questionnaires",
       "categoryApplications",
+      "changeRequests",
       "avl",
     ]);
   });

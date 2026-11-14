@@ -35,7 +35,7 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
   const t = await getTranslations();
   const supabase = await createClient();
   const params = await searchParams;
-  const tab = params.tab === "all" ? "all" : params.tab === "incomplete" ? "incomplete" : "review";
+  const tab = params.tab === "all" ? "all" : params.tab === "incomplete" ? "incomplete" : params.tab === "rejected" ? "rejected" : "review";
   const today = bakuToday();
 
   let query = supabase
@@ -49,7 +49,9 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
       ? query.eq("status", "SUBMITTED").order("submitted_at", { ascending: true })
       : tab === "incomplete"
         ? query.eq("status", "DRAFT").order("created_at", { ascending: true })
-        : query.order("legal_name");
+        : tab === "rejected"
+          ? query.eq("status", "REJECTED").order("created_at", { ascending: false })
+          : query.order("legal_name");
   const { data } = await query.returns<VendorListRow[]>();
   const vendors = data ?? [];
 
@@ -87,6 +89,13 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
           { key: "tax", label: t("vendors.columns.taxNumber") },
           { key: "created", label: t("vendors.columns.created") },
         ]
+      : tab === "rejected"
+      ? [
+          { key: "name", label: t("vendors.columns.name") },
+          { key: "type", label: t("vendors.columns.type") },
+          { key: "tax", label: t("vendors.columns.taxNumber") },
+          { key: "created", label: t("vendors.columns.created") },
+        ]
       : tab === "review"
       ? [
           { key: "name", label: t("vendors.columns.name") },
@@ -106,7 +115,7 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
   return (
     <div className="flex flex-col gap-5">
       <nav className="flex w-fit gap-1 rounded-[18px] border border-(--glass-tabs-border) bg-(--glass-tabs-bg) p-1 backdrop-blur-md" aria-label={t("vendors.tabsLabel")}>
-        {(["review", "incomplete", "all"] as const).map((key) => (
+        {(["review", "incomplete", "rejected", "all"] as const).map((key) => (
           <Link
             key={key}
             href={key === "review" ? "/vendors" : "/vendors?tab=" + key}
@@ -121,12 +130,12 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
         ))}
       </nav>
       {vendors.length === 0 ? (
-        <EmptyState message={t(tab === "review" ? "vendors.emptyReview" : tab === "incomplete" ? "vendors.emptyIncomplete" : "vendors.emptyAll")} />
+        <EmptyState message={t(tab === "review" ? "vendors.emptyReview" : tab === "incomplete" ? "vendors.emptyIncomplete" : tab === "rejected" ? "vendors.emptyRejected" : "vendors.emptyAll")} />
       ) : (
         <SortableTable
           columns={columns}
           rows={rows}
-          initialSort={tab === "review" ? { key: "submitted", dir: "asc" } : tab === "incomplete" ? { key: "created", dir: "asc" } : { key: "name", dir: "asc" }}
+          initialSort={tab === "review" ? { key: "submitted", dir: "asc" } : tab === "incomplete" ? { key: "created", dir: "asc" } : tab === "rejected" ? { key: "created", dir: "desc" } : { key: "name", dir: "asc" }}
         />
       )}
     </div>

@@ -20,7 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { decideRegistration } from "./actions";
+import { ActionDialog } from "@/components/action-dialog";
+import { FormField } from "@/components/form-field";
+import { ChangeRequestHistory } from "@/components/vendor/change-request-history";
+import { Textarea } from "@/components/ui/textarea";
+import { decideRegistration, reopenRegistration } from "./actions";
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -86,10 +90,26 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
       ]}
     />
   ) : null;
+  // REG-02 AC5, REG-08 AC14: reopen a rejected registration with a comment
+  const reopenButton =
+    user.roles.includes("PROCUREMENT_SPECIALIST") && vendor.status === "REJECTED" ? (
+      <ActionDialog
+        action={reopenRegistration.bind(null, vendor.id)}
+        trigger={t("rejected.reopen")}
+        triggerVariant="default"
+        title={t("rejected.reopenTitle")}
+        testId="reopen"
+      >
+        <FormField id="comment" label={t("decision.comment")} required>
+          <Textarea id="comment" name="comment" rows={3} />
+        </FormField>
+      </ActionDialog>
+    ) : null;
   const actions =
-    resetButton || decisionPanel ? (
+    resetButton || decisionPanel || reopenButton ? (
       <>
         {resetButton}
+        {reopenButton}
         {decisionPanel}
       </>
     ) : undefined;
@@ -398,6 +418,8 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
 
         <TabsContent value="history" className="flex flex-col gap-4 pt-4">
           <HistoryTab recordType="vendor" recordId={vendor.id} />
+          <h3 className="text-sm font-semibold">{t("changeRequest.history")}</h3>
+          <ChangeRequestHistory vendorId={vendor.id} audience="internal" />
           <h3 className="text-sm font-semibold">{t("vendorCard.standingHistory")}</h3>
           <HistoryTab recordType="vendor_standing" recordId={vendor.id} />
         </TabsContent>

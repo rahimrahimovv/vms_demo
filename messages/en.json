@@ -32,7 +32,8 @@
     "decisions": "Decisions",
     "minutes": "Minutes",
     "purchaseOrders": "Purchase orders",
-    "vendorPurchaseOrders": "Purchase orders"
+    "vendorPurchaseOrders": "Purchase orders",
+    "changeRequests": "Change requests"
   },
   "roles": {
     "REQUESTER": "Requester",
@@ -144,7 +145,8 @@
         "submitted": "{number} submitted a registration",
         "approved": "Your registration was approved. You can now fill the qualification questionnaire.",
         "returned": "Your registration was returned for correction: {comment}",
-        "rejected": "Your registration was rejected: {comment}"
+        "rejected": "Your registration was rejected: {comment}",
+        "reopened": "Your registration was reopened: {comment}"
       },
       "questionnaire": {
         "submitted": "{number} submitted the qualification questionnaire",
@@ -196,6 +198,10 @@
         "fullyApproved": "{number} ({total} excluding VAT) was approved by the committee",
         "accepted": "{number} was accepted by the vendor",
         "declined": "{number} was declined by the vendor: {reason}"
+      },
+      "changeRequest": {
+        "submitted": "{number} asks to change {section}",
+        "decided": "Your change request for {section} is {decision}. {comment}"
       }
     }
   },
@@ -216,7 +222,8 @@
       "proposalsToSubmit": "{count, plural, =0 {No proposals to submit} one {# proposal to submit} other {# proposals to submit}}",
       "votesWaiting": "{count, plural, =0 {No decisions waiting for your vote} one {# decision waiting for your vote} other {# decisions waiting for your vote}}",
       "posToApprove": "{count, plural, =0 {No POs to approve} one {# PO to approve} other {# POs to approve}}",
-      "posToAccept": "{count, plural, =0 {No POs to accept} one {# PO to accept} other {# POs to accept}}"
+      "posToAccept": "{count, plural, =0 {No POs to accept} one {# PO to accept} other {# POs to accept}}",
+      "changeRequests": "{count, plural, =0 {No change requests to review} one {# change request to review} other {# change requests to review}}"
     },
     "newPr": "New PR",
     "greeting": {
@@ -383,7 +390,13 @@
     "pickVendors": "Pick at least one vendor",
     "ownPurchaseOrder": "You cannot approve a PO for your own request or sourcing",
     "sourcingHasPurchaseOrders": "This sourcing already has purchase orders; cancel its open lines instead",
-    "lineOnPurchaseOrder": "This line is already on a purchase order"
+    "lineOnPurchaseOrder": "This line is already on a purchase order",
+    "changeRequestOpen": "A request for this section is already open",
+    "noChange": "Change at least one value",
+    "supportRequired": "Attach a supporting document",
+    "useChangeRequest": "Bank accounts change through a change request",
+    "documentKinds": "Choose the documents to replace",
+    "documentFileRequired": "Attach a file for every document you replace"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -460,7 +473,8 @@
       "justification": "Justification",
       "attachment": "Attachment",
       "pdf": "PDF",
-      "proof_of_authority": "Proof of authority (power of attorney, charter extract or decision)"
+      "proof_of_authority": "Proof of authority (power of attorney, charter extract or decision)",
+      "change_support": "Supporting document"
     }
   },
   "registration": {
@@ -625,7 +639,7 @@
     "renew": "Upload renewal",
     "noExpiry": "No expiry",
     "noOwners": "No owners recorded.",
-    "ownersHint": "Owners are part of the registration and can change only while it is a draft or returned.",
+    "ownersHint": "Owners change through a change request once the registration is approved.",
     "sections": {
       "company": "Company profile",
       "brands": "Brands",
@@ -699,7 +713,8 @@
     "tabs": {
       "review": "To review",
       "all": "All vendors",
-      "incomplete": "Incomplete registrations"
+      "incomplete": "Incomplete registrations",
+      "rejected": "Rejected"
     },
     "columns": {
       "name": "Name",
@@ -712,7 +727,8 @@
       "grade": "Grade",
       "created": "Created"
     },
-    "emptyIncomplete": "No incomplete registrations"
+    "emptyIncomplete": "No incomplete registrations",
+    "emptyRejected": "No rejected registrations."
   },
   "vendorCard": {
     "sharesOwner": "Shares an owner with",
@@ -861,6 +877,19 @@
       "from": "From",
       "to": "To",
       "reason": "Reason or comment"
+    },
+    "profileUpdated": "Profile updated: {section}",
+    "sections": {
+      "ACTIVITY": "Main activity",
+      "MAIN_GOODS": "Main goods",
+      "BANK_GUARANTEE": "Bank guarantee",
+      "BRANDS": "Brands",
+      "CERTIFICATES": "Certificates",
+      "CONTACT_PERSONS": "Contact persons",
+      "COMPANY_DETAILS": "Company details",
+      "OWNERS": "Owners",
+      "BANK_ACCOUNTS": "Bank accounts",
+      "DOCUMENTS": "Documents"
     }
   },
   "placeTypes": {
@@ -1599,5 +1628,61 @@
       "copied": "Copied",
       "done": "Done"
     }
+  },
+  "rejected": {
+    "title": "Registration rejected",
+    "reason": "Reason",
+    "contact": "Contact your buyer",
+    "reopen": "Reopen registration",
+    "reopenTitle": "Reopen this registration?"
+  },
+  "changeRequest": {
+    "sections": {
+      "COMPANY_DETAILS": "Company details",
+      "OWNERS": "Owners",
+      "BANK_ACCOUNTS": "Bank accounts",
+      "DOCUMENTS": "Documents"
+    },
+    "formTitle": "Change request: {section}",
+    "formSubtitle": "Your current data stays in force until a Procurement Specialist approves the change.",
+    "requestButton": "Request a change",
+    "pending": "Change pending approval",
+    "returnedNote": "Returned for correction",
+    "openRequest": "Open request",
+    "reason": "Reason for the change",
+    "support": "Attach a supporting document",
+    "supportHintCompany": "A supporting document is required for a change of the legal name or the tax number.",
+    "supportKept": "The supporting document you attached earlier stays; attach a new one only to replace it.",
+    "documentsHint": "Attach a file for each document you want to replace.",
+    "submit": "Submit request",
+    "resubmit": "Resubmit request",
+    "withdraw": "Withdraw request",
+    "submittedAt": "Submitted {date}",
+    "history": "Change requests",
+    "historyEmpty": "No change requests yet.",
+    "diff": {
+      "field": "Field",
+      "current": "Current value",
+      "proposed": "Proposed value",
+      "changed": "Changed",
+      "document": "Document"
+    },
+    "columns": {
+      "vendor": "Vendor",
+      "section": "Section",
+      "submitted": "Submitted",
+      "age": "Age",
+      "status": "Status",
+      "decision": "Decision",
+      "comments": "Reason and comments"
+    },
+    "age": "{days, plural, =0 {today} one {# day} other {# days}}",
+    "tabsLabel": "Change request filters",
+    "tabs": {
+      "review": "To review",
+      "all": "All"
+    },
+    "empty": "No change requests are waiting.",
+    "emptyAll": "No change requests yet."
   }
 }

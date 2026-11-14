@@ -665,25 +665,32 @@ describe("REG-01 AC4 / REG-06 AC3 / AC7 bank accounts", () => {
 
   // REG-01 AC6 / REG-07 AC9: the account form has no bank account; Submit still needs one (registration.rls.test.ts).
 
-  it("REG-06 AC3: the vendor adds, edits and removes accounts after submit, keeping one main", async () => {
+  // The database function that registration and an approved change request both use; the vendor itself cannot call it.
+  const replaceAccounts = (id: string, accounts: unknown[]) =>
+    db
+      .query("select app.replace_bank_accounts($1, $2::jsonb)", [id, JSON.stringify(accounts)])
+      .then(() => undefined)
+      .catch((e: Error) => e.message);
+
+  it("REG-06 AC3 (revised): an approved vendor cannot replace its accounts directly; the accounts are replaced, keeping one main, when a request is applied", async () => {
     const id = actors.vendorA.vendorId!;
     const two = [account({ iban: "AZ00TEST0001", is_main: true }), account({ iban: "AZ00TEST0002", currency: "USD" })];
-    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: two })).error).toBeNull();
+    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: two })).error?.message).toBe("errors.useChangeRequest");
+    expect(await replaceAccounts(id, two)).toBeUndefined();
     expect(await accountsOf(id)).toEqual([
       { iban: "AZ00TEST0001", currency: "AZN", is_main: true },
       { iban: "AZ00TEST0002", currency: "USD", is_main: false },
     ]);
     // move "main" to the USD account, then remove the AZN one
     const moved = [account({ iban: "AZ00TEST0001" }), account({ iban: "AZ00TEST0002", currency: "USD", is_main: true })];
-    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: moved })).error).toBeNull();
+    expect(await replaceAccounts(id, moved)).toBeUndefined();
     const one = [account({ iban: "AZ00TEST0002", currency: "USD", is_main: true })];
-    expect((await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: one })).error).toBeNull();
+    expect(await replaceAccounts(id, one)).toBeUndefined();
     expect(await accountsOf(id)).toEqual([{ iban: "AZ00TEST0002", currency: "USD", is_main: true }]);
   });
 
   it("REG-06 AC3: at least one account, exactly one main, IBAN up to 34 letters and digits", async () => {
-    const save = async (accounts: unknown[]) =>
-      (await actors.vendorA.client.rpc("bank_accounts_save", { p_accounts: accounts })).error?.message;
+    const save = (accounts: unknown[]) => replaceAccounts(actors.vendorA.vendorId!, accounts);
     expect(await save([])).toBe("errors.bankAccountRequired");
     expect(await save([account(), account({ iban: "AZ00TEST0003" })])).toBe("errors.mainAccountOne");
     expect(await save([account({ is_main: true }), account({ iban: "AZ00TEST0003", is_main: true })])).toBe("errors.mainAccountOne");

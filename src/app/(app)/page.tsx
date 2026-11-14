@@ -73,6 +73,8 @@ export default async function HomePage() {
     if (filter === "notOwn") q = q.neq("requester_id", user.id);
     return q;
   };
+  // Slice 7b (REG-08): change requests waiting for a Procurement Specialist
+  const changeRequests = isSpecialist ? await supabase.from("vendor_change_request").select("id", { count: "exact", head: true }).eq("status", "SUBMITTED") : null;
   const belowMinimum = isSpecialist ? await supabase.from("sourcing").select("id", { count: "exact", head: true }).eq("status", "CLOSED").eq("owner_id", user.id) : null;
   const [toApprove, returned, readyForSourcing] = await Promise.all([
     isApprover ? prCount("PENDING_APPROVAL", "notOwn") : null,
@@ -100,6 +102,7 @@ export default async function HomePage() {
     ...(isSpecialist
       ? [
           { key: "registrations", href: "/vendors", count: registrations?.count ?? 0 },
+          { key: "changeRequests", href: "/change-requests", count: changeRequests?.count ?? 0 },
           { key: "questionnaires", href: "/questionnaires", count: questionnaires?.count ?? 0 },
           { key: "applications", href: "/category-applications", count: applications?.count ?? 0 },
           { key: "sourcingsBelowMinimum", href: "/sourcing", count: belowMinimum?.count ?? 0 },

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
+import { parseProfileEvent } from "@/lib/vendors/change-requests";
 import { StatusBadge } from "@/components/status-badge";
 import { EmptyState } from "@/components/empty-state";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -46,17 +47,27 @@ export async function HistoryTab({ recordType, recordId }: { recordType: string;
           </TableRow>
         </TableHeader>
         <TableBody>
-          {entries.map((entry) => (
+          {entries.map((entry) => {
+            // REG-08 AC11: "Profile updated: <section>"; the stored reason is the section code (with a masked detail)
+            const profile = entry.to_status === "PROFILE_UPDATED" ? parseProfileEvent(entry.reason) : null;
+            return (
             <TableRow key={entry.id}>
               <TableCell className="whitespace-nowrap tabular-nums">{formatDateTime(entry.created_at)}</TableCell>
               <TableCell>{entry.user_id ? (entry.user?.full_name ?? "") : t("system")}</TableCell>
               <TableCell>{entry.from_status ? <StatusBadge status={entry.from_status} /> : null}</TableCell>
               <TableCell>
-                <StatusBadge status={entry.to_status} />
+                {profile ? (
+                  <span className="text-sm font-medium" data-testid="profile-updated">
+                    {t("profileUpdated", { section: t(`sections.${profile.code}`) })}
+                  </span>
+                ) : (
+                  <StatusBadge status={entry.to_status} />
+                )}
               </TableCell>
-              <TableCell className="max-w-md whitespace-pre-wrap text-muted-foreground">{entry.reason}</TableCell>
+              <TableCell className="max-w-md whitespace-pre-wrap text-muted-foreground">{profile ? profile.detail : entry.reason}</TableCell>
             </TableRow>
-          ))}
+            );
+          })}
         </TableBody>
       </Table>
     </div>

@@ -2,7 +2,7 @@
 
 e-Procurement is a generic, 1C-free procurement platform. The product is called e-Procurement; the look is the Midnight Navy palette in the
 light glass style (see Design). This repo holds the MVP for the management demo (date to confirm, Q-003).
-The single source of truth for scope and acceptance criteria is `docs/backlog.md` (32 stories, Given/When/Then).
+The single source of truth for scope and acceptance criteria is `docs/backlog.md` (34 stories, Given/When/Then).
 If this file and the backlog disagree, the backlog wins; ask the BA.
 Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are in the backlog section "Decisions, Assumptions And Open Questions".
 
@@ -80,10 +80,11 @@ Each slice ends deployed and clickable on the Vercel link. Never break an earlie
 | 5 | CMT-01 to CMT-04 | Committee setup, voting engine (opening, winner, PO decisions), numbered minutes PDF, tender opening approved by the committee |
 | 6 | RFQ-03, RFQ-05, RFQ-07, RFQ-08 | Q&A, technical pass/fail (two envelopes), comparison with extra costs and evaluated price, final offer round, proposed winner and winner vote |
 | 7 | PO-01 to PO-03 | PO per winning vendor, Approver then committee, vendor accepts or declines |
+| 7b | PLT-03, REG-08 | Change and reset passwords (temporary password shown once, must change password); vendor change requests for core company data approved by a Procurement Specialist; "Registration rejected" page and Reopen; "Profile updated" log |
 | 8a | DEMO-01, DEMO-02 | Demo bar, Fill sample, seed and reset to scenario start; full scenario rehearsed |
 | 8b | DEMO-03 | Second load mode: populated demo data, created through the application's own functions, with a self-check |
 
-Status (14 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 8a (DEMO-01, DEMO-02) and 8b (DEMO-03) not
+Status (17 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 7b (PLT-03, REG-08) done on vms-dev and deployed after the production step in `docs/PROGRESS.md`; Slice 8a (DEMO-01, DEMO-02) and 8b (DEMO-03) not
 started. Open items are in `docs/PROGRESS.md`.
 
 The data model for every slice is in place from Slice 2 (all ERD tables, RLS and status audit); each slice adds its screens and the functions that change status.

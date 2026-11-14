@@ -26,6 +26,11 @@ async function vendorUser() {
   return user.vendorId && canAccess(user.roles, "vendorProfile") ? (user as typeof user & { vendorId: string }) : null;
 }
 
+/** REG-08 AC11: "Profile updated: <section>" in the Registration history (the database logs it for an APPROVED vendor only). */
+async function logProfile(supabase: Awaited<ReturnType<typeof createClient>>, section: string) {
+  await supabase.rpc("profile_log", { p_section: section });
+}
+
 function refresh() {
   revalidatePath("/vendor/profile");
   revalidatePath("/");
@@ -56,6 +61,11 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   if (Object.keys(errors).length > 0) return done(errors);
 
   const supabase = await createClient();
+  const { data: before } = await supabase
+    .from("vendor")
+    .select("main_activity, main_goods, bank_guarantee_available, bank_guarantee_types, bank_guarantee_max, bank_guarantee_currency")
+    .eq("id", user.vendorId)
+    .single();
   const { error } = await supabase
     .from("vendor")
     .update({
@@ -68,6 +78,24 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
     })
     .eq("id", user.vendorId);
   if (error) return done({ form: errorKey(error) ?? "common.genericError" });
+  // one entry per section that really changed
+  if (before) {
+    const guarantee = (g: { bank_guarantee_available: boolean; bank_guarantee_types: string[] | null; bank_guarantee_max: string | number | null; bank_guarantee_currency: string | null }) =>
+      JSON.stringify([g.bank_guarantee_available, [...(g.bank_guarantee_types ?? [])].sort(), g.bank_guarantee_max === null ? null : Number(g.bank_guarantee_max), g.bank_guarantee_currency]);
+    if ((before.main_activity ?? "") !== activity) await logProfile(supabase, "ACTIVITY");
+    if (JSON.stringify(before.main_goods ?? []) !== JSON.stringify(goods)) await logProfile(supabase, "MAIN_GOODS");
+    if (
+      guarantee(before) !==
+      guarantee({
+        bank_guarantee_available: available,
+        bank_guarantee_types: available ? types : [],
+        bank_guarantee_max: available && max ? Number(max) : null,
+        bank_guarantee_currency: available && max ? currency : null,
+      })
+    ) {
+      await logProfile(supabase, "BANK_GUARANTEE");
+    }
+  }
   refresh();
   return done({}, true);
 }
@@ -110,6 +138,7 @@ export async function addBrand(_prev: FormState, formData: FormData): Promise<Fo
   if (isUpload(letter)) {
     await storeFile({ companyId: user.companyId, ownerType: "vendor_brand", ownerId: data.id, kind: "attachment", file: letter, userId: user.id });
   }
+  await logProfile(supabase, "BRANDS");
   refresh();
   return done({}, true);
 }
@@ -119,7 +148,10 @@ export async function deleteBrand(id: string): Promise<void> {
   if (!user) return;
   const supabase = await createClient();
   const { data } = await supabase.from("vendor_brand").delete().eq("id", id).eq("vendor_id", user.vendorId).select("id");
-  if (data && data.length > 0) await removeFiles("vendor_brand", id);
+  if (data && data.length > 0) {
+    await removeFiles("vendor_brand", id);
+    await logProfile(supabase, "BRANDS");
+  }
   refresh();
 }
 
@@ -158,6 +190,7 @@ export async function addCertificate(_prev: FormState, formData: FormData): Prom
     .single();
   if (error) return done({ form: errorKey(error) ?? "common.genericError" });
   await storeFile({ companyId: user.companyId, ownerType: "vendor_certificate", ownerId: data.id, kind: "attachment", file: file as string, userId: user.id });
+  await logProfile(supabase, "CERTIFICATES");
   refresh();
   return done({}, true);
 }
@@ -189,6 +222,7 @@ export async function renewCertificate(id: string, _prev: FormState, formData: F
   const { error } = await supabase.from("vendor_certificate").update({ expires_on: expiresOn }).eq("id", id);
   if (error) return done({ form: errorKey(error) ?? "common.genericError" });
   await storeFile({ companyId: user.companyId, ownerType: "vendor_certificate", ownerId: id, kind: "attachment", file: file as string, userId: user.id });
+  await logProfile(supabase, "CERTIFICATES");
   refresh();
   return done({}, true);
 }
@@ -198,6 +232,9 @@ export async function deleteCertificate(id: string): Promise<void> {
   if (!user) return;
   const supabase = await createClient();
   const { data } = await supabase.from("vendor_certificate").delete().eq("id", id).eq("vendor_id", user.vendorId).select("id");
-  if (data && data.length > 0) await removeFiles("vendor_certificate", id);
+  if (data && data.length > 0) {
+    await removeFiles("vendor_certificate", id);
+    await logProfile(supabase, "CERTIFICATES");
+  }
   refresh();
 }

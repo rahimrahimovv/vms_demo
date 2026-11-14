@@ -15,11 +15,14 @@ export async function requireSignedIn(): Promise<CurrentUser> {
 
 /**
  * For pages and server actions: the current user, or redirect to sign-in. PLT-03 AC6: a user marked "must change
- * password" gets the change-password form and nothing else until the password is changed.
+ * password" gets the change-password form and nothing else until the password is changed; a REJECTED vendor gets
+ * the "Registration rejected" page.
  */
 export async function requireUser(): Promise<CurrentUser> {
   const user = await requireSignedIn();
   if (user.mustChangePassword) redirect("/change-password");
+  // REG-02 AC5: a vendor whose registration was rejected sees only the "Registration rejected" page
+  if (user.vendorStatus === "REJECTED") redirect("/registration-rejected");
   return user;
 }
 
@@ -34,7 +37,7 @@ export async function checkSection(key: SectionKey): Promise<{ user: CurrentUser
 
 /** For route handlers that read the user themselves: false when the PLT-03 gate stops this user (answer 403). */
 export function mayUseApi(user: CurrentUser | null): user is CurrentUser {
-  return Boolean(user) && !user!.mustChangePassword;
+  return Boolean(user) && !user!.mustChangePassword && user!.vendorStatus !== "REJECTED";
 }
 
 /** For route handlers: 401 without a session, 403 without the role or while the password must change (NFR-003). */

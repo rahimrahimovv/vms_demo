@@ -25,3 +25,17 @@ export async function decideRegistration(vendorId: string, _prev: DecisionState,
   revalidatePath("/vendors");
   return { error: errorKey(error), attempt: Date.now() };
 }
+
+/** REG-02 AC5, REG-08 AC14: reopen a rejected registration with a comment; it becomes RETURNED. */
+export async function reopenRegistration(vendorId: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  const user = await requireUser();
+  if (!user.roles.includes("PROCUREMENT_SPECIALIST")) return { error: "access.denied", attempt: Date.now() };
+  const comment = String(formData.get("comment") ?? "").trim();
+  if (!comment) return { error: "errors.commentRequired", attempt: Date.now() };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("registration_reopen", { p_vendor: vendorId, p_comment: comment });
+  revalidatePath(`/vendors/${vendorId}`);
+  revalidatePath("/vendors");
+  return { error: errorKey(error), attempt: Date.now() };
+}

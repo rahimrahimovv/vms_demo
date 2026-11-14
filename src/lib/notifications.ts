@@ -49,7 +49,9 @@ export function messageValues(
     else if (key === "type" && label.has(`certificateTypes.${value}`)) out[key] = label.translate(`certificateTypes.${value}`);
     // committee decisions: the type and result are codes in the database, words on the screen
     else if (key === "decisionType" && label.has(`decisions.types.${value}`)) out[key] = label.translate(`decisions.types.${value}`);
-    else if (key === "result" && label.has(`status.${value}`)) out[key] = label.translate(`status.${value}`);
+    else if ((key === "result" || key === "decision") && label.has(`status.${value}`)) out[key] = label.translate(`status.${value}`);
+    // change requests: the section is a code in the database, a name on the screen
+    else if (key === "section" && label.has(`changeRequest.sections.${value}`)) out[key] = label.translate(`changeRequest.sections.${value}`);
     else out[key] = value ?? "";
   }
   return out;

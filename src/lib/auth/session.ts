@@ -13,6 +13,8 @@ export type CurrentUser = {
   vendorId: string | null;
   /** PLT-03: set after a reset; every page, action and file route stops at the change-password form until it is cleared. */
   mustChangePassword: boolean;
+  /** REG-02 AC5: set for vendor users; a REJECTED vendor sees only the "Registration rejected" page. */
+  vendorStatus: string | null;
 };
 
 /**
@@ -36,6 +38,12 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const roles = (user.user_role ?? []).map((r: { role: string }) => r.role).filter(isRole);
   if (roles.length === 0) return null;
 
+  let vendorStatus: string | null = null;
+  if (user.vendor_id) {
+    const { data: vendor } = await supabase.from("vendor").select("status").eq("id", user.vendor_id).maybeSingle();
+    vendorStatus = vendor?.status ?? null;
+  }
+
   return {
     id: user.id,
     companyId: user.company_id,
@@ -44,5 +52,6 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     roles,
     vendorId: user.vendor_id ?? null,
     mustChangePassword: user.must_change_password === true,
+    vendorStatus,
   };
 });

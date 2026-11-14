@@ -482,3 +482,45 @@ and "Load populated demo data"; Slice 8 is not started, so nothing to change yet
 5. **Throwaway vendor on vms-dev**: "Click Test LLC …" from the vendor menu click-through; delete it.
 6. Re-export of the backlog by the BA (PO-02 AC3 message, above).
 7. Confirm A-020 to A-025 and the open questions Q-001 to Q-008 with the client before a real roll-out.
+
+## Slice 7b: PLT-03 and REG-08 (17 Nov 2026)
+
+Backlog export with 34 stories (PLT-03, REG-08, REG-06 AC3, REG-02 AC5, D-020, D-021, A-026, Q-009). The BA fixed REG-08 AC13 (SUBMITTED is
+read-only) and AC14 (Reopen on the vendor card, Rejected filter on the Vendors list); `docs/backlog.md` is patched the same way.
+Migrations `20261117100000_passwords` and `20261117110000_change_requests` (RLS in the same files). Commits: PLT-03 37e4671; REG-08 next.
+
+### PLT-03 (done)
+- Own password: user menu, Change password (current, new, confirmation); the current password is checked by signing in on a throwaway client,
+  the new one is set with the user's own session, `password_change_done()` clears the mark and writes PASSWORD_CHANGED.
+- Reset: Admin on Users (internal users, not self), Procurement Specialist on the vendor card (vendor account). `password_reset_authorize` decides
+  who may reset whom, the server sets a 12-character temporary password in Auth (shown once, Copy button), `password_reset_apply` sets
+  `app_user.must_change_password`, deletes the user's `auth.sessions` (refresh tokens go with them) and writes PASSWORD_RESET (actor and target).
+- `must_change_password` is enforced in `requireUser` (every page and server action) and in the file and PDF routes; the form lives outside
+  the app shell at `/change-password`. The sign-in page says "Forgot your password? ..." and has no reset link.
+- No password is stored, logged or audited (audit reason is null; a test searches the trail).
+
+### REG-08 and the Registration rejected page (done on vms-dev)
+- `vendor_change_request` (COMPANY_DETAILS, OWNERS, BANK_ACCOUNTS, DOCUMENTS; SUBMITTED, RETURNED, APPROVED, REJECTED, WITHDRAWN), one open request
+  per vendor and section, snapshot of the current values at submit, supporting files `change_support` (private; a vendor never reads another's).
+- Approval (`change_request_decide`) validates again (VÖEN format, tax number taken, owner shares, bank rules, supporting file), replaces the data in
+  one transaction and returns the storage paths of replaced documents; the server deletes those objects afterwards. IBANs in the history show the
+  last 4 characters only.
+- `bank_accounts_save` is for DRAFT and RETURNED vendors only; an APPROVED vendor gets "Bank accounts change through a change request".
+- Free edits (activity, main goods, bank guarantee, brands, certificates, contact persons) stay immediate and log "Profile updated: <section>" for
+  APPROVED vendors. No backfill for current vendors.
+- REJECTED vendor: signs in, sees only `/registration-rejected` (reason, "Contact your buyer"); every other page redirects there (`requireUser`).
+  `registration_reopen` (Procurement Specialist, comment) sets RETURNED and notifies; the Vendors list has a Rejected filter, the vendor card a Reopen button.
+- New screens: vendor Profile sections with "Request a change", request form and request page (edit when RETURNED, Withdraw); Change requests list
+  and page for the specialist (side-by-side values, files, decision); change requests in the Registration history of the Profile and the vendor card;
+  My tasks card; three notification texts.
+
+### Verified
+- Typecheck, lint, production build; 133 unit tests; the full RLS suite on vms-dev after both migrations: 11 files, 231 tests (passwords 11,
+  change requests 19; three older bank-account tests changed because the direct path is closed for APPROVED vendors).
+- Click-through in the browser: NOT run (the browser tool found no Chrome and installing playwright was refused). vms-prod is not migrated yet.
+
+### Open issues
+20. After a reset, an access token that was already issued keeps working against the API until it expires (about an hour): the app stops at the
+    change-password form because of the mark, but a direct API call with the old token is not stopped (`must_change_password` is enforced in the app only, accepted).
+21. Replaced registration documents: the database rows are replaced in the approval transaction, the storage objects are deleted afterwards; a failure
+    there leaves an orphan object. Same family as open item 9 (staged uploads without a cleanup job).

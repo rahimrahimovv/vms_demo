@@ -7,6 +7,7 @@ type Audience = "vendor" | "internal";
 const INTERNAL_PATHS: Record<string, (id: string) => string> = {
   vendor: (id) => `/vendors/${id}`,
   vendor_standing: (id) => `/vendors/${id}`,
+  vendor_change_request: (id) => `/change-requests/${id}`,
   questionnaire_response: (id) => `/questionnaires/${id}`,
   category_application: (id) => `/category-applications/${id}`,
   requisition: (id) => `/requisitions/${id}`,
@@ -19,6 +20,7 @@ const INTERNAL_PATHS: Record<string, (id: string) => string> = {
 const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {
   vendor: (_id, event) => (event?.startsWith("certificate.") ? "/vendor/profile" : "/vendor/registration"),
   vendor_standing: () => "/vendor/qualification",
+  vendor_change_request: (id) => `/vendor/profile/requests/${id}`,
   questionnaire_response: () => "/vendor/qualification",
   category_application: () => "/vendor/categories",
   sourcing: (id) => `/vendor/invitations/${id}`,

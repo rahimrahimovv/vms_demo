@@ -306,7 +306,7 @@ describe("REG-06 AC3 after approval", () => {
     expect((await actors.A.client.from("vendor_contact").select("id")).data).toHaveLength(2);
   });
 
-  it("the strict bank rule applies again after approval: the last account cannot be removed", async () => {
-    expect((await actors.A.client.rpc("bank_accounts_save", { p_accounts: [] })).error?.message).toBe("errors.bankAccountRequired");
+  it("after approval the vendor cannot replace or empty its accounts directly (REG-06 AC3, REG-08): a change request is needed", async () => {
+    expect((await actors.A.client.rpc("bank_accounts_save", { p_accounts: [] })).error?.message).toBe("errors.useChangeRequest");
   });
 });

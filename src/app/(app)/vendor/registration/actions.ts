@@ -232,6 +232,7 @@ export async function saveContact(_prev: StepState, formData: FormData): Promise
   const { error: checkError } = await ctx.supabase.rpc("contact_check");
   if (checkError) return state({ errors: { form: errorKey(checkError) ?? "common.genericError" }, contact: values });
 
+  await ctx.supabase.rpc("profile_log", { p_section: "CONTACT_PERSONS" }); // REG-08 AC11 (APPROVED vendors only)
   revalidatePath("/vendor/registration", "layout");
   revalidatePath("/vendor/profile");
   return state({ saved: true });
@@ -243,6 +244,7 @@ export async function deleteContact(id: string): Promise<{ error: string | null 
   const { error } = await ctx.supabase.rpc("contact_delete", { p_id: id });
   if (error) return { error: errorKey(error) ?? "common.genericError" };
   await removeFiles("vendor_contact", id);
+  await ctx.supabase.rpc("profile_log", { p_section: "CONTACT_PERSONS" }); // REG-08 AC11 (APPROVED vendors only)
   revalidatePath("/vendor/registration", "layout");
   revalidatePath("/vendor/profile");
   return { error: null };

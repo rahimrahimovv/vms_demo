@@ -14,6 +14,7 @@ export type SectionKey =
   | "vendors"
   | "questionnaires"
   | "categoryApplications"
+  | "changeRequests"
   | "avl"
   | "plan"
   | "requisitions"
@@ -92,6 +93,8 @@ export const SECTIONS: Section[] = [
   { key: "questionnaires", href: "/questionnaires", labelKey: "questionnaires", icon: "clipboardCheck", roles: ["PROCUREMENT_SPECIALIST"], group: "vendors" },
   // "Qualify or reject a category application; view the AVL" = PS, Admin (view)
   { key: "categoryApplications", href: "/category-applications", labelKey: "categoryApplications", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST"], group: "vendors" },
+  // REG-08: "Decide a change request; reopen a rejected registration" = PS only
+  { key: "changeRequests", href: "/change-requests", labelKey: "changeRequests", icon: "listChecks", roles: ["PROCUREMENT_SPECIALIST"], group: "vendors" },
   { key: "avl", href: "/avl", labelKey: "avl", icon: "shieldCheck", roles: ["PROCUREMENT_SPECIALIST", "ADMIN"], group: "vendors" },
   // "Manage users, catalogue, categories, dictionaries, settings, committee" and
   // "Build the qualification questionnaire" = Admin only.
