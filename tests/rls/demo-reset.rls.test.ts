@@ -204,11 +204,29 @@ describe("the command asks before it does anything", () => {
     }
   });
 
-  it("demo:load is a placeholder that changes nothing", async () => {
+  it("demo:load asks for the confirmation first: no confirmation or a wrong one changes nothing", async () => {
     const before = await counts();
-    const out = run("scripts/demo-load.ts", "");
-    expect(out.stderr).toContain("not built yet");
-    expect(out.status).toBe(1);
+    const none = run("scripts/demo-load.ts", "");
+    expect(none.stdout).toContain("Type the last 6 characters");
+    expect(none.stderr).toContain("Cancelled");
+    expect(none.status).toBe(1);
+    const wrong = run("scripts/demo-load.ts", "zzzzzz\n");
+    expect(wrong.stderr).toContain("do not match");
+    expect(wrong.status).toBe(1);
     expect(await counts()).toEqual(before);
+  });
+
+  it("demo:load refuses while demo_flag is off, without asking anything", async () => {
+    await db.query("update public.demo_flag set enabled = false");
+    try {
+      const before = await counts();
+      const out = run("scripts/demo-load.ts", "");
+      expect(out.stderr).toContain("demo_flag is not enabled");
+      expect(out.stdout).not.toContain("Type the last 6 characters");
+      expect(out.status).toBe(1);
+      expect(await counts()).toEqual(before);
+    } finally {
+      await db.query("update public.demo_flag set enabled = true");
+    }
   });
 });
