@@ -31,7 +31,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       <AppSidebar sections={sectionsFor(user.roles, vendorStatus)} />
       {/* Content starts 256 px from the left (16 + 224 + 16) and keeps 16 px from the other edges */}
       <div className="flex min-w-0 flex-col gap-(--shell-gap) py-(--shell-gap) pr-(--shell-gap) pl-[calc(var(--shell-gap)*2+var(--sidebar-w))]">
-        <DemoBarSlot />
+        <DemoBarSlot currentUserId={user.id} />
         <TopBar
           userId={user.id}
           fullName={user.fullName}

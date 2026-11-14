@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/auth-shell";
+import { DemoBarSlot } from "@/components/layout/demo-bar-slot";
 import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { RegisterForm, type RegisterFormState } from "@/components/vendor/register-form";
@@ -27,6 +28,8 @@ export default async function RegisterPage() {
   const t = await getTranslations();
 
   return (
+    <>
+    <DemoBarSlot floating />
     <AuthShell name={t("app.name")} wide>
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -41,5 +44,6 @@ export default async function RegisterPage() {
         <RegisterForm action={registerVendor} initial={EMPTY} />
       </div>
     </AuthShell>
+    </>
   );
 }

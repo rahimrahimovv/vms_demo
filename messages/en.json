@@ -396,7 +396,8 @@
     "supportRequired": "Attach a supporting document",
     "useChangeRequest": "Bank accounts change through a change request",
     "documentKinds": "Choose the documents to replace",
-    "documentFileRequired": "Attach a file for every document you replace"
+    "documentFileRequired": "Attach a file for every document you replace",
+    "notAvailable": "Not available"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -1684,5 +1685,32 @@
     },
     "empty": "No change requests are waiting.",
     "emptyAll": "No change requests yet."
+  },
+  "demo": {
+    "bar": {
+      "label": "Demo tools",
+      "switchUser": "Switch user",
+      "switchPlaceholder": "Choose a user…",
+      "internalUsers": "Internal users",
+      "vendorUsers": "Vendors",
+      "switchGo": "Switch",
+      "switching": "Switching…",
+      "lock": "Lock",
+      "notAvailable": "Not available",
+      "failed": "Could not switch user, try again"
+    },
+    "access": {
+      "title": "Demo access",
+      "subtitle": "Enter the demo code to unlock the demo tools in this browser for 8 hours.",
+      "code": "Demo code",
+      "submit": "Unlock",
+      "link": "Demo access",
+      "back": "Back to sign in",
+      "errors": {
+        "invalid": "Incorrect demo code",
+        "locked": "Too many attempts, try again in 15 minutes",
+        "unavailable": "Not available"
+      }
+    }
   }
 }

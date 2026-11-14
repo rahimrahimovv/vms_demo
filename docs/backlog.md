@@ -79,7 +79,7 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 - Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner.
 - Committee: configuration, a winner vote and a PO vote, numbered minutes for each decision.
 - Purchase order: one PO per winning vendor; Approver, then committee, then vendor acceptance.
-- Demo mode: role switcher, sample fill, end-deadline-now, reset; one seeded scenario and a populated demo dataset in a second load mode.
+- Demo mode: user switcher and end-deadline-now in the demo bar behind a demo code; reset to the scenario start and the populated demo data in a second load mode, both run as commands on a developer's machine (D-023); one seeded scenario. Sample fill is not in this release.
 - High-urgency items delivered (24 of 46): #1 (plan lines only), #9, #15, #16 (limit and justification; the committee approves it in the winner vote), #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #106 (certificate register with 30-day reminders), #110, plus #54 (owners), #97 (bank guarantee), #99 (bank-detail change request, approved by the Procurement Specialist because the MVP has no Finance role) and #100 (activity and brands).
 
 **If time allows (cut first when late)**
@@ -959,9 +959,9 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode is switched on by an environment setting and the presenter has entered the demo code (DEMO\_ACCESS\_CODE; the browser session stays unlocked for 8 hours, and without it every demo endpoint answers "Not available"), **When** any page loads, **Then** a demo bar shows Switch user, Reset to scenario start and Load populated demo data (DEMO-03).
+1. **Given** demo mode is switched on by an environment setting and the presenter has entered the demo code (DEMO\_ACCESS\_CODE; the browser session stays unlocked for 8 hours, and without it every demo endpoint answers "Not available"), **When** any page loads, **Then** a demo bar shows Switch user, End deadline now (where it applies) and Lock. The bar has no Reset and no Load button, and no web endpoint or server action resets or loads data (D-023).
 2. **Given** the demo bar, **When** the presenter picks a seeded user from Switch user, **Then** the session changes to that user without a password and the page reloads with that user's menu.
-3. **Given** a scenario form (registration, category application, PR, sourcing, proposal, question, answer, vote, decline reason), **When** the presenter clicks Fill sample, **Then** the form fills with the values in Demo Scenario Data and nothing is saved until the presenter clicks Save or Submit.
+3. **Given** a scenario form, **When** the presenter works through the scenario, **Then** the values in Demo Scenario Data are typed by hand. Fill sample is not in this release and stays a later addition.
 4. **Given** an OPEN sourcing, **When** the presenter clicks End deadline now, **Then** the deadline becomes the current time and the sourcing closes within 10 seconds as in RFQ-04.
 5. **Given** demo mode is switched off, **When** any page loads, **Then** no demo control is shown and every demo endpoint answers "Not available" with no effect.
 
@@ -984,7 +984,7 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode, **When** the presenter clicks Reset to scenario start, **Then** a dialog says "This deletes all data and restores the demo scenario" and needs a confirm click.
+1. **Given** a developer runs `npm run demo:reset` and the demo flag is enabled in that database, **When** the command has printed the target project reference and the number of rows it will delete, **Then** it deletes nothing until the developer types the last 6 characters of the project reference; with the flag disabled it refuses. There is no Reset button or web endpoint (D-023).
 2. **Given** the presenter confirms, **When** the reset runs, **Then** within 30 seconds all data is deleted and the seed in Demo Scenario Data is restored, and every user is signed out.
 3. **Given** a finished reset, **When** the presenter signs in as Vendor A, **Then** Vendor A does not exist yet and the registration page opens empty, so the scenario starts at step 1.
 4. **Given** the seed, **When** it is loaded, **Then** it holds no real person, company, VÖEN or bank account; all values are synthetic.
@@ -1008,7 +1008,7 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode, **When** the presenter clicks "Load populated demo data" in the demo bar and confirms the dialog "This deletes all data and loads the populated demo data", **Then** within 60 seconds all data is replaced by the Populated Data Catalogue below and every user is signed out; "Reset to scenario start" (DEMO-02) stays the other mode.
+1. **Given** a developer runs `npm run demo:load`, with the same project-reference confirmation and demo-flag guard as the reset (DEMO-02 AC1), **When** they confirm, **Then** within 60 seconds all data is replaced by the Populated Data Catalogue below and every user is signed out; `npm run demo:reset` (DEMO-02) stays the other mode. There is no Load button or web endpoint (D-023).
 2. **Given** the load, **When** it runs, **Then** every record is created through the application's own database functions, in dependency order, so each one has its audit entries, notifications, document numbers and minutes as if users had done the steps; no table is filled by a direct insert that skips the rules.
 3. **Given** any date in the data, **When** it is created, **Then** it is relative to the load time; every open deadline and every voting deadline is at least 2 days ahead so nothing closes during a demo session, and closed or decided records carry past dates in a sensible order.
 4. **Given** the data, **When** it is read, **Then** it holds only synthetic people, companies, tax numbers, IBANs and files; sample files are small generated PDFs.
@@ -1439,11 +1439,12 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-015 | Product name e-Procurement; look: Midnight Navy palette (brand blue #1D4E89), light glass style (translucent dark sidebar, top bar, cards and dialogs over a soft gradient; data tables stay solid and fall back to solid colours when the browser or the user asks for reduced transparency), compact tables, rounded corners, shield-and-check logo | CLAUDE.md, Design |
 | D-016 | One buying company now; every table carries company\_id so more can be added later | PLT-01 |
 | D-017 | The Approver sees a WINNER decision but not the comparison inside it; the Approver who is also the owner of the sourcing cannot approve its PO | CMT-02, PO-02 |
-| D-018 | Audit entries and minutes are immutable. The demo reset clears them only through a guarded server function that works when demo mode is on | NFR-011, DEMO-02 |
+| D-018 | Audit entries and minutes are immutable. The demo reset clears them only through a guarded database function that works when the demo flag is enabled and is called only by the reset command (D-023) | NFR-011, DEMO-02 |
 | D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
 | D-020 | After approval, core company data (legal name, tax number, address, director, founding date, VAT status, owners, bank accounts, documents) changes only through a change request that a Procurement Specialist approves; other profile data changes freely and is logged | REG-08 |
 | D-021 | Users change their own password; an Admin resets internal users and a Procurement Specialist resets vendors with a temporary password, because the release sends no e-mail | PLT-03 |
-| D-022 | Demo tools (Switch user, Fill sample, End deadline now, Reset, Load) work only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account or wipe data | DEMO-01 |
+| D-022 | Demo tools (Switch user, End deadline now) work only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account | DEMO-01 |
+| D-023 | Resetting and loading demo data are commands run on a developer's machine (`npm run demo:reset`, `npm run demo:load`), never a web endpoint, button or server action; each needs the demo flag enabled in the database and the last 6 characters of the project reference typed by the developer. Fill sample is not in this release | DEMO-02, DEMO-03 |
 
 **Assumptions in force**
 
