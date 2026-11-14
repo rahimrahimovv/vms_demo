@@ -62,7 +62,7 @@ describe("the guard", () => {
       await expect(db.query("select app.demo_backdate('sourcing', $1, interval '3 days')", [id])).rejects.toThrow(/demo_flag is not enabled/);
       await db.query("rollback to savepoint a");
       await db.query("update public.demo_flag set enabled = true");
-      for (const bad of ["0 days", "-2 days", "400 days"]) {
+      for (const bad of ["0 days", "-2 days", "900 days"]) {
         await db.query("savepoint b");
         await expect(db.query("select app.demo_backdate('sourcing', $1, $2::interval)", [id, bad])).rejects.toThrow(/shift must be/);
         await db.query("rollback to savepoint b");
@@ -150,7 +150,7 @@ describe("what it moves and what it keeps", () => {
       await db.query("select app.demo_backdate('sourcing', $1, interval '5 days')", [running]);
       await db.query("select app.demo_backdate('sourcing', $1, interval '5 days')", [over]);
       const after = await db.query("select id, final_offer_deadline, deadline from public.sourcing where id = any($1)", [[running, over]]);
-      const get = (rows: { id: string }[], id: string) => rows.find((r) => r.id === id) as { final_offer_deadline: Date; deadline: Date };
+      const get = (rows: { id: string }[], id: string) => rows.find((r) => r.id === id) as unknown as { final_offer_deadline: Date; deadline: Date };
       expect(get(after.rows, running).final_offer_deadline).toEqual(get(before.rows, running).final_offer_deadline);
       expect(get(before.rows, over).final_offer_deadline.getTime() - get(after.rows, over).final_offer_deadline.getTime()).toBe(5 * 86_400_000);
       const fo = await db.query("select sourcing_id, responded_at from public.final_offer_request where sourcing_id = any($1)", [[running, over]]);
@@ -200,5 +200,28 @@ describe("the immutability triggers", () => {
     const { rows: src } = await db.query("select prosrc from pg_proc where proname = 'demo_backdate'");
     expect(src[0].prosrc).not.toMatch(/disable trigger|session_replication_role|alter table/i);
     expect(src[0].prosrc).not.toMatch(/update public\.audit_entry|update public\.minutes/i);
+  });
+});
+
+describe("dates that depend on the decision moment", () => {
+  it("a vendor shifted by 14 months has lapsed validity; the daily job then expires it with an audit entry", async () => {
+    await rolledBack(async () => {
+      const before = await db.query(
+        "select valid_until from public.questionnaire_response where vendor_id = $1 and status = 'GRADED'", [BETA]);
+      expect(before.rows).toHaveLength(1);
+      const r = await db.query("select app.demo_backdate('vendor', $1, interval '430 days') as r", [BETA]);
+      expect(r.rows[0].r.vendor).toBe(1);
+      const after = await db.query(
+        "select (($1::date - valid_until)) as days, valid_until < app.today() as lapsed from public.questionnaire_response where vendor_id = $2 and status = 'GRADED'",
+        [before.rows[0].valid_until, BETA]);
+      expect(after.rows[0].days).toBe(430);
+      expect(after.rows[0].lapsed).toBe(true);
+      await db.query("select app.run_daily_jobs()");
+      const s = await db.query("select status from public.questionnaire_response where vendor_id = $1 order by created_at desc limit 1", [BETA]);
+      expect(s.rows[0].status).toBe("EXPIRED");
+      const a = await db.query(
+        "select to_status, user_id from public.audit_entry where record_type = 'questionnaire_response' and to_status = 'EXPIRED' order by created_at desc limit 1");
+      expect(a.rows[0]).toEqual({ to_status: "EXPIRED", user_id: null });
+    });
   });
 });
