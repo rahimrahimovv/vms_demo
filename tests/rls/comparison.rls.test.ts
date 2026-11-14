@@ -434,8 +434,11 @@ describe("Rejected winner, tie rule and the frozen package", () => {
     expect((await actors.vendorA.client.rpc("final_offer_submit", { p_sourcing: id, p_lines: [{ sourcing_line_id: line, unit_price: 28.5 }], p_keep: false })).error?.message).toBe("errors.finalOfferHigher");
     expect((await actors.vendorA.client.rpc("final_offer_submit", { p_sourcing: id, p_lines: [{ sourcing_line_id: line, unit_price: 27.5 }], p_keep: false })).error).toBeNull();
     expect(await notified("vendorB", "finalOffer.requested", id)).toHaveLength(0);
-    await db.query("update public.sourcing set final_offer_deadline = now() - interval '1 second' where id = $1", [id]);
-    await db.query("select app.close_due_sourcings()");
+    // DEMO-01 AC4: "End deadline now" on a running final-offer round ends it at once (no wait for the minute job)
+    expect((await service.rpc("demo_deadline_info", { p_sourcing: id })).data).toBe("FINAL_OFFER_ROUND");
+    expect((await service.rpc("demo_end_deadline", { p_sourcing: id })).data).toBe("FINAL_OFFER_ROUND");
+    expect((await db.query("select status from public.sourcing where id = $1", [id])).rows[0].status).toBe("COMPARISON");
+    expect((await service.rpc("demo_end_deadline", { p_sourcing: id })).data).toBeNull(); // nothing left to end
     const c = (await comparison("specialist", id))!;
     expect(cellOf(c, 0, pB).unitExclVat).toBe(28); // not chosen: unchanged (AC7)
     expect(c.lines[0].defaultProposalId).toBe(pA);

@@ -1,14 +1,47 @@
 "use client";
 
-import { useActionState } from "react";
-import { FlaskConical, Lock } from "lucide-react";
+import { useActionState, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { FlaskConical, Lock, TimerOff } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { lockAction, switchUserAction, type DemoState } from "@/app/actions/demo";
+import {
+  deadlineInfoAction,
+  endDeadlineAction,
+  lockAction,
+  switchUserAction,
+  type DemoState,
+} from "@/app/actions/demo";
 import { Button } from "@/components/ui/button";
 
 export type DemoUser = { id: string; name: string; email: string; role: string; isVendor: boolean };
 
 const IDLE: DemoState = { error: null };
+const SOURCING_PATH = /^\/sourcing\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:\/|$)/i;
+
+/**
+ * "End deadline now" shows only on a sourcing record whose deadline can be ended (OPEN, or a running final-offer
+ * round). The layout stays mounted between pages, so the bar asks the server again when the page changes and every
+ * 10 seconds (a sourcing may have just been published or its round started).
+ */
+function useEndableSourcing(): { id: string; kind: "OPEN" | "FINAL_OFFER_ROUND" } | null {
+  const sourcingId = SOURCING_PATH.exec(usePathname())?.[1] ?? null;
+  const [found, setFound] = useState<{ id: string; kind: "OPEN" | "FINAL_OFFER_ROUND" } | null>(null);
+  useEffect(() => {
+    if (!sourcingId) return;
+    let alive = true;
+    const ask = () =>
+      deadlineInfoAction(sourcingId).then((kind) => {
+        if (alive) setFound(kind ? { id: sourcingId, kind } : null);
+      });
+    ask();
+    const timer = setInterval(ask, 10_000);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+    };
+  }, [sourcingId]);
+  return sourcingId && found?.id === sourcingId ? found : null;
+}
 
 /**
  * The demo bar (glass strip): Switch user, End deadline now (where it applies) and Lock. Resetting and loading
@@ -17,7 +50,14 @@ const IDLE: DemoState = { error: null };
 export function DemoBarControls({ users, currentUserId }: { users: DemoUser[]; currentUserId?: string }) {
   const t = useTranslations("demo.bar");
   const roles = useTranslations("roles");
+  const router = useRouter();
   const [state, switchAction, switching] = useActionState(switchUserAction, IDLE);
+  const endable = useEndableSourcing();
+  const [endState, endAction, ending] = useActionState(async (prev: DemoState, formData: FormData) => {
+    const result = await endDeadlineAction(prev, formData);
+    if (!result.error) router.refresh();
+    return result;
+  }, IDLE);
 
   const label = (u: DemoUser) =>
     `${u.name} (${u.role
@@ -76,6 +116,15 @@ export function DemoBarControls({ users, currentUserId }: { users: DemoUser[]; c
       </form>
 
       <div className="ml-auto flex items-center gap-2">
+        {endable && (
+          <form action={endAction}>
+            <input type="hidden" name="sourcingId" value={endable.id} />
+            <Button type="submit" variant="outline" size="sm" disabled={ending} data-testid="demo-end-deadline">
+              <TimerOff aria-hidden />
+              {endable.kind === "OPEN" ? t("endDeadline") : t("endFinalOffer")}
+            </Button>
+          </form>
+        )}
         <form action={lockAction}>
           <Button type="submit" variant="outline" size="sm" data-testid="demo-lock">
             <Lock aria-hidden />
@@ -84,6 +133,11 @@ export function DemoBarControls({ users, currentUserId }: { users: DemoUser[]; c
         </form>
       </div>
 
+      {endState.error && (
+        <p role="alert" className="basis-full text-xs font-medium text-destructive" data-testid="demo-end-error">
+          {endState.error === "errors.notAvailable" ? t("notAvailable") : t("nothingToEnd")}
+        </p>
+      )}
       {state.error && (
         <p role="alert" className="basis-full text-xs font-medium text-destructive" data-testid="demo-bar-error">
           {state.error === "errors.notAvailable" ? t("notAvailable") : t("failed")}

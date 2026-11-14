@@ -1697,7 +1697,10 @@
       "switching": "Switching…",
       "lock": "Lock",
       "notAvailable": "Not available",
-      "failed": "Could not switch user, try again"
+      "failed": "Could not switch user, try again",
+      "endDeadline": "End deadline now",
+      "endFinalOffer": "End final-offer round now",
+      "nothingToEnd": "No deadline to end here"
     },
     "access": {
       "title": "Demo access",
