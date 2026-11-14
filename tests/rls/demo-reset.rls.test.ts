@@ -177,7 +177,7 @@ describe("the command asks before it does anything", () => {
     const out = run("scripts/demo-reset.ts", "abcdef\n");
     expect(out.stdout).toMatch(/Target project reference: [a-z0-9]{20}/);
     expect(out.stdout).toMatch(/About to delete:\s+\d+ rows in \d+ tables/);
-    expect(out.stdout).toMatch(/Auth users .* sessions .*\s+\d+ uploaded files/s);
+    expect(out.stdout).toMatch(/Auth users [^\n]* sessions[^\n]*\n\s+\d+ uploaded files/);
     expect(out.stdout).toContain("Type the last 6 characters of the project reference");
     expect(out.stdout + out.stderr).toContain("Cancelled: the characters do not match. Nothing was changed.");
     expect(out.status).toBe(1);
