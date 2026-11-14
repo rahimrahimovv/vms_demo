@@ -517,10 +517,11 @@ Migrations `20261117100000_passwords` and `20261117110000_change_requests` (RLS 
 ### Verified
 - Typecheck, lint, production build; 133 unit tests; the full RLS suite on vms-dev after both migrations: 11 files, 231 tests (passwords 11,
   change requests 19; three older bank-account tests changed because the direct path is closed for APPROVED vendors).
-- Click-through in the browser: NOT run (the browser tool found no Chrome and installing playwright was refused). vms-prod is not migrated yet.
+- Click-through in the browser: NOT run (waived by the BA on 17 Nov 2026). The UI flows of Slice 7b (password change and reset, change request, rejected page and Reopen) were not clicked through and must be covered in the final rehearsal. vms-prod migrated on 17 Nov 2026 (ref bxomavkbdppdbpdklkeg, checked first).
 
 ### Open issues
 20. After a reset, an access token that was already issued keeps working against the API until it expires (about an hour): the app stops at the
     change-password form because of the mark, but a direct API call with the old token is not stopped (`must_change_password` is enforced in the app only, accepted).
 21. Replaced registration documents: the database rows are replaced in the approval transaction, the storage objects are deleted afterwards; a failure
     there leaves an orphan object. Same family as open item 9 (staged uploads without a cleanup job).
+22. **Final rehearsal must cover the Slice 7b UI flows**: change own password; Admin resets an internal user; Procurement Specialist resets a vendor (temporary password shown once, forced change at sign-in); vendor change request approved, returned, rejected and withdrawn; rejected vendor sees only "Registration rejected"; Reopen. Also check on production that the password gate does not block normal users.
