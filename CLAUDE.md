@@ -89,7 +89,7 @@ Each slice ends deployed and clickable on the Vercel link. Never break an earlie
 | 8b | DEMO-03 | `npm run demo:load`: populated demo data, created through the application's own functions, with a self-check |
 
 Status (18 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 7b (PLT-03, REG-08) done on vms-dev and deployed after the production step in `docs/PROGRESS.md`; Slice 8a (DEMO-01, DEMO-02) built on vms-dev,
-not yet on vms-prod or `main` on Vercel (see `docs/PROGRESS.md`); 8b (DEMO-03) not started. Open items are in `docs/PROGRESS.md`.
+not yet on vms-prod or `main` on Vercel (see `docs/PROGRESS.md`); 8b (DEMO-03, `npm run demo:load`) built on vms-dev, first real run pending. Open items are in `docs/PROGRESS.md`.
 
 The data model for every slice is in place from Slice 2 (all ERD tables, RLS and status audit); each slice adds its screens and the functions that change status.
 

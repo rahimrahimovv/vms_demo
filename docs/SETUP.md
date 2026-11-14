@@ -131,5 +131,9 @@ update public.demo_flag set enabled = false;    -- forbid it again
 It is **enabled on vms-dev**. vms-prod is **not** migrated and the flag is **not** enabled there; do both deliberately, when the
 production reset is wanted.
 
-**Load populated demo data** (`npm run demo:load`, DEMO-03, Slice 8b) is a placeholder that prints "not built yet" and changes nothing.
-It will reuse the same module (`scripts/lib/demo-data.ts`), the same typed confirmation and the same flag.
+**Load populated demo data** (`npm run demo:load`, DEMO-03, Slice 8b) runs the reset first and then loads the Populated Data Catalogue
+through the application's own database functions, signed in as the right user (the vendor, the Specialist, the committee, ...). Same module
+(`scripts/lib/demo-data.ts`), same typed confirmation, same flag as the reset. It takes up to 3 minutes, ends with the self-check and prints
+`Loaded: N vendors, N PRs, N sourcings, N decisions, N POs` or the first failed check. It needs `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` too (the loader
+signs in as the demo users with `DEMO_SEED_PASSWORD`). Migrations `20261119100000_demo_backdate` and `20261119120000_demo_backdate_dates`
+(function `app.demo_backdate`) must be applied to the target database first.

@@ -540,7 +540,7 @@ them are not built** (nothing of them was ever written). Commits: DEMO-01 a04a5c
 | DEMO-01 AC4 | done on vms-dev | End deadline now in the bar, only on a sourcing record that is OPEN or in a running final-offer round; sets the deadline to now and runs `app.close_due_sourcings()` in the same call (immediate) |
 | DEMO-01 AC3 | not in this release | Fill sample stays a later addition (D-023) |
 | DEMO-02 | done on vms-dev, real run pending | `npm run demo:reset`: prints the project reference and what it deletes, refuses unless `demo_flag` is enabled, waits for the last 6 characters of the project reference; one TRUNCATE transaction (`app.demo_reset`) seeds the 9 users through `app.demo_seed`, ends all sessions, leaves one RESET audit line; then deletes Auth users not in the list, every Storage object, and restores the sample proof files. Immutability triggers are never touched. The user list is a parameter of `resetToUsers` (`scripts/lib/demo-data.ts`) for Slice 8b |
-| DEMO-03 | not started | `npm run demo:load` is a placeholder ("not built yet") |
+| DEMO-03 | built in Slice 8b, see below | `npm run demo:load` |
 
 `supabase/seed.sql` now only calls `app.seed_base()`; the seed data moved into that function (change it with a migration). `scripts/seed-users.ts`
 takes its user list and proof-file code from `scripts/lib/demo-data.ts`.
@@ -574,3 +574,58 @@ takes its user list and proof-file code from `scripts/lib/demo-data.ts`.
 24. The demo bar's "End deadline now" asks the server every 10 seconds while a sourcing page is open (the layout stays mounted between pages).
 25. A reset ends every Auth session, but an access token already issued keeps working until it expires (about an hour), like issue 20; the unlock cookie survives a reset by design.
 26. `docs/backlog.md` carries the developer's wording of the D-023 patch (see above); replace it with the BA's text at the next export.
+
+## Slice 8b: DEMO-03, populated demo data (19 Nov 2026)
+
+Backlog export of 14 Nov 2026 (DEMO-03 Populated Data Catalogue with display names; AC1 allows up to 3 minutes). Migrations
+`20261119100000_demo_backdate`, `20261119110000_demo_names`, `20261119120000_demo_backdate_dates` (vms-dev only; vms-prod not migrated, `main` not pushed).
+
+### Display names (rename)
+Agro Holding MMC (was Demo Agro LLC), Aygun Rzayeva (was Demo Admin), Ege Tarim Kimya A.S. (Beta Trade), Caspian Agrochem MMC (Gamma Supply); the live Scenario A
+vendor is Kura Agro Supply MMC (was Alpha Agro). E-mail addresses unchanged. Done in `app.seed_base()` (new migration; existing databases are renamed in place),
+the tests that compare names, the texts and SETUP.md. Older entries of this file keep the old names (history).
+
+### Time-shift design (as agreed)
+The functions refuse past deadlines and stamp `now()`. The loader builds each story in the present, then calls `app.demo_backdate(root_type, root_id, interval)`
+(root: requisition, sourcing or vendor). It refuses unless `demo_flag` is on, is in the app schema with execute revoked from every API role, moves only a fixed list of
+timestamp and validity-date columns (created, submitted, decided, opened, closed, voted, asked, published, responded, passed, bids and prices opened, closed-record
+deadlines, grade and category validity, HOLD end) and the notifications and files of the moved records, never a status, never `audit_entry` or `minutes`, and
+disables or replaces no trigger. Open records keep their times: an OPEN sourcing and everything under it, a VOTING decision and its voters, the deadline and
+answers of a running final-offer round. **History tab and minutes show the load time** (immutable by design; Option B, a demo clock in the audit trigger, was
+rejected). Largest shift 800 days: Mugan Irrigation Systems is moved 430 days, the daily job (`app.run_daily_jobs`) expires its first qualification with its own audit
+entry, it is graded again and qualified in Spare parts.
+
+### How it runs
+Reset first (same module as `demo:reset`), then every record through the app's own functions as the right user (own signed-in session with the demo password):
+vendors walk the REG-07 steps (short form, company details, owners, bank, contact with proof, documents, submit); the Specialist approves, returns or rejects;
+questionnaires use answers worth grades A 90.0, B 73.0, C 58.5, D 26.5; certificates and applications as the vendor. Documents with a number are created
+strictly one after another, oldest story first (S6, S7, S10, S11, S12, S4, S8, S5, rejected and returned PR, S9, S3, S2, S1, the other PRs), so PR, SRC, PO and MIN
+numbers rise with their dates; only vendor registrations run side by side (4 at a time). Files go through the app's own upload core (`src/lib/files/store.ts`, shared by
+the server actions and the loader). "End deadline now" (`demo_end_deadline`) closes the sourcings, as the demo bar does. Mirrored path: the short account form
+(`register_vendor` payload); `tests/unit/demo-load-paths.test.ts` proves it equals the app's `toAccountColumns` for every vendor.
+
+### Deviations from the catalogue (decided by the app's rules; to confirm with the BA)
+1. **Eight closed decisions and minutes (MIN-2026-001 to 008), not six.** A Tender goes through an OPENING decision (S10 as well as S6 and S12), and a FULLY_APPROVED PO
+   exists only after a committee PO decision (S10's first PO), so S10 adds two closed decisions: its opening and its first PO. The three open votes are those of the
+   catalogue. Decisions total 11 (the "Loaded" line counts closed and open).
+2. The Administrator is addressed by no workflow event, so three Admin notices (registrations waiting for review) are sent with `app.notify`, the app's notification function.
+3. Plan lines: six (Fertilisers 500,000.00 as in the base seed, Irrigation 300,000.00, Seeds 200,000.00, Spare parts 250,000.00, Plant protection 150,000.00, Office supplies 10,000.00).
+4. SRC numbers follow creation order, so the S-labels and the SRC numbers do not match (S6 is the oldest sourcing).
+
+### Invented values (synthetic; the VÖENs are invented and may coincide with real ones by chance)
+VÖENs of the vendors (10 digits, 17004000xx), names, phones, IBANs, owners and the prices below are all invented. Quantities and prices per story (AZN excluding VAT):
+S1 6 drip lines x 600 + 40 disc filters x 60; S2 300 wheat x 25 + 150 barley x 30; S3 400 filters x 45 + 500 hoses x 60 + 100 ploughshares x 370;
+S4 400 ammonium nitrate x 30 + 200 NPK x 40; S5 120 x 800 + 900 x 40 + 300 x 60; S6 300 x 80 + 500 x 50 + 300 x 50; S7 200 x 20 + 250 x 22 (customs 0.40 per unit on the
+first line of the Mugan proposal); S8 100 x 150 + 1,300 x 10 (final offer 146.00 and 9.70); S9 100 micronutrient mix x 40 (justification: the only registered importer in
+the region, with a PDF); S10 1,000 x 24 + 800 x 30 + 80 x 300, three winners (23.00, 28.50, 280.00); S11 400 urea x 35 (winner 34.00).
+
+### Verified
+- Unit tests (137 before, now with the 17 of `demo-load-paths`); RLS: `demo-backdate` (7 tests: no API role may execute, flag guard, shift limits, closed rows move and open
+  rows stay, status and audit and minutes untouched, validity dates and the daily job, triggers enabled); `demo-reset` and `vendors` re-run green after the rename.
+- Static check of every RPC call of the loader against the SQL signatures (parameter names): no mismatch.
+- **The real `npm run demo:load` has NOT been run** (the typed confirmation is the developer's). Run it on vms-dev, then the full RLS suite once, and check the timing
+  (target 3 minutes) and the self-check line. No browser click-through of the loaded screens yet.
+
+### Open issues
+27. The first real run may stop at a function message or at the self-check; the loader stops at the first error and names the function and the user.
+28. A load leaves about a hundred small PDFs in Storage; `demo:reset` empties the bucket.
