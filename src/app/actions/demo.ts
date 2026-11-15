@@ -44,25 +44,3 @@ export async function switchUserAction(_prev: DemoState, formData: FormData): Pr
 
   redirect("/");
 }
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/** Which deadline "End deadline now" could end on this sourcing: an OPEN sourcing or a running final-offer round. */
-export async function deadlineInfoAction(sourcingId: string): Promise<"OPEN" | "FINAL_OFFER_ROUND" | null> {
-  if (!(await isDemoUnlocked()) || !UUID.test(sourcingId)) return null;
-  const { data } = await createAdminClient().rpc("demo_deadline_info", { p_sourcing: sourcingId });
-  return data === "OPEN" || data === "FINAL_OFFER_ROUND" ? data : null;
-}
-
-/**
- * End deadline now (DEMO-01 AC4): the deadline becomes the current time and the deadline job runs at once, so the
- * sourcing closes (or the final-offer round ends) right away.
- */
-export async function endDeadlineAction(_prev: DemoState, formData: FormData): Promise<DemoState> {
-  if (!(await isDemoUnlocked())) return { error: "errors.notAvailable" };
-  const sourcingId = String(formData.get("sourcingId") ?? "");
-  if (!UUID.test(sourcingId)) return { error: "common.genericError" };
-  const { data, error } = await createAdminClient().rpc("demo_end_deadline", { p_sourcing: sourcingId });
-  if (error || !data) return { error: "demo.bar.nothingToEnd" };
-  return { error: null };
-}

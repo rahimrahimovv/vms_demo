@@ -41,7 +41,8 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 34 stories
 │   ├── RFQ-05  Specialist evaluates and proposes the winner
 │   ├── RFQ-06  Specialist runs a Single Source Purchase (SSP)
 │   ├── RFQ-07  Specialist adds extra costs (landed price)
-│   └── RFQ-08  Specialist requests a final (discounted) offer
+│   ├── RFQ-08  Specialist requests a final (discounted) offer
+│   └── RFQ-09  Specialist closes a sourcing early
 ├── CMT  Committee
 │   ├── CMT-01  Admin configures the committee
 │   ├── CMT-02  Committee votes on a winner or a PO decision
@@ -765,6 +766,32 @@ TBD
 
 ---
 
+### RFQ-09 - Specialist Closes A Sourcing Early
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-09 |
+| **Story title** | The owner closes an OPEN sourcing before its deadline once every invited vendor has answered. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Procurement Specialist (owner of the sourcing) |
+| **I want to...** | close an OPEN sourcing now, with a reason, when every invited vendor has answered |
+| **So that...** | the buying does not wait for a deadline that no longer matters |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** an OPEN sourcing whose invited vendors have all answered (a submitted proposal or a declined invitation), **When** the owner clicks Close now, sees the deadline that will be replaced and enters a reason, **Then** the deadline becomes the current time and the sourcing closes exactly as at a normal deadline: a Tender goes to AWAITING_OPENING, an RFQ or an SSP to COMPARISON, or the sourcing stays CLOSED when it is below the minimum.
+2. **Given** an OPEN sourcing with at least one invited vendor that has not answered (invited, accepted without a submitted proposal, a saved or withdrawn proposal), **When** the owner looks at Close now, **Then** it is disabled and shows "N invited vendors have not answered yet" with the names of those vendors; a call to the database is refused with the same message and nothing changes.
+3. **Given** the reason is empty, **When** the owner confirms, **Then** "Enter a reason" appears and nothing changes.
+4. **Given** a user who is not the owner (another specialist, or any other role or a vendor), or a sourcing that is not OPEN, **When** Close now is called, **Then** it is refused and nothing changes.
+5. **Given** a sourcing closed early, **When** the History tab is opened, **Then** each status change (OPEN to CLOSED and the next one) has an entry with the user, the time, the reason and the original deadline.
+6. **Given** a sourcing closed early, **When** it closes, **Then** every vendor with a submitted proposal is notified "Sourcing closed early"; the reason stays internal and no declined vendor is notified.
+
+---
+
 ### CMT-01 - Admin Configures The Committee
 
 | Field | Value |
@@ -959,10 +986,10 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode is switched on by an environment setting and the presenter has entered the demo code (DEMO\_ACCESS\_CODE; the browser session stays unlocked for 8 hours, and without it every demo endpoint answers "Not available"), **When** any page loads, **Then** a demo bar shows Switch user and Lock, and on an OPEN sourcing the control End deadline now.
+1. **Given** demo mode is switched on by an environment setting and the presenter has entered the demo code (DEMO\_ACCESS\_CODE; the browser session stays unlocked for 8 hours, and without it every demo endpoint answers "Not available"), **When** any page loads, **Then** a demo bar shows Switch user and Lock.
 2. **Given** the demo bar, **When** the presenter picks a seeded user from Switch user, **Then** the session changes to that user without a password and the page reloads with that user's menu.
 3. **Given** (later addition, not in this release) a scenario form (registration, category application, PR, sourcing, proposal, question, answer, vote, decline reason), **When** the presenter clicks Fill sample, **Then** the form fills with the values in Demo Scenario Data and nothing is saved until the presenter clicks Save or Submit.
-4. **Given** an OPEN sourcing, **When** the presenter clicks End deadline now, **Then** the deadline becomes the current time and the sourcing closes within 10 seconds as in RFQ-04.
+4. (Removed, D-025) Closing a sourcing early is the business function of RFQ-09, not a demo tool.
 5. **Given** demo mode is switched off, **When** any page loads, **Then** no demo control is shown and every demo endpoint answers "Not available" with no effect.
 
 ---
@@ -1058,8 +1085,8 @@ Also one SUBMITTED change request (Bank accounts) by Zeta Irrigation LLC. Plan l
 | ID | Method and type | Category, value (AZN) | State to show |
 | --- | --- | --- | --- |
 | S1 | Competitive RFQ | Irrigation systems, 6,000 | DRAFT: invitees listed, not published |
-| S2 | Competitive RFQ | Seeds, 12,000 | OPEN, deadline in 2 days, 4 invited: 2 submitted, 1 accepted without a proposal, 1 declined with a reason |
-| S3 | Competitive Tender | Spare parts, 85,000 | OPEN, deadline in 9 days, 1 proposal so far; Q&A with 1 published and 1 UNANSWERED question |
+| S2 | Competitive RFQ | Seeds, 12,000 | OPEN, deadline in 2 days, 4 invited: 2 submitted, 2 declined with a reason (Close now is allowed) |
+| S3 | Competitive Tender | Spare parts, 85,000 | OPEN, deadline in 9 days, 1 proposal so far, 1 declined and 2 invited vendors that have not answered (Close now is refused); Q&A with 1 published and 1 UNANSWERED question |
 | S4 | Competitive RFQ | Fertilisers, 20,000 | CLOSED below minimum (2 of 3): Extend, Continue and Cancel available |
 | S5 | Competitive Tender | Irrigation systems, 150,000 | AWAITING\_OPENING, 4 proposals, OPENING vote in progress with 1 of 3 votes cast |
 | S6 | Competitive Tender | Plant protection, 64,000 | TECHNICAL\_EVALUATION after the opening approved 3 to 0; 3 proposals, 1 marked PASSED |
@@ -1094,6 +1121,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Create, edit and submit own PR | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Approve, return or reject a PR (not own) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Start, publish, extend, continue or cancel a sourcing | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
+| Close an OPEN sourcing early (all invited vendors answered) | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Answer questions, publish clarifications | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Accept or decline an invitation, ask a question, submit a proposal | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | See proposal prices before the deadline | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
@@ -1131,7 +1159,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | --- | --- | --- | --- | --- |
 | (none) | DRAFT | Start sourcing on an APPROVED PR | Procurement Specialist | Method Competitive (type by value) or Single Source (SSP) |
 | DRAFT | OPEN | Publish | Owner | At least one invitee; an SSP above the limit needs a justification and a file |
-| OPEN | CLOSED | Deadline passes | System | Within 1 minute; vendors reminded 24 hours before |
+| OPEN | CLOSED | Deadline passes, or Close now | System, or Owner | Within 1 minute; vendors reminded 24 hours before. Close now needs a reason and every invited vendor answered (RFQ-09) |
 | CLOSED | OPEN | Extend | Owner | Reason; at most 2 times |
 | CLOSED | AWAITING\_OPENING | Minimum reached, or Continue | System or Owner | Tender only; an OPENING decision opens |
 | CLOSED | COMPARISON | Minimum reached, or Continue | System or Owner | RFQ and SSP; prices open; Continue needs a reason |
@@ -1282,6 +1310,7 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | Answer or clarification published | Invited vendors not declined | In-app | Sourcing number, question and answer, no asker name | No |
 | Deadline extended | Invited vendors not declined | In-app | New deadline | No |
 | Sourcing closed | Sourcing owner | In-app | Proposals received versus minimum | No |
+| Sourcing closed early | Every vendor with a submitted proposal | In-app | Sourcing number (the reason stays internal) | No |
 | Sourcing cancelled | Invited vendors not declined | In-app | Sourcing number, reason | No |
 | Committee decision opened | Eligible committee members | In-app | Decision type (opening, winner or PO), sourcing, voting deadline | No |
 | Committee decision closed | Sourcing owner, committee members | In-app | Result, minutes number | No |
@@ -1330,7 +1359,7 @@ The release has no ERP, e-mail or SMS integration; every interface below runs in
 | Supabase Auth | API | Sign-in with e-mail and password; user creation by the Admin; vendor self-registration | Session for the user's roles | Wrong credentials: message, no session; service down: "Sign-in is unavailable, try again" |
 | Supabase database with row-level security | API | Every read and write | Rows filtered by company, role and vendor | Refused write: error message, nothing saved |
 | Supabase Storage (private bucket) | API | File upload and download | Stored file; time-limited download link | Wrong type or size: message, file not stored |
-| Deadline and voting job | Job, every minute | OPEN sourcing past its deadline; VOTING decision past its period | Status change, notifications, minutes | A failed run is caught by the next run; demo mode also has End deadline now |
+| Deadline and voting job | Job, every minute | OPEN sourcing past its deadline; VOTING decision past its period | Status change, notifications, minutes | A failed run is caught by the next run |
 | Qualification expiry | Job, daily, plus a check on read | QUALIFIED application past its valid-until date | EXPIRED status, vendor out of the AVL | The read-time check keeps the AVL correct even if the job fails |
 | PDF generation | API (server function) | Download of minutes or a PO | PDF in English | "The PDF could not be generated, try again"; data unchanged |
 | In-app notifications | Event | Any event in the Notification table | Bell item for each recipient, pushed live | If live push fails, the bell refreshes on the next page load |
@@ -1402,7 +1431,7 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 3. Leyla creates a PR on the plan line with two lines: 2,000 bags of "Ammonium nitrate 34.4%, 50 kg bag" × 30.00 AZN = 60,000.00 and 500 L of "Foliar fertiliser, 1 L" × 40.00 AZN = 20,000.00, delivery in 30 days to "Central warehouse"; value 80,000.00 AZN. Rashad approves.
 4. Nigar starts sourcing: Tender (80,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
 5. Beta Trade asks "Can delivery be split into two shipments?"; Nigar answers "Yes, two shipments before the delivery date."
-6. First proposals, per bag and per litre: Alpha Agro 33.04 and 48.38 including 18% VAT (28.00 and 41.00 excluding VAT), DDP Central warehouse, 20 days; Beta Trade 29.50 and 40.00 without VAT, CIP Baku port, 15 days, flagged "Different terms: Incoterm, named place"; Gamma Supply 27.00 and 38.00 without VAT, DDP Central warehouse, 25 days, technical document without the product certificate. The presenter clicks End deadline now.
+6. First proposals, per bag and per litre: Alpha Agro 33.04 and 48.38 including 18% VAT (28.00 and 41.00 excluding VAT), DDP Central warehouse, 20 days; Beta Trade 29.50 and 40.00 without VAT, CIP Baku port, 15 days, flagged "Different terms: Incoterm, named place"; Gamma Supply 27.00 and 38.00 without VAT, DDP Central warehouse, 25 days, technical document without the product certificate. The Specialist clicks Close now once every invited vendor has answered or declined (RFQ-09).
 7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per unit to Beta Trade on both lines (port to warehouse), and requests a final offer from both: Alpha Agro lowers the bags to 27.50 excluding VAT (32.45 with VAT) and keeps 41.00 for the litres; Beta Trade lowers the litres to 39.00 and keeps 29.50 for the bags. The evaluated prices are 27.50 against 30.50 for the bags and 41.00 against 40.00 for the litres, so Alpha Agro is proposed for the bags and Beta Trade for the litres. Only 2 of 3 proposals are eligible, so Nigar writes the low-competition reason and sends both winners to the committee.
 8. Winner vote: Elchin For, Sevinj For, Tural Against ("Beta Trade delivers 5 days faster") → APPROVED 2 to 1, minutes MIN-2026-002.
 9. Two POs are created: PO-2026-0001 to Alpha Agro, 55,000.00 AZN excluding VAT (2,000 × 27.50), 64,900.00 AZN with 18% VAT; PO-2026-0002 to Beta Trade, 19,500.00 AZN (500 × 39.00). Rashad approves both; each PO vote is 3 to 0, "Same as the approved winner decision", minutes MIN-2026-003 and MIN-2026-004.
@@ -1443,8 +1472,9 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
 | D-020 | After approval, core company data (legal name, tax number, address, director, founding date, VAT status, owners, bank accounts, documents) changes only through a change request that a Procurement Specialist approves; other profile data changes freely and is logged | REG-08 |
 | D-021 | Users change their own password; an Admin resets internal users and a Procurement Specialist resets vendors with a temporary password, because the release sends no e-mail | PLT-03 |
-| D-022 | Demo tools (Switch user, End deadline now) work only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account or wipe data | DEMO-01 |
+| D-022 | Demo tools (Switch user) work only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account or wipe data | DEMO-01 |
 | D-023 | Resetting and loading demo data are commands run by a developer (npm run demo:reset and npm run demo:load) against a database whose demo flag is on, with a typed confirmation; they are not buttons in the app. Fill sample is a later addition | DEMO-02, DEMO-03 |
+| D-025 | The Procurement Specialist who owns an OPEN sourcing may close it before its deadline when every invited vendor has answered (a submitted proposal or a declined invitation); a reason is required and the audit trail keeps it with the original deadline. This replaces the demo tool "End deadline now", which is removed | RFQ-09, DEMO-01 |
 
 **Assumptions in force**
 

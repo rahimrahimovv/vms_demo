@@ -119,3 +119,28 @@ describe("Role Matrix sections", () => {
     expect(sectionForPath("/purchase-orders/abc")?.key).toBe("purchaseOrders");
   });
 });
+
+// My tasks: cards and the "Waiting for you" list come from the same results (src/lib/home/tasks.ts)
+import { taskKeysFor, waitingRows, waitingTotal, type TaskResult } from "@/lib/home/tasks";
+
+describe("My tasks", () => {
+  it("each role gets its own cards", () => {
+    expect(taskKeysFor(["PROCUREMENT_SPECIALIST"])).toEqual([
+      "registrations", "changeRequests", "questionnaires", "applications", "sourcingsBelowMinimum", "prsReadyForSourcing",
+    ]);
+    expect(taskKeysFor(["APPROVER"])).toEqual(["posToApprove", "prsToApprove"]);
+    expect(taskKeysFor(["REQUESTER"])).toEqual(["prsReturned"]);
+    expect(taskKeysFor(["COMMITTEE_MEMBER"])).toEqual(["votesWaiting"]);
+    expect(taskKeysFor(["ADMIN"])).toEqual([]);
+  });
+
+  it("the list holds the rows of the cards, newest first, and the greeting counts the same items", () => {
+    const row = (key: "registrations" | "prsReadyForSourcing", id: string, since: string) => ({ key, recordType: "x", recordId: id, params: {}, since });
+    const results: TaskResult[] = [
+      { key: "registrations", count: 2, rows: [row("registrations", "a", "2026-11-10T10:00:00Z"), row("registrations", "b", "2026-11-12T10:00:00Z")] },
+      { key: "prsReadyForSourcing", count: 1, rows: [row("prsReadyForSourcing", "c", "2026-11-11T10:00:00Z")] },
+    ];
+    expect(waitingRows(results).map((r) => r.recordId)).toEqual(["b", "c", "a"]);
+    expect(waitingTotal(results)).toBe(waitingRows(results).length);
+  });
+});

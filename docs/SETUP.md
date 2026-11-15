@@ -97,8 +97,7 @@ Run `db:push` after every new migration, before or together with the deploy that
 
 **In the browser** (Vercel and local): demo tools need `DEMO_MODE=true` **and** an unlocked browser. Open `/demo-access` (the sign-in
 page links to it while demo mode is on) and type `DEMO_ACCESS_CODE`; the signed httpOnly cookie lasts 8 hours. Five wrong codes from one IP
-lock it for 15 minutes. The demo bar then shows **Switch user** (any active user, no password), **End deadline now** (only on a sourcing
-record whose deadline can be ended: an OPEN sourcing or a running final-offer round; it takes effect within seconds) and **Lock**.
+lock it for 15 minutes. The demo bar then shows **Switch user** (any active user, no password), and **Lock**. (Closing a sourcing early is the business function Close now, RFQ-09, not a demo tool.)
 Without both conditions no control is rendered and every demo action answers "Not available". The browser has **no** Reset button, **no**
 Load button and no endpoint for either.
 

@@ -56,6 +56,9 @@ const TONES: Record<string, StatusTone> = {
   NOT_AWARDED: "grey",
 };
 
+/** Every status that has a badge colour; each needs a status.<NAME> text (checked by a test). */
+export const KNOWN_STATUSES = Object.keys(TONES);
+
 export function statusTone(status: string): StatusTone {
   return TONES[status] ?? "grey";
 }

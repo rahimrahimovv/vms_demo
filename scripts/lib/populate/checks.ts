@@ -126,6 +126,9 @@ export async function selfCheck(w: World, sourcings: Record<string, string>): Pr
   // 6. sealed rules on the loaded data: no price or vendor name reaches a role that must not see it
   await sealedChecks(w, sourcings);
 
+  // 6b. RFQ-09: S2 can be closed now (every invitation answered), S3 cannot (two invited vendors have not answered)
+  await closeNowChecks(w, sourcings);
+
   // 7. every seeded vendor can sign in
   for (const v of w.vendors.values()) await as(w, v.email);
 
@@ -169,4 +172,27 @@ async function sealedChecks(w: World, s: Record<string, string>) {
   const { rows: ownerRow } = await w.db.query("select id from public.vendor where legal_name = 'Ege Tarim Kimya A.S.'");
   const others = await ege.from("proposal").select("vendor_id").neq("vendor_id", ownerRow[0].id);
   if ((others.data ?? []).length > 0) fail("a vendor can read the proposals of other vendors");
+}
+
+async function closeNowChecks(w: World, s: Record<string, string>) {
+  const split = async (id: string) => {
+    const { rows } = await w.db.query(
+      `select i.status as invitation, exists (select 1 from public.proposal p where p.sourcing_id = i.sourcing_id and p.vendor_id = i.vendor_id and p.status = 'SUBMITTED') as submitted
+         from public.invitation i where i.sourcing_id = $1`, [id]);
+    return {
+      invited: rows.length,
+      submitted: rows.filter((r) => r.submitted).length,
+      declined: rows.filter((r) => r.invitation === "DECLINED").length,
+      unanswered: rows.filter((r) => r.invitation !== "DECLINED" && !r.submitted).length,
+    };
+  };
+  const s2 = await split(s.S2);
+  if (JSON.stringify(s2) !== JSON.stringify({ invited: 4, submitted: 2, declined: 2, unanswered: 0 })) fail(`S2 invitations: ${JSON.stringify(s2)}`);
+  const s3 = await split(s.S3);
+  if (JSON.stringify(s3) !== JSON.stringify({ invited: 4, submitted: 1, declined: 1, unanswered: 2 })) fail(`S3 invitations: ${JSON.stringify(s3)}`);
+  const nigar = await as(w, EMAIL.specialist);
+  const state2 = (await nigar.rpc("close_now_state", { p_sourcing: s.S2 })).data as { unanswered: string[] } | null;
+  const state3 = (await nigar.rpc("close_now_state", { p_sourcing: s.S3 })).data as { unanswered: string[] } | null;
+  if (!state2 || state2.unanswered.length !== 0) fail("S2 should be closable now: its invitations are all answered");
+  if (!state3 || state3.unanswered.length !== 2) fail("S3 should name two vendors that have not answered");
 }

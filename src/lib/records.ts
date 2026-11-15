@@ -27,6 +27,9 @@ const VENDOR_PATHS: Record<string, (id: string, event?: string) => string> = {
   purchase_order: (id) => `/vendor/purchase-orders/${id}`,
 };
 
+/** Every record type that can open from a notification or a task: each needs a home.recordTypes text (checked by a test). */
+export const RECORD_TYPES = [...new Set([...Object.keys(INTERNAL_PATHS), ...Object.keys(VENDOR_PATHS)])];
+
 export function recordHref(recordType: string, recordId: string, audience: Audience = "internal", event?: string) {
   const build = audience === "vendor" ? VENDOR_PATHS[recordType] : INTERNAL_PATHS[recordType];
   return build ? build(recordId, event) : "/";

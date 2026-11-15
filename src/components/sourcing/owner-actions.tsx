@@ -86,3 +86,42 @@ export function RequestFinalOffer({
     </ActionDialog>
   );
 }
+
+/**
+ * RFQ-09 (D-025): "Close now" on an OPEN sourcing (secondary button). Disabled, with the message and the names of the vendors that
+ * have not answered, while any invitation is unanswered. The dialog shows the deadline that will be replaced and asks for the reason.
+ */
+export function CloseNow({ action, deadline, unanswered }: { action: Action; deadline: string; unanswered: string[] }) {
+  const t = useTranslations();
+  if (unanswered.length > 0) {
+    return (
+      <div className="flex max-w-xs flex-col items-end gap-1" data-testid="close-now-blocked">
+        <Button type="button" variant="secondary" disabled>
+          {t("sourcing.closeNow.button")}
+        </Button>
+        <p className="text-right text-xs text-muted-foreground">
+          {t("errors.vendorsNotAnswered", { count: unanswered.length })}: {unanswered.join(", ")}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <ActionDialog
+      action={action}
+      trigger={t("sourcing.closeNow.button")}
+      triggerVariant="secondary"
+      title={t("sourcing.closeNow.title")}
+      description={t("sourcing.closeNow.description", { deadline })}
+      submitLabel={t("sourcing.closeNow.confirm")}
+      testId="close-now"
+    >
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="close-now-reason">
+          {t("sourcing.closeNow.reason")}
+          <span className="text-destructive" aria-hidden>*</span>
+        </Label>
+        <Textarea id="close-now-reason" name="comment" rows={3} required />
+      </div>
+    </ActionDialog>
+  );
+}

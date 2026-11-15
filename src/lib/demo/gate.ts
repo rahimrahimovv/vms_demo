@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { hashIp, safeEqual, signUnlock, verifyUnlock, UNLOCK_TTL_MS } from "./token";
 
 /**
- * Demo tools (Switch user, Fill sample, End deadline now, Reset, Load) need BOTH demo mode (DEMO_MODE=true) and an
+ * Demo tools (Switch user, Fill sample, Reset, Load) need BOTH demo mode (DEMO_MODE=true) and an
  * unlocked browser session: the presenter has entered the demo code (D-022, DEMO-01 AC1, CLAUDE.md rule 13).
  * Without both, every demo endpoint and server action answers "Not available" and changes nothing.
  */

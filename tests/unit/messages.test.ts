@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 import messages from "../../messages/en.json";
 import { ROLES } from "@/lib/auth/roles";
 import { SECTIONS } from "@/lib/auth/sections";
+import { TASK_HREF } from "@/lib/home/tasks";
+import { RECORD_TYPES } from "@/lib/records";
+import { KNOWN_STATUSES } from "@/lib/status";
+import { missingMessage } from "@/i18n/missing";
 
 function get(path: string): unknown {
   return path.split(".").reduce<unknown>((node, key) => (node as Record<string, unknown> | undefined)?.[key], messages);
@@ -84,6 +88,63 @@ describe("messages/en.json", () => {
     ]) {
       expect(get(`notifications.events.${event}`), event).toBeTypeOf("string");
     }
+  });
+
+  it("has every card of My tasks: label, link, screen-reader text and list text, for every role's task, the Admin shortcuts and the vendor home", () => {
+    for (const key of Object.keys(TASK_HREF)) {
+      for (const family of ["cardLabels", "cardLinks", "cards", "tasks"]) expect(get(`home.${family}.${key}`), `home.${family}.${key}`).toBeTypeOf("string");
+    }
+    for (const key of ["users", "committee", "items", "categories"]) {
+      expect(get(`home.adminCards.${key}.label`), key).toBeTypeOf("string");
+      expect(get(`home.adminCards.${key}.link`), key).toBeTypeOf("string");
+    }
+    for (const key of ["invitationsToAnswer", "proposalsToSubmit", "posToAccept"]) {
+      for (const family of ["vendorHome.cardLabels", "vendorHome.cardHints", "home.cards"]) expect(get(`${family}.${key}`), `${family}.${key}`).toBeTypeOf("string");
+    }
+    for (const key of ["registration", "questionnaire", "categories"]) {
+      for (const family of ["vendorHome.steps", "vendorHome.stepHints"]) expect(get(`${family}.${key}`), `${family}.${key}`).toBeTypeOf("string");
+    }
+  });
+
+  it("has a record-type pill for every record that opens from a task or a notification, a text for every status, a heading for every menu group", () => {
+    for (const type of RECORD_TYPES) expect(get(`home.recordTypes.${type}`), `home.recordTypes.${type}`).toBeTypeOf("string");
+    for (const status of KNOWN_STATUSES) expect(get(`status.${status}`), `status.${status}`).toBeTypeOf("string");
+    for (const group of new Set(SECTIONS.map((x) => x.group))) expect(get(`nav.groups.${group}`), group).toBeTypeOf("string");
+  });
+
+  it("has a text for every notification event that a database function sends", () => {
+    const events = new Set<string>(["registration.approved", "registration.returned", "registration.rejected"]); // built as 'registration.' || status
+    for (const name of readdirSync("supabase/migrations")) {
+      const sql = readFileSync(join("supabase/migrations", name), "utf8");
+      for (const m of sql.matchAll(/app\.notify\(([^;]*?)'([a-z][A-Za-z]*\.[A-Za-z]+)'/g)) events.add(m[2]);
+    }
+    expect(events.size).toBeGreaterThan(25);
+    for (const event of events) expect(get(`notifications.events.${event}`), event).toBeTypeOf("string");
+  });
+
+  it("has every message key that a t(...) call with a literal key uses, and the family of every dynamic one", () => {
+    const missing: string[] = [];
+    for (const file of files("src")) {
+      const source = readFileSync(file, "utf8");
+      const namespaces = [...source.matchAll(/(?:getTranslations|useTranslations)\(\s*"([\w.]+)"\s*\)/g)].map((m) => m[1]);
+      const prefixes = /(?:getTranslations|useTranslations)\(\s*\)/.test(source) || namespaces.length === 0 ? ["", ...namespaces] : namespaces;
+      const exists = (key: string, kind: "string" | "object") => prefixes.some((p) => typeof get(p ? `${p}.${key}` : key) === kind);
+      for (const m of source.matchAll(/\bt(?:\.has)?\(\s*"([\w.]+)"/g)) {
+        if (!exists(m[1], "string") && !m[0].startsWith("t.has")) missing.push(`${file}: ${m[1]}`);
+      }
+      for (const m of source.matchAll(/\bt(?:\.has)?\(\s*`([^`$]+)\$\{/g)) {
+        const family = m[1].replace(/\.$/, "");
+        if (family && !exists(family, "object")) missing.push(`${file}: family ${family}`);
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it("never shows a bare key: a missing text is marked, not printed as home.cardLabels.x", () => {
+    const text = missingMessage("home.cardLabels", "changeRequests");
+    expect(text).toBe("[missing text: home.cardLabels.changeRequests]");
+    expect(text).not.toMatch(/^[A-Za-z]+(\.[A-Za-z]+)+$/);
+    expect(missingMessage(undefined, "x.y")).toBe("[missing text: x.y]");
   });
 
   it("keeps the backlog's exact texts", () => {

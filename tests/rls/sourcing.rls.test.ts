@@ -411,21 +411,6 @@ describe("RFQ-04 below the minimum", () => {
     expect(await cancelled(actors.vendorB.id)).toHaveLength(0);
   });
 
-  it("DEMO-01 AC4: End deadline now closes an OPEN sourcing at once, only through the server key", async () => {
-    const { id } = await startRfq(240, 25);
-    expect((await publish(id, { hours: 48 })).error).toBeNull();
-    expect((await service.rpc("demo_deadline_info", { p_sourcing: id })).data).toBe("OPEN");
-    const anon = createClient(URL, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
-    expect((await anon.rpc("demo_end_deadline", { p_sourcing: id })).error?.code).toBe("42501");
-    expect((await actors.specialist.client.rpc("demo_end_deadline", { p_sourcing: id })).error?.code).toBe("42501");
-    expect((await sourcingRow(id)).status).toBe("OPEN");
-    const started = Date.now();
-    expect((await service.rpc("demo_end_deadline", { p_sourcing: id })).data).toBe("OPEN");
-    expect(Date.now() - started).toBeLessThan(10_000);
-    expect((await sourcingRow(id)).status).toBe("CLOSED"); // below the minimum of proposals: stays CLOSED as in RFQ-04
-    expect((await service.rpc("demo_end_deadline", { p_sourcing: id })).data).toBeNull();
-  });
-
   it("the 24-hour reminder reaches vendors that neither declined nor submitted, once", async () => {
     const { id } = await startRfq(240, 25);
     expect((await publish(id, { hours: 23 })).error).toBeNull();

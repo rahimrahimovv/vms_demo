@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActionButton, ActionDialog } from "@/components/action-dialog";
 import { ComparisonView } from "@/components/sourcing/comparison-view";
-import { RequestFinalOffer, SEND_FORM_ID, SendToCommittee } from "@/components/sourcing/owner-actions";
+import { CloseNow, RequestFinalOffer, SEND_FORM_ID, SendToCommittee } from "@/components/sourcing/owner-actions";
 import { QaPanel, type QaItem } from "@/components/sourcing/qa-panel";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +29,7 @@ import type { PoListRow } from "@/lib/purchase-orders/types";
 import {
   cancelLine,
   chooseWinner,
+  closeSourcingNow,
   decideSourcing,
   deleteCost,
   evaluateProposal,
@@ -210,6 +211,12 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
   const purchaseOrders = ((poData ?? []) as PoListRow[]).filter((po) => po.sourcing_id === id);
   const hasLivePo = purchaseOrders.some((po) => po.status !== "REJECTED" && po.status !== "DECLINED_BY_VENDOR");
 
+  // RFQ-09: Close now (owner of an OPEN sourcing): the vendors that have not answered keep it disabled
+  const closeState =
+    owner && s.status === "OPEN"
+      ? (((await supabase.rpc("close_now_state", { p_sourcing: id })).data ?? null) as { deadline: string; unanswered: string[] } | null)
+      : null;
+
   const invitees = draft && owner ? ((await supabase.rpc("sourcing_invitees", { p_id: id })).data ?? []) : [];
 
   // Dictionary entries: active ones, plus the one already chosen
@@ -262,7 +269,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
 
   const finalOfferDays = comparison?.sourcing.finalOfferDays ?? 2;
   const actions =
-    filteredOptions.length > 0 || extendDisabled || comparing ? (
+    filteredOptions.length > 0 || extendDisabled || comparing || closeState ? (
       <div className="flex items-start gap-2">
         {comparing && comparison && (
           <RequestFinalOffer
@@ -271,6 +278,9 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
             defaultDeadline={bakuLocalInDays(finalOfferDays)}
             used={comparison.sourcing.finalOfferRoundsUsed >= comparison.sourcing.finalOfferRoundsMax}
           />
+        )}
+        {closeState && (
+          <CloseNow action={closeSourcingNow.bind(null, s.id)} deadline={formatDateTime(closeState.deadline)} unanswered={closeState.unanswered} />
         )}
         <div className="flex flex-col items-end gap-2">
           <DecisionPanel action={decideSourcing.bind(null, s.id)} options={filteredOptions} />

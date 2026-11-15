@@ -176,7 +176,8 @@
         "closed": "{number} closed: {received} of {minimum} proposals received",
         "cancelled": "{number} was cancelled: {reason}",
         "completed": "{number} is completed. Lines you won: {lines}",
-        "notAwarded": "{number} is completed. Not awarded"
+        "notAwarded": "{number} is completed. Not awarded",
+        "closedEarly": "{number} was closed early by the buyer. Your proposal will be evaluated."
       },
       "decision": {
         "opened": "{decisionType} decision opened on {number}. Vote by {deadline}",
@@ -244,7 +245,8 @@
       "prsReadyForSourcing": "Approved PRs ready for sourcing",
       "sourcingsBelowMinimum": "Sourcings below the minimum",
       "votesWaiting": "Decisions waiting for your vote",
-      "posToApprove": "POs to approve"
+      "posToApprove": "POs to approve",
+      "changeRequests": "Change requests to review"
     },
     "cardLinks": {
       "registrations": "Open vendors",
@@ -255,7 +257,8 @@
       "prsReadyForSourcing": "Open requisitions",
       "sourcingsBelowMinimum": "Open sourcing",
       "votesWaiting": "Open decisions",
-      "posToApprove": "Open purchase orders"
+      "posToApprove": "Open purchase orders",
+      "changeRequests": "Open change requests"
     },
     "recordTypes": {
       "vendor": "Registration",
@@ -266,7 +269,8 @@
       "plan_line": "Plan",
       "sourcing": "Sourcing",
       "decision": "Decision",
-      "purchase_order": "Purchase order"
+      "purchase_order": "Purchase order",
+      "vendor_change_request": "Change request"
     },
     "adminCards": {
       "users": {
@@ -285,6 +289,18 @@
         "label": "Categories",
         "link": "Open categories"
       }
+    },
+    "tasks": {
+      "registrations": "Review the registration of {name}",
+      "questionnaires": "Grade the qualification questionnaire of {name}",
+      "applications": "Decide the {category} application of {name}",
+      "changeRequests": "Review the change of {section} requested by {name}",
+      "sourcingsBelowMinimum": "{number} closed below the minimum: extend, continue or cancel",
+      "prsReadyForSourcing": "{number} is approved and ready for sourcing",
+      "prsToApprove": "Approve, return or reject {number}",
+      "prsReturned": "{number} was returned to you for correction",
+      "votesWaiting": "Vote on the {type} decision of {number}",
+      "posToApprove": "Approve {number} for {vendor}"
     }
   },
   "errors": {
@@ -397,7 +413,8 @@
     "useChangeRequest": "Bank accounts change through a change request",
     "documentKinds": "Choose the documents to replace",
     "documentFileRequired": "Attach a file for every document you replace",
-    "notAvailable": "Not available"
+    "notAvailable": "Not available",
+    "vendorsNotAnswered": "{count, plural, one {# invited vendor has not answered yet} other {# invited vendors have not answered yet}}"
   },
   "vendorTypes": {
     "LOCAL_COMPANY": "Local company",
@@ -1249,6 +1266,13 @@
     "purchaseOrders": {
       "empty": "No purchase orders yet. They are created when the winner decision is approved.",
       "cancelBlocked": "This sourcing has purchase orders. Cancel its open lines instead."
+    },
+    "closeNow": {
+      "button": "Close now",
+      "title": "Close this sourcing now",
+      "description": "The deadline {deadline} is replaced by the current time. The sourcing then moves on exactly as at a normal deadline.",
+      "reason": "Reason",
+      "confirm": "Close now"
     }
   },
   "proposal": {
@@ -1697,10 +1721,7 @@
       "switching": "Switching…",
       "lock": "Lock",
       "notAvailable": "Not available",
-      "failed": "Could not switch user, try again",
-      "endDeadline": "End deadline now",
-      "endFinalOffer": "End final-offer round now",
-      "nothingToEnd": "No deadline to end here"
+      "failed": "Could not switch user, try again"
     },
     "access": {
       "title": "Demo access",

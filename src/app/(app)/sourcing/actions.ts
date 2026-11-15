@@ -264,3 +264,22 @@ export async function decideSourcing(id: string, _prev: DecisionState, formData:
   refresh(id);
   return { error: errorKey(error), attempt: Date.now() };
 }
+
+/**
+ * RFQ-09 (D-025): the owner closes an OPEN sourcing now. The database checks the owner, the status, the reason and that every
+ * invited vendor has answered; "N invited vendors have not answered yet" carries N in the error detail.
+ */
+export async function closeSourcingNow(id: string, _prev: DecisionState, formData: FormData): Promise<DecisionState> {
+  const user = await requireUser();
+  if (!user.roles.includes("PROCUREMENT_SPECIALIST")) return { error: "access.denied", attempt: Date.now() };
+  const reason = String(formData.get("comment") ?? "").trim();
+  if (!reason) return { error: "errors.reasonRequired", attempt: Date.now() };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("close_now", { p_sourcing: id, p_reason: reason });
+  refresh(id);
+  const key = errorKey(error);
+  if (key === "errors.vendorsNotAnswered") {
+    return { error: key, errorParams: { count: String(Number(error?.details) || 0) }, attempt: Date.now() };
+  }
+  return { error: key, attempt: Date.now() };
+}

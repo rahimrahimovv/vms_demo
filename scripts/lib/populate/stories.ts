@@ -1,7 +1,7 @@
 // DEMO-03: plan lines, the 19 requisitions and the 12 sourcings S1 to S12 with their decisions and purchase orders.
 // Every step is the application's own database function, called as the user who would do it. Documents with a number
 // (PR, SRC, PO, MIN) are created strictly one after another, oldest story first, so the numbers rise with their dates.
-import { CAT, COMMITTEE, EMAIL, MODE, PAYMENT, PLACE, attach, backdate, bakuDate, call, callAdmin, hoursFromNow, itemId, userId, type World } from "./world";
+import { CAT, COMMITTEE, EMAIL, MODE, PAYMENT, PLACE, attach, backdate, bakuDate, call, hoursFromNow, itemId, userId, type World } from "./world";
 
 const NIGAR = EMAIL.specialist;
 const LEYLA = EMAIL.requester;
@@ -101,10 +101,12 @@ export async function offer(w: World, key: string, sourcing: string, prices: num
 /** Vendors answer side by side: proposals and answers carry no document number, so their order does not matter. */
 export const together = (...jobs: Promise<unknown>[]) => Promise.all(jobs).then(() => undefined);
 
-/** "End deadline now": the same call as the demo bar (it runs the deadline job at once). */
+/** RFQ-09: the owner closes the sourcing early (every invited vendor has answered, so the database allows it). */
 export async function closeNow(w: World, id: string) {
-  await callAdmin(w, "demo_end_deadline", { p_sourcing: id });
+  await call(w, NIGAR, "close_now", { p_sourcing: id, p_reason: "All invited vendors have answered" });
 }
+
+const NO_STOCK = "No capacity for this order at the moment";
 
 export async function statusOf(w: World, table: "sourcing" | "requisition" | "purchase_order" | "decision", id: string): Promise<string> {
   const { rows } = await w.db.query(`select status from public.${table} where id = $1`, [id]);
@@ -191,6 +193,7 @@ export async function s7(ctx: Ctx) {
     offer(w, "epsilon", id, [19.5, 21.5]),
     offer(w, "zeta", id, [20, 22]),
     offer(w, "eta", id, [21, 22.5]),
+    decline(w, "gamma", id, NO_STOCK),
   );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "COMPARISON", "S7");
@@ -269,6 +272,7 @@ export async function s12(ctx: Ctx) {
     offer(w, "epsilon", id, [39, 345]),
     offer(w, "zeta", id, [41, 350]),
     offer(w, "eta", id, [40, 348]),
+    decline(w, "gamma", id, NO_STOCK),
   );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "AWAITING_OPENING", "S12");
@@ -287,7 +291,7 @@ export async function s4(ctx: Ctx) {
   await together(
     offer(w, "beta", id, [29.5, 40]),
     offer(w, "gamma", id, [31, 39]),
-    accept(w, "eta", id),
+    decline(w, "eta", id, NO_STOCK),
   );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "CLOSED", "S4");
@@ -304,6 +308,7 @@ export async function s8(ctx: Ctx) {
     offer(w, "delta", id, [148, 9.8]),
     offer(w, "pi", id, [152, 10.2]),
     offer(w, "beta", id, [150, 10]),
+    decline(w, "gamma", id, NO_STOCK),
   );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "COMPARISON", "S8");
@@ -355,13 +360,13 @@ export async function s9(ctx: Ctx) {
   await age(ctx, "S9", pr, id, 7);
 }
 
-/** S3: Tender, Spare parts 85,000: OPEN, deadline in 9 days, 1 proposal, Q&A with 1 published and 1 UNANSWERED question. */
+/** S3: Tender, Spare parts 85,000: OPEN, deadline in 9 days, 1 proposal, 1 declined, 2 invited vendors that have not answered (Close now is refused); Q&A with 1 published and 1 UNANSWERED question. */
 export async function s3(ctx: Ctx) {
   const { w } = ctx;
   const pr = await makePr(w, ctx.plan.spareParts, [{ item: 16, qty: 400, price: 45 }, { item: 19, qty: 500, price: 60 }, { item: 20, qty: 100, price: 370 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 9 * 24 + 4 });
   await publish(w, id);
-  await offer(w, "epsilon", id, [44, 58, 365]);
+  await together(offer(w, "epsilon", id, [44, 58, 365]), decline(w, "gamma", id, NO_STOCK)); // Zeta and Eta have not answered
   const q1 = await call<string>(w, vendorMail(w, "epsilon").email, "question_ask", { p_sourcing: id, p_text: "Can delivery be split into two shipments?" });
   await call(w, vendorMail(w, "zeta").email, "question_ask", { p_sourcing: id, p_text: "Is a certificate of origin required for the plough shares?" });
   await call(w, NIGAR, "question_publish", { p_sourcing: id, p_question: q1, p_question_text: "", p_answer: "Yes, two shipments are accepted if both arrive before the delivery date." });
@@ -370,7 +375,7 @@ export async function s3(ctx: Ctx) {
   ctx.sourcings.S3 = id;
 }
 
-/** S2: RFQ, Seeds 12,000: OPEN, deadline in 2 days, 4 invited: 2 submitted, 1 accepted without a proposal, 1 declined with a reason. */
+/** S2: RFQ, Seeds 12,000: OPEN, deadline in 2 days, 4 invited: 2 submitted, 2 declined with a reason (so Close now is allowed). */
 export async function s2(ctx: Ctx) {
   const { w } = ctx;
   const pr = await makePr(w, ctx.plan.seeds, [{ item: 6, qty: 300, price: 25 }, { item: 7, qty: 150, price: 30 }], { decide: "APPROVE" });
@@ -379,7 +384,7 @@ export async function s2(ctx: Ctx) {
   await together(
     offer(w, "delta", id, [24.5, 29]),
     offer(w, "pi", id, [26, 31]),
-    accept(w, "beta", id),
+    decline(w, "beta", id, "Seed stock is reserved for existing contracts until the autumn"),
     decline(w, "gamma", id, "No stock of the requested varieties this season"),
   );
   await backdate(w, "requisition", pr, 4);
