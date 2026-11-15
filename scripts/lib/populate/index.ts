@@ -1,6 +1,7 @@
 // DEMO-03: `npm run demo:load`. Resets to the scenario start (the same shared module as demo:reset), then loads the
 // Populated Data Catalogue through the application's own database functions. See docs/PROGRESS.md for the time-shift design.
 import { SCENARIO_START_USERS, resetToUsers, type Context, type ResetSummary } from "../demo-data";
+import { writeDemoAccounts } from "./accounts";
 import { selfCheck } from "./checks";
 import { buildVendors } from "./vendors";
 import { createPlanLines, runStories, type Ctx } from "./stories";
@@ -80,6 +81,8 @@ export async function populate(ctx: Context, log: Log): Promise<PopulateResult> 
 
   stepStart(log, "6", "self-check");
   const loaded = await selfCheck(w, stories.sourcings);
+  const accounts = await writeDemoAccounts(w); // docs/DEMO-ACCOUNTS.md, from the loaded data
+  log(`  docs/DEMO-ACCOUNTS.md written (${accounts.length} accounts)`);
 
   await ctx.db.query("delete from auth.sessions"); // every user is signed out (the loader's own sessions included)
   return { loaded, reset, seconds: (Date.now() - started) / 1000 };
