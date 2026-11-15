@@ -11,7 +11,7 @@ const EDGES: Record<string, string[]> = {
   ],
   requisition: [":DRAFT", ":PENDING_APPROVAL", "DRAFT:PENDING_APPROVAL", "PENDING_APPROVAL:APPROVED", "PENDING_APPROVAL:RETURNED", "PENDING_APPROVAL:REJECTED",
     "RETURNED:PENDING_APPROVAL", "APPROVED:IN_SOURCING", "IN_SOURCING:APPROVED", "IN_SOURCING:COMPLETED"],
-  vendor: [":DRAFT", "DRAFT:SUBMITTED", "RETURNED:SUBMITTED", "SUBMITTED:APPROVED", "SUBMITTED:RETURNED", "SUBMITTED:REJECTED", "REJECTED:RETURNED"],
+  vendor: [":PROFILE_UPDATED", ":DRAFT", "DRAFT:SUBMITTED", "RETURNED:SUBMITTED", "SUBMITTED:APPROVED", "SUBMITTED:RETURNED", "SUBMITTED:REJECTED", "REJECTED:RETURNED"],
   questionnaire_response: [":DRAFT", "DRAFT:SUBMITTED", "RETURNED:SUBMITTED", "SUBMITTED:GRADED", "SUBMITTED:RETURNED", "GRADED:EXPIRED"],
   category_application: [":PENDING", "PENDING:QUALIFIED", "PENDING:REJECTED", "QUALIFIED:EXPIRED"],
   invitation: [":INVITED", "INVITED:ACCEPTED", "INVITED:DECLINED", "ACCEPTED:DECLINED"],
@@ -93,9 +93,11 @@ export async function selfCheck(w: World, sourcings: Record<string, string>): Pr
   }
   for (const [type, table] of Object.entries(STATUS_TABLES)) {
     const { rows } = await w.db.query(
-      `select r.id, r.status, (select e.to_status from public.audit_entry e where e.record_type = $1 and e.record_id = r.id order by e.created_at desc, e.id desc limit 1) as last
+      `select r.id, r.status, (select e.to_status from public.audit_entry e where e.record_type = $1 and e.record_id = r.id and e.to_status <> 'PROFILE_UPDATED' order by e.created_at desc, e.id desc limit 1) as last
          from public.${table} r`, [type]);
     for (const r of rows) {
+      // rows of the base seed (fixed ids 00000000-0000-4000-8000-...) are written by app.seed_base() before the reset empties the audit log: no entry, by design
+      if (r.last === null && String(r.id).startsWith("00000000-0000-4000-8000-")) continue;
       if (r.last === null) fail(`${type} ${r.id} has no audit entry`);
       if (r.last !== r.status && !(await sameInstant(w, type, r.id, r.status))) fail(`${type} ${r.id}: status ${r.status} but the audit trail ends with ${r.last}`);
     }
@@ -135,7 +137,7 @@ export async function selfCheck(w: World, sourcings: Record<string, string>): Pr
 async function sameInstant(w: World, type: string, id: string, status: string): Promise<boolean> {
   const { rows } = await w.db.query(
     `select 1 from public.audit_entry e where e.record_type = $1 and e.record_id = $2 and e.to_status = $3
-       and e.created_at = (select max(created_at) from public.audit_entry where record_type = $1 and record_id = $2)`, [type, id, status]);
+       and e.created_at = (select max(created_at) from public.audit_entry where record_type = $1 and record_id = $2 and to_status <> 'PROFILE_UPDATED')`, [type, id, status]);
   return rows.length > 0;
 }
 
@@ -149,12 +151,12 @@ async function sealedChecks(w: World, s: Record<string, string>) {
     const prices = await client.from("proposal_line").select("proposal_id").in("proposal_id", proposalIds);
     if ((prices.data ?? []).length > 0) fail(`sealed prices of S2, S3, S5 or S6 are readable by ${email}`);
   }
-  // names of bidders: not before the opening (S2, S3 are OPEN; S5 is awaiting the opening decision)
-  const openIds = sealedProposals.filter((p) => [s.S2, s.S3, s.S5].includes(p.sourcing_id)).map((p) => p.id as string);
+  // names of bidders: not before the deadline (S2 and S3 are OPEN). From AWAITING_OPENING (S5) the app shows names without prices (app.bids_visible).
+  const openIds = sealedProposals.filter((p) => [s.S2, s.S3].includes(p.sourcing_id)).map((p) => p.id as string);
   for (const email of [EMAIL.specialist, EMAIL.chair, EMAIL.admin]) {
     const client = await as(w, email);
     const names = await client.from("proposal").select("id").in("id", openIds);
-    if ((names.data ?? []).length > 0) fail(`proposals (vendor names) of S2, S3 or S5 are readable by ${email} before the opening`);
+    if ((names.data ?? []).length > 0) fail(`proposals (vendor names) of S2 or S3 are readable by ${email} while the sourcing is OPEN`);
   }
   // the final-offer answers of S8 stay hidden while the round runs
   const { rows: round2 } = await w.db.query("select pl.id from public.proposal_line pl join public.proposal p on p.id = pl.proposal_id where p.sourcing_id = $1 and pl.round = 2", [s.S8]);

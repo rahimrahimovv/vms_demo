@@ -98,6 +98,9 @@ export async function offer(w: World, key: string, sourcing: string, prices: num
   });
 }
 
+/** Vendors answer side by side: proposals and answers carry no document number, so their order does not matter. */
+export const together = (...jobs: Promise<unknown>[]) => Promise.all(jobs).then(() => undefined);
+
 /** "End deadline now": the same call as the demo bar (it runs the deadline job at once). */
 export async function closeNow(w: World, id: string) {
   await callAdmin(w, "demo_end_deadline", { p_sourcing: id });
@@ -164,9 +167,11 @@ export async function s6(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.plantProtection, [{ item: 11, qty: 300, price: 80 }, { item: 12, qty: 500, price: 50 }, { item: 14, qty: 300, price: 50 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "delta", id, [78, 49, 49]);
-  await offer(w, "eta", id, [80, 50, 52]);
-  await offer(w, "epsilon", id, [79, 52, 50]);
+  await together(
+    offer(w, "delta", id, [78, 49, 49]),
+    offer(w, "eta", id, [80, 50, 52]),
+    offer(w, "epsilon", id, [79, 52, 50]),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "AWAITING_OPENING", "S6");
   await allVote(w, await openDecision(w, id, "OPENING"));
@@ -182,9 +187,11 @@ export async function s7(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.spareParts, [{ item: 17, qty: 200, price: 20 }, { item: 18, qty: 250, price: 22 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "epsilon", id, [19.5, 21.5]);
-  await offer(w, "zeta", id, [20, 22]);
-  await offer(w, "eta", id, [21, 22.5]);
+  await together(
+    offer(w, "epsilon", id, [19.5, 21.5]),
+    offer(w, "zeta", id, [20, 22]),
+    offer(w, "eta", id, [21, 22.5]),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "COMPARISON", "S7");
   await sendToCommittee(w, id);
@@ -205,10 +212,12 @@ export async function s10(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.seeds, [{ item: 6, qty: 1000, price: 24 }, { item: 7, qty: 800, price: 30 }, { item: 9, qty: 80, price: 300 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await decline(w, "beta", id, "Capacity is booked until the next season");
-  await offer(w, "delta", id, [23, 31, 310]);
-  await offer(w, "pi", id, [25, 28.5, 305]);
-  await offer(w, "gamma", id, [26, 32, 280]);
+  await together(
+    decline(w, "beta", id, "Capacity is booked until the next season"),
+    offer(w, "delta", id, [23, 31, 310]),
+    offer(w, "pi", id, [25, 28.5, 305]),
+    offer(w, "gamma", id, [26, 32, 280]),
+  );
   await closeNow(w, id);
   await allVote(w, await openDecision(w, id, "OPENING"));
   const { rows: proposals } = await w.db.query("select id from public.proposal where sourcing_id = $1 and status = 'SUBMITTED'", [id]);
@@ -232,9 +241,11 @@ export async function s11(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.fertilisers, [{ item: 2, qty: 400, price: 35 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "beta", id, [34]);
-  await offer(w, "gamma", id, [35.5]);
-  await offer(w, "eta", id, [36]);
+  await together(
+    offer(w, "beta", id, [34]),
+    offer(w, "gamma", id, [35.5]),
+    offer(w, "eta", id, [36]),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "COMPARISON", "S11");
   await sendToCommittee(w, id);
@@ -254,9 +265,11 @@ export async function s12(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.spareParts, [{ item: 16, qty: 500, price: 40 }, { item: 20, qty: 100, price: 350 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "epsilon", id, [39, 345]);
-  await offer(w, "zeta", id, [41, 350]);
-  await offer(w, "eta", id, [40, 348]);
+  await together(
+    offer(w, "epsilon", id, [39, 345]),
+    offer(w, "zeta", id, [41, 350]),
+    offer(w, "eta", id, [40, 348]),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "AWAITING_OPENING", "S12");
   await call(w, NIGAR, "sourcing_cancel", { p_id: id, p_reason: "Budget moved to the autumn programme" });
@@ -271,9 +284,11 @@ export async function s4(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.fertilisers, [{ item: 1, qty: 400, price: 30 }, { item: 3, qty: 200, price: 40 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "beta", id, [29.5, 40]);
-  await offer(w, "gamma", id, [31, 39]);
-  await accept(w, "eta", id);
+  await together(
+    offer(w, "beta", id, [29.5, 40]),
+    offer(w, "gamma", id, [31, 39]),
+    accept(w, "eta", id),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "CLOSED", "S4");
   await age(ctx, "S4", pr, id, 16);
@@ -285,9 +300,11 @@ export async function s8(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.seeds, [{ item: 8, qty: 100, price: 150 }, { item: 10, qty: 1300, price: 10 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "delta", id, [148, 9.8]);
-  await offer(w, "pi", id, [152, 10.2]);
-  await offer(w, "beta", id, [150, 10]);
+  await together(
+    offer(w, "delta", id, [148, 9.8]),
+    offer(w, "pi", id, [152, 10.2]),
+    offer(w, "beta", id, [150, 10]),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "COMPARISON", "S8");
   await call(w, NIGAR, "final_offer_request", {
@@ -307,10 +324,12 @@ export async function s5(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.irrigation, [{ item: 26, qty: 120, price: 800 }, { item: 27, qty: 900, price: 40 }, { item: 28, qty: 300, price: 60 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 72 });
   await publish(w, id);
-  await offer(w, "delta", id, [790, 39, 58]);
-  await offer(w, "epsilon", id, [820, 41, 60]);
-  await offer(w, "pi", id, [800, 40, 59]);
-  await offer(w, "beta", id, [810, 42, 62]);
+  await together(
+    offer(w, "delta", id, [790, 39, 58]),
+    offer(w, "epsilon", id, [820, 41, 60]),
+    offer(w, "pi", id, [800, 40, 59]),
+    offer(w, "beta", id, [810, 42, 62]),
+  );
   await closeNow(w, id);
   await expect(w, "sourcing", id, "AWAITING_OPENING", "S5");
   await vote(w, await openDecision(w, id, "OPENING"), EMAIL.chair, "FOR");
@@ -357,10 +376,12 @@ export async function s2(ctx: Ctx) {
   const pr = await makePr(w, ctx.plan.seeds, [{ item: 6, qty: 300, price: 25 }, { item: 7, qty: 150, price: 30 }], { decide: "APPROVE" });
   const id = await startSourcing(ctx, pr, { deadlineHours: 52 });
   await publish(w, id);
-  await offer(w, "delta", id, [24.5, 29]);
-  await offer(w, "pi", id, [26, 31]);
-  await accept(w, "beta", id);
-  await decline(w, "gamma", id, "No stock of the requested varieties this season");
+  await together(
+    offer(w, "delta", id, [24.5, 29]),
+    offer(w, "pi", id, [26, 31]),
+    accept(w, "beta", id),
+    decline(w, "gamma", id, "No stock of the requested varieties this season"),
+  );
   await backdate(w, "requisition", pr, 4);
   ctx.prs.S2 = pr;
   ctx.sourcings.S2 = id;

@@ -36,39 +36,49 @@ export async function notifications(w: World): Promise<void> {
   }
   // some read ones for variety: the older 40 % of each user's notices, never below 3 unread
   const { rows: users } = await w.db.query("select id, email from public.app_user where is_active");
-  for (const u of users) {
-    const { rows } = await w.db.query("select id from public.notification where user_id = $1 and not is_read order by created_at asc, id", [u.id]);
-    const markable = Math.min(Math.floor(rows.length * 0.4), Math.max(0, rows.length - 3));
-    if (markable === 0) continue;
-    const client = await as(w, u.email);
-    const { error } = await client.from("notification").update({ is_read: true }).in("id", rows.slice(0, markable).map((r) => r.id));
-    if (error) throw new Error(`marking notices of ${u.email} as read: ${error.message}`);
-  }
+  await Promise.all(
+    users.map(async (u) => {
+      const { rows } = await w.db.query("select id from public.notification where user_id = $1 and not is_read order by created_at asc, id", [u.id]);
+      const markable = Math.min(Math.floor(rows.length * 0.4), Math.max(0, rows.length - 3));
+      if (markable === 0) return;
+      const client = await as(w, u.email);
+      const { error } = await client.from("notification").update({ is_read: true }).in("id", rows.slice(0, markable).map((r) => r.id));
+      if (error) throw new Error(`marking notices of ${u.email} as read: ${error.message}`);
+    }),
+  );
 }
 
 export type PopulateResult = { loaded: string; reset: ResetSummary; seconds: number };
 
+let stepClock = Date.now();
+function stepStart(log: Log, n: string, title: string) {
+  const took = ((Date.now() - stepClock) / 1000).toFixed(1);
+  if (n !== "1") log(`  (previous step took ${took} s)`);
+  stepClock = Date.now();
+  log(`Step ${n} of 6: ${title}`);
+}
+
 export async function populate(ctx: Context, log: Log): Promise<PopulateResult> {
   const started = Date.now();
-  log("Step 1 of 6: reset to the scenario start");
+  stepStart(log, "1", "reset to the scenario start");
   const reset = await resetToUsers(ctx, SCENARIO_START_USERS, log);
   const w = newWorld({ db: ctx.db, admin: ctx.admin, password: ctx.password, log });
 
-  log("Step 2 of 6: vendors (registration, approval, grade, categories, certificates)");
+  stepStart(log, "2", "vendors (registration, approval, grade, categories, certificates)");
   await buildVendors(w);
 
-  log("Step 3 of 6: plan lines");
+  stepStart(log, "3", "plan lines");
   const plan = await createPlanLines(w);
 
-  log("Step 4 of 6: requisitions, sourcings, committee decisions and purchase orders (one after another, oldest first)");
+  stepStart(log, "4", "requisitions, sourcings, committee decisions and purchase orders (one after another, oldest first)");
   const stories: Ctx = { w, plan, prs: {}, sourcings: {} };
   await runStories(stories, log);
 
-  log("Step 5 of 6: change request and notifications");
+  stepStart(log, "5", "change request and notifications");
   await changeRequest(w);
   await notifications(w);
 
-  log("Step 6 of 6: self-check");
+  stepStart(log, "6", "self-check");
   const loaded = await selfCheck(w, stories.sourcings);
 
   await ctx.db.query("delete from auth.sessions"); // every user is signed out (the loader's own sessions included)

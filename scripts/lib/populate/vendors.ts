@@ -207,9 +207,11 @@ export async function fillSteps(w: World, s: VendorSpec, v: VendorRef, upTo: "ow
     await attach(w, { type: "vendor_contact", id: contactId }, "proof_of_authority", "power-of-attorney.pdf", v.userId, `Proof of authority of ${s.legalName}`);
     await call(w, s.email, "contact_check");
   }
-  for (const kind of requiredKinds(s.type, s.vat === true)) {
-    await attach(w, { type: "vendor", id: v.id }, kind as "charter", `${kind.replace(/_/g, "-")}.pdf`, v.userId, s.legalName);
-  }
+  await Promise.all(
+    requiredKinds(s.type, s.vat === true).map((kind) =>
+      attach(w, { type: "vendor", id: v.id }, kind as "charter", `${kind.replace(/_/g, "-")}.pdf`, v.userId, s.legalName),
+    ),
+  );
 }
 
 export async function decide(w: World, v: VendorRef, decision: "APPROVE" | "RETURN" | "REJECT", comment: string | null = null): Promise<void> {
@@ -229,9 +231,13 @@ export async function fillQuestionnaire(w: World, s: VendorSpec, v: VendorRef, g
     return { questionId: r.question_id, optionId: option.id as string };
   });
   await call(w, s.email, "questionnaire_save", { p_response: responseId, p_answers: answers });
-  for (const r of rows.filter((x) => x.evidence_required)) {
-    await attach(w, { type: "questionnaire_answer", id: r.answer_id }, "attachment", "evidence.pdf", v.userId, `Evidence of ${s.legalName}`);
-  }
+  await Promise.all(
+    rows
+      .filter((x) => x.evidence_required)
+      .map((r) =>
+        attach(w, { type: "questionnaire_answer", id: r.answer_id }, "attachment", "evidence.pdf", v.userId, `Evidence of ${s.legalName}`),
+      ),
+  );
   await call(w, s.email, "questionnaire_submit", { p_response: responseId });
   return responseId;
 }
@@ -318,22 +324,18 @@ export async function extendSeedVendors(w: World): Promise<void> {
 }
 
 export async function buildVendors(w: World): Promise<void> {
-  // registrations and logins carry no document number, so independent vendors may run side by side
-  const independent = VENDORS.filter((s) => !["zeta", "omicron"].includes(s.key));
-  const queue = [...independent];
+  // registrations and logins carry no document number, so vendors may run side by side; the two long ones (Mugan, Zaqatala) start first
+  const first = VENDORS.filter((s) => ["zeta", "omicron"].includes(s.key));
+  const queue = [...first, ...VENDORS.filter((s) => !first.includes(s))];
   const worker = async () => {
     for (let s = queue.shift(); s; s = queue.shift()) {
       await buildVendor(w, s);
       w.log(`  vendor ${s.legalName}`);
     }
   };
-  await Promise.all([worker(), worker(), worker(), worker()]);
-  for (const s of VENDORS.filter((x) => ["zeta", "omicron"].includes(x.key))) {
-    await buildVendor(w, s);
-    w.log(`  vendor ${s.legalName}`);
-  }
+  await Promise.all(Array.from({ length: 8 }, () => worker()));
   await extendSeedVendors(w);
-  // refresh ids of seed vendors' legal names for later use
+  // refresh the legal names of the seed vendors for later use
   const { rows } = await w.db.query("select id, legal_name from public.vendor");
   for (const ref of w.vendors.values()) ref.legalName = rows.find((r) => r.id === ref.id)?.legal_name ?? ref.legalName;
 }
