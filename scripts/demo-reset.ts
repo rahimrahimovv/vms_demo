@@ -5,7 +5,7 @@
 import {
   SCENARIO_START_USERS,
   closeContext,
-  confirmByTyping,
+  confirmRun,
   ENABLE_SQL,
   inventory,
   isFlagEnabled,
@@ -29,7 +29,7 @@ async function main() {
     console.log(`  ${before.storageObjects} uploaded files in Storage`);
     console.log("Then the scenario start is restored: dictionaries, categories, items, plan line, users, committee, Ege Tarim Kimya and Caspian Agrochem.");
 
-    await confirmByTyping(ctx, "reset this project");
+    await confirmRun(ctx, "reset this project");
     console.log("Resetting ...");
 
     const summary = await resetToUsers(ctx, SCENARIO_START_USERS, console.log);

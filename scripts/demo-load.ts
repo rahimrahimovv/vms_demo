@@ -2,7 +2,7 @@
 // the application's own database functions. A developer command (D-023), never a web endpoint. Same guards as the reset:
 // it reads ENV_FILE (default .env.local), prints the target project and what it is about to delete, refuses unless
 // demo_flag is enabled in that database, and does nothing until the last 6 characters of the project reference are typed.
-import { SCENARIO_START_USERS, closeContext, confirmByTyping, ENABLE_SQL, inventory, isFlagEnabled, openContext } from "./lib/demo-data";
+import { SCENARIO_START_USERS, closeContext, confirmRun, ENABLE_SQL, inventory, isFlagEnabled, openContext } from "./lib/demo-data";
 import { populate } from "./lib/populate";
 
 async function main() {
@@ -19,7 +19,7 @@ async function main() {
     console.log(`  ${before.storageObjects} uploaded files in Storage`);
     console.log("Then the populated demo data is loaded: 15 vendors, 19 requisitions, 12 sourcings, committee decisions with minutes, purchase orders.");
 
-    await confirmByTyping(ctx, "reset this project and load the populated demo data");
+    await confirmRun(ctx, "reset this project and load the populated demo data");
     console.log("Loading ... (a few minutes)");
 
     const result = await populate(ctx, console.log);

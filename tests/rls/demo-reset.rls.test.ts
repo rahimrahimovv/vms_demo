@@ -216,6 +216,26 @@ describe("the command asks before it does anything", () => {
     expect(await counts()).toEqual(before);
   });
 
+  it("--unattended is refused without the variable, for another reference and for a production reference; nothing changes", { timeout: 240_000 }, async () => {
+    const before = await counts();
+    const prodRef = "bxomavkbdppdbpdklkeg";
+    for (const script of ["scripts/demo-load.ts", "scripts/demo-reset.ts"]) {
+      for (const [label, value, expected] of [
+        ["empty", "", /needs DEMO_UNATTENDED_REF/],
+        ["another reference", "abcdefghijklmnopqrst", /not the target project reference/],
+        ["the production reference", prodRef, /not the target project reference/],
+      ] as const) {
+        const out = spawnSync(process.execPath, ["--import", "tsx", script, "--unattended"], {
+          input: "", encoding: "utf8", timeout: 120_000, env: { ...process.env, DEMO_UNATTENDED_REF: value },
+        });
+        expect(out.stderr, script + " " + label).toMatch(expected);
+        expect(out.stdout, script + " " + label).not.toContain("Unattended run");
+        expect(out.status, script + " " + label).toBe(1);
+      }
+    }
+    expect(await counts()).toEqual(before);
+  });
+
   it("demo:load refuses while demo_flag is off, without asking anything", async () => {
     await db.query("update public.demo_flag set enabled = false");
     try {

@@ -5,6 +5,7 @@ import { createInterface } from "node:readline";
 import { config } from "dotenv";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import pg from "pg";
+import { unattendedRefusal, wantsUnattended } from "./unattended";
 
 export const COMPANY_ID = "00000000-0000-4000-8000-000000000001"; // Agro Holding MMC, see app.seed_base()
 export const BETA_TRADE_ID = "00000000-0000-4000-8000-000000000502";
@@ -123,6 +124,17 @@ export async function confirmByTyping(ctx: Context, action: string): Promise<voi
   });
   if (answer === null) throw new Error("Cancelled: no confirmation was typed. Nothing was changed.");
   if (answer.trim() !== expected) throw new Error("Cancelled: the characters do not match. Nothing was changed.");
+}
+
+/**
+ * The confirmation of both commands: the typed characters, or --unattended when DEMO_UNATTENDED_REF in the env file equals the
+ * target project reference (scripts/lib/unattended.ts). A refused --unattended never falls back silently: it stops the command.
+ */
+export async function confirmRun(ctx: Context, action: string, argv: string[] = process.argv.slice(2)): Promise<void> {
+  if (!wantsUnattended(argv)) return confirmByTyping(ctx, action);
+  const refusal = unattendedRefusal(argv, process.env, ctx.projectRef, ctx.envFile);
+  if (refusal) throw new Error(refusal);
+  console.log("Unattended run: DEMO_UNATTENDED_REF equals the target project reference, the typed confirmation is skipped.");
 }
 
 type Log = (message: string) => void;

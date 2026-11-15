@@ -137,3 +137,8 @@ through the application's own database functions, signed in as the right user (t
 `Loaded: N vendors, N PRs, N sourcings, N decisions, N POs` or the first failed check. It needs `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` too (the loader
 signs in as the demo users with `DEMO_SEED_PASSWORD`). Migrations `20261119100000_demo_backdate` and `20261119120000_demo_backdate_dates`
 (function `app.demo_backdate`) must be applied to the target database first.
+
+**Unattended mode** (`npm run demo:reset -- --unattended`, `npm run demo:load -- --unattended`) skips the typed confirmation, only when
+`DEMO_UNATTENDED_REF` in the env file equals the target project reference exactly (and the env file is not a production one). Set it in `.env.local`
+to the vms-dev reference and nowhere else: **never** in `.env.production.local`, on Vercel or with a real value in `.env.example`. Without the variable, or with
+another reference, the flag is refused and the typed confirmation stays mandatory (unit tests `unattended.test.ts`, command tests in `demo-reset.rls.test.ts`).
