@@ -629,3 +629,26 @@ the region, with a PDF); S10 1,000 x 24 + 800 x 30 + 80 x 300, three winners (23
 ### Open issues
 27. The first real run may stop at a function message or at the self-check; the loader stops at the first error and names the function and the user.
 28. A load leaves about a hundred small PDFs in Storage; `demo:reset` empties the bucket.
+
+## RFQ-09, My tasks from the current state, D-024 and the accounts list (15 Nov 2026)
+
+- **RFQ-09 (D-025), Close now.** `public.close_now(sourcing, reason)` (migration `20261120100000_close_now`): only the owner, OPEN only, a reason, every invitation answered
+  (a SUBMITTED proposal or a declined invitation; "N invited vendors have not answered yet" with N in the error detail), then the closing logic of the deadline job
+  (`app.close_open_sourcing`, now shared by the job and Close now). Audit text "Closed early: <reason> (original deadline DD Mon YYYY HH:MM)"; vendors with a submitted proposal get
+  `sourcing.closedEarly` (no reason). `public.close_now_state` feeds the button on the sourcing header (disabled with the names of the vendors that have not answered). 8 RLS tests
+  (`close-now.rls.test.ts`). Backlog patched (RFQ-09, D-025, Role Matrix, notification, status note, S2 and S3). The loader closes its sourcings with `close_now`, so every invitation
+  of a closed story is answered; S2 has 2 submitted and 2 declined, S3 1 submitted, 1 declined and 2 unanswered.
+- **My tasks.** Cards and the "Waiting for you" list come from the same queries (`src/lib/home/tasks.ts`); notifications keep their own card. Added the missing texts
+  `home.cardLabels.changeRequests`, `home.cardLinks.changeRequests`, `home.recordTypes.vendor_change_request` and a `home.tasks.*` text per card. The key test now covers literal and
+  dynamic keys, card and menu definitions, record types, statuses and notification events from the SQL; a missing text prints `[missing text: key]`, never a bare key.
+  Specialist counts on the loaded data: 3 registrations, 1 questionnaire, 2 category applications, 1 change request, 1 sourcing below the minimum, 3 approved PRs ready for sourcing.
+- **D-024, in-app demo tools removed.** Demo access page, unlock cookie, attempt limit, demo bar, Switch user, Lock, End deadline now, the three environment variables and `demo_attempt`
+  (migration `20261121100000_remove_demo_tools`). Kept: `demo:reset`, `demo:load` (typed confirmation, `--unattended` for the development project), `demo_flag`, `app.demo_reset`,
+  `app.demo_seed`, `app.demo_backdate`. Test `no-passwordless-signin.test.ts`: no code path can create a session without a password, only `signInWithPassword` exists.
+- **docs/DEMO-ACCOUNTS.md** is written by `demo:load` from the loaded data (22 accounts by role, no passwords).
+
+### Verified
+- Typecheck, lint, unit tests, production build. Final run: `demo:reset`, the full RLS suite once (14 files, 259 tests, all pass, after the RFQ-09 and D-024 migrations), `demo:load`:
+  `Loaded: 15 vendors, 19 PRs, 12 sourcings, 11 decisions, 4 POs`.
+- **Not done: the Next.js dev overlay ("Issues") check on the main pages of every role.** No Chrome here, and installing `playwright-core` to drive Edge was refused by the permission check.
+  The key coverage test and the typecheck catch the class of error behind the 2 issues seen on My tasks; the overlay itself still has to be looked at in the browser.
