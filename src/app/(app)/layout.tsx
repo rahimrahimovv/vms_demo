@@ -4,10 +4,9 @@ import { sectionsFor } from "@/lib/auth/sections";
 import { createClient } from "@/lib/supabase/server";
 import { BELL_COLUMNS, BELL_MAX_ITEMS, toBellItem, type NotificationRow } from "@/lib/notifications";
 import { AppSidebar } from "@/components/layout/app-sidebar";
-import { DemoBarSlot } from "@/components/layout/demo-bar-slot";
 import { TopBar } from "@/components/layout/top-bar";
 
-/** Signed-in shell: sidebar (menu by role), demo bar slot, top bar (title, bell, user). */
+/** Signed-in shell: sidebar (menu by role), top bar (title, bell, user). */
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const user = await requireUser();
   const t = await getTranslations("roles");
@@ -31,7 +30,6 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       <AppSidebar sections={sectionsFor(user.roles, vendorStatus)} />
       {/* Content starts 256 px from the left (16 + 224 + 16) and keeps 16 px from the other edges */}
       <div className="flex min-w-0 flex-col gap-(--shell-gap) py-(--shell-gap) pr-(--shell-gap) pl-[calc(var(--shell-gap)*2+var(--sidebar-w))]">
-        <DemoBarSlot currentUserId={user.id} />
         <TopBar
           userId={user.id}
           fullName={user.fullName}

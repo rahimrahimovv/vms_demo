@@ -85,7 +85,7 @@ export const ENABLE_SQL = "update public.demo_flag set enabled = true;";
 
 async function publicTables(ctx: Context): Promise<string[]> {
   const { rows } = await ctx.db.query(
-    "select tablename from pg_tables where schemaname = 'public' and tablename not in ('demo_flag', 'demo_attempt') order by 1",
+    "select tablename from pg_tables where schemaname = 'public' and tablename <> 'demo_flag' order by 1",
   );
   return rows.map((r) => r.tablename as string);
 }

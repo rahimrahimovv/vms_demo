@@ -71,11 +71,8 @@ Run `db:push` after every new migration, before or together with the deploy that
    | `NEXT_PUBLIC_SUPABASE_URL` | vms-prod project URL | |
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | vms-prod publishable key | |
    | `SUPABASE_SECRET_KEY` | vms-prod secret key | mark as Sensitive; server only |
-   | `DEMO_MODE` | `false` | `true` only for rehearsal and demo day |
-   | `DEMO_ACCESS_CODE` | the demo code | mark as Sensitive; at least 6 characters; the presenter types it at `/demo-access` |
-   | `DEMO_SESSION_SECRET` | 16+ random characters | mark as Sensitive; signs the 8-hour unlock cookie |
 
-   Do **not** add `SUPABASE_DB_URL` or `DEMO_SEED_PASSWORD` to Vercel; only the local scripts use them. There is no
+   Do **not** add `SUPABASE_DB_URL`, `DEMO_SEED_PASSWORD` or `DEMO_UNATTENDED_REF` to Vercel; only the local scripts use them. There is no
    `CRON_SECRET`: the release has no cron route (the staging clean-up is an open item in `docs/PROGRESS.md`).
 4. Production branch: `main`. Every push to `main` deploys; a failed build keeps the previous version live.
 
@@ -93,13 +90,10 @@ Run `db:push` after every new migration, before or together with the deploy that
 - Vendor self-registration works with public sign-up off: the server creates the account already confirmed.
 - NFR-014: the free project pauses after about a week without use; open it the day before the demo.
 
-## Demo tools and the reset command (Slice 8a, D-022, D-023)
+## The reset and load commands (Slice 8a and 8b, D-023, D-024)
 
-**In the browser** (Vercel and local): demo tools need `DEMO_MODE=true` **and** an unlocked browser. Open `/demo-access` (the sign-in
-page links to it while demo mode is on) and type `DEMO_ACCESS_CODE`; the signed httpOnly cookie lasts 8 hours. Five wrong codes from one IP
-lock it for 15 minutes. The demo bar then shows **Switch user** (any active user, no password), and **Lock**. (Closing a sourcing early is the business function Close now, RFQ-09, not a demo tool.)
-Without both conditions no control is rendered and every demo action answers "Not available". The browser has **no** Reset button, **no**
-Load button and no endpoint for either.
+**In the browser** there are no demo tools (D-024): no demo page, no demo bar, no Switch user, no Lock, no Reset or Load button, and no
+endpoint or server action that signs in as another user without a password. Resetting and loading are commands on your machine.
 
 **Reset to scenario start** is a command on your machine:
 
@@ -110,7 +104,7 @@ ENV_FILE=.env.production.local npm run demo:reset   # another project (Git Bash)
 
 It prints the target project reference and what it is about to delete, refuses if `demo_flag` is off, and waits until **you type the last
 6 characters of the project reference**. It deletes every row of every table in `public` (audit trail and minutes included; only
-`demo_flag` and `demo_attempt` stay), all Auth users except the 9 seed users, every session (everyone is signed out) and every uploaded
+`demo_flag` stays), all Auth users except the 9 seed users, every session (everyone is signed out) and every uploaded
 file in the `files` bucket. It restores the scenario start (dictionaries, categories, items, the 500,000.00 AZN plan line, the 7 internal
 users and the demo committee, Ege Tarim Kimya and Caspian Agrochem with owners, bank accounts and sample proof files, settings, vendor logins with
 the demo password), restarts document numbers at 0001 and leaves one `RESET` line in the audit trail. Kura Agro Supply does not exist

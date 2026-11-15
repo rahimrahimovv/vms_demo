@@ -53,7 +53,7 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 34 stories
 │   ├── PO-02   Approver, then committee, approve the PO
 │   └── PO-03   Vendor accepts or declines the PO
 └── DEMO Demo mode
-    ├── DEMO-01 Presenter uses demo tools
+    ├── DEMO-01 Presenter uses demo tools (withdrawn, D-024)
     ├── DEMO-02 System seeds and resets the demo scenario
     └── DEMO-03 System loads the populated demo data
 ```
@@ -969,7 +969,9 @@ TBD
 
 ---
 
-### DEMO-01 - Presenter Uses Demo Tools
+### DEMO-01 - Presenter Uses Demo Tools (withdrawn, D-024)
+
+**Withdrawn (D-024).** The app has no demo tools: no demo access page or code, no demo bar, no Switch user, Lock or End deadline now. Closing a sourcing early is the business function of RFQ-09. The criteria below are kept for history only.
 
 | Field | Value |
 | --- | --- |
@@ -1143,7 +1145,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Request a change to company data, owners, bank accounts or documents | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Decide a change request; reopen a rejected registration | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
-Owner means the Procurement Specialist who started the sourcing; other specialists can read it. Demo tools (DEMO-01) are open to everyone, and only while demo mode is on.
+Owner means the Procurement Specialist who started the sourcing; other specialists can read it.
 
 ## Status Transition Model
 
@@ -1472,8 +1474,9 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
 | D-020 | After approval, core company data (legal name, tax number, address, director, founding date, VAT status, owners, bank accounts, documents) changes only through a change request that a Procurement Specialist approves; other profile data changes freely and is logged | REG-08 |
 | D-021 | Users change their own password; an Admin resets internal users and a Procurement Specialist resets vendors with a temporary password, because the release sends no e-mail | PLT-03 |
-| D-022 | Demo tools (Switch user) work only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account or wipe data | DEMO-01 |
+| D-022 | (Withdrawn, D-024) Demo tools in the app were unlocked with a demo code | DEMO-01 |
 | D-023 | Resetting and loading demo data are commands run by a developer (npm run demo:reset and npm run demo:load) against a database whose demo flag is on, with a typed confirmation; they are not buttons in the app. Fill sample is a later addition | DEMO-02, DEMO-03 |
+| D-024 | The app has no demo tools: no demo access page, demo bar, Switch user, Lock or End deadline now, and no endpoint or action that signs in as another user without a password. Demo data is reset and loaded only by the developer commands of D-023 | DEMO-01 (withdrawn), DEMO-02, DEMO-03 |
 | D-025 | The Procurement Specialist who owns an OPEN sourcing may close it before its deadline when every invited vendor has answered (a submitted proposal or a declined invitation); a reason is required and the audit trail keeps it with the original deadline. This replaces the demo tool "End deadline now", which is removed | RFQ-09, DEMO-01 |
 
 **Assumptions in force**
