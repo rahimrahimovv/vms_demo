@@ -650,5 +650,7 @@ the region, with a PDF); S10 1,000 x 24 + 800 x 30 + 80 x 300, three winners (23
 ### Verified
 - Typecheck, lint, unit tests, production build. Final run: `demo:reset`, the full RLS suite once (14 files, 259 tests, all pass, after the RFQ-09 and D-024 migrations), `demo:load`:
   `Loaded: 15 vendors, 19 PRs, 12 sourcings, 11 decisions, 4 POs`.
-- **Not done: the Next.js dev overlay ("Issues") check on the main pages of every role.** No Chrome here, and installing `playwright-core` to drive Edge was refused by the permission check.
-  The key coverage test and the typecheck catch the class of error behind the 2 issues seen on My tasks; the overlay itself still has to be looked at in the browser.
+- **Dev overlay check (done 15 Nov 2026).** Edge headless driven through its debug port (a throwaway script, nothing installed) against the dev server on the loaded data:
+  58 pages as 9 sign-ins (Requester, Approver, Specialist, Committee, Admin, an approved vendor, a DRAFT vendor, a REJECTED vendor, plus the public pages): My tasks, the lists, a
+  record page of each list, the Close now dialog. The overlay element was present on every checked page and showed **0 Issues**; no console error, no raw message key, no error
+  page; the only redirects are the expected ones (DRAFT vendor to its registration step, REJECTED vendor to "Registration rejected").
