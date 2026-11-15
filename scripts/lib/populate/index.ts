@@ -81,7 +81,7 @@ export async function populate(ctx: Context, log: Log): Promise<PopulateResult> 
 
   stepStart(log, "6", "self-check");
   const loaded = await selfCheck(w, stories.sourcings);
-  const accounts = await writeDemoAccounts(w); // docs/DEMO-ACCOUNTS.md, from the loaded data
+  const accounts = await writeDemoAccounts(w, ctx.projectRef); // docs/DEMO-ACCOUNTS.md, from the loaded data
   log(`  docs/DEMO-ACCOUNTS.md written (${accounts.length} accounts)`);
 
   await ctx.db.query("delete from auth.sessions"); // every user is signed out (the loader's own sessions included)

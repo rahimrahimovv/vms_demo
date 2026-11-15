@@ -654,3 +654,17 @@ the region, with a PDF); S10 1,000 x 24 + 800 x 30 + 80 x 300, three winners (23
   58 pages as 9 sign-ins (Requester, Approver, Specialist, Committee, Admin, an approved vendor, a DRAFT vendor, a REJECTED vendor, plus the public pages): My tasks, the lists, a
   record page of each list, the Close now dialog. The overlay element was present on every checked page and showed **0 Issues**; no console error, no raw message key, no error
   page; the only redirects are the expected ones (DRAFT vendor to its registration step, REJECTED vendor to "Registration rejected").
+
+## Production rollout, part 1 (15 Nov 2026)
+
+- Target checked first: API and database reference both `bxomavkbdppdbpdklkeg` (production), `DEMO_UNATTENDED_REF` not in `.env.production.local`. vms-prod was at `20261117110000`.
+- `ENV_FILE=.env.production.local npm run db:push` applied 8 migrations (no seed: `db:push` seeds only with `--seed`): `20261118100000_demo_access`, `20261118110000_demo_end_deadline`,
+  `20261118120000_demo_reset` (creates `demo_flag`, **disabled**), `20261119100000_demo_backdate`, `20261119110000_demo_names` (renames the seed company, two seed vendors and the admin in place),
+  `20261119120000_demo_backdate_dates`, `20261120100000_close_now` (RFQ-09), `20261121100000_remove_demo_tools`. No demo data was loaded, the flag was not enabled.
+- `main` pushed (`cbffee2` at the time); Vercel deployment `success`. Read-only smoke check on https://vms-demo-rho.vercel.app and the production database: all pass. Public pages load and show
+  nothing about demos; 12 protected pages (including the removed `/demo-access`) redirect to sign-in; anonymous calls to `close_now`, `close_now_state` (42501) and to `demo_reset`, `demo_seed`,
+  `demo_backdate`, `seed_base`, the old demo functions (not exposed, PGRST202); a signed-in user cannot call any demo function either and cannot reach schema `app` (PGRST106) or read `demo_flag`;
+  `close_now` by a non-owner answers `errors.noAccess` and changes nothing; no API role can execute the 7 internal functions; `demo_flag` exists and is disabled; both immutability triggers enabled;
+  production data unchanged (6 vendors, 0 sourcings).
+- The exact SQL and PowerShell lines to enable the flag and load the demo data on production are in `docs/SETUP.md` (section "Demo data on production"). They are for the developer to run; the
+  flag stays off until then. `docs/DEMO-ACCOUNTS.md` now names the project reference it was generated from.

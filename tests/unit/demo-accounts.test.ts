@@ -8,7 +8,7 @@ const rows: AccountRow[] = [
 ];
 
 describe("docs/DEMO-ACCOUNTS.md", () => {
-  const text = renderAccounts(rows, "15 Nov 2026, 11:00 (Asia/Baku)");
+  const text = renderAccounts(rows, "15 Nov 2026, 11:00 (Asia/Baku)", "devprojectref0000000a");
 
   it("groups the accounts by role in the fixed order, one table row per account", () => {
     const requester = text.indexOf("## Requester (1)");
@@ -19,6 +19,11 @@ describe("docs/DEMO-ACCOUNTS.md", () => {
     expect(specialist).toBeLessThan(vendor);
     expect(text).toContain("| info@shirvan-seeds.test | Farid Hasanov | Shirvan Seeds MMC | registration APPROVED; grade A. |");
     expect(text).not.toContain("## Admin"); // empty groups are left out
+  });
+
+  it("names the project it was generated from, so a load against another project is never mislabelled", () => {
+    expect(text).toContain("Supabase project devprojectref0000000a");
+    expect(text).not.toContain("vms-dev");
   });
 
   it("names the demo password variable but never a password", () => {

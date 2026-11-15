@@ -131,6 +131,45 @@ through the application's own database functions, signed in as the right user (t
 signs in as the demo users with `DEMO_SEED_PASSWORD`). Migrations `20261119100000_demo_backdate` and `20261119120000_demo_backdate_dates`
 (function `app.demo_backdate`) must be applied to the target database first.
 
+**Demo data on production (vms-prod, `bxomavkbdppdbpdklkeg`)** is loaded only by you, in two steps. The production database has the demo functions and the
+flag since the rollout of 15 Nov 2026, with `demo_flag` **disabled**; nothing loads until you enable it.
+
+1. Enable the flag: Supabase dashboard of the **production** project, SQL editor:
+
+   ```sql
+   update public.demo_flag set enabled = true;
+   select enabled from public.demo_flag;   -- must return true
+   ```
+
+2. Load (PowerShell, on your machine; `.env.production.local` holds the production URL, keys, `SUPABASE_DB_URL` and `DEMO_SEED_PASSWORD`):
+
+   ```powershell
+   cd C:Projectsms_demo
+   $env:ENV_FILE = ".env.production.local"
+   npm run demo:load
+   # it prints: Target project reference: bxomavkbdppdbpdklkeg   (env file: .env.production.local)
+   # and asks you to type the last 6 characters of that reference:  dklkeg
+   Remove-Item Env:ENV_FILE
+   ```
+
+   Do not add `--unattended`: it is refused for a production reference and a production env file. The command deletes **every** row, Auth user (except the
+   9 seed users) and file of the production project (the 6 vendors and the audit trail included), loads the catalogue and takes 4 to 6 minutes. Expected last lines:
+   `docs/DEMO-ACCOUNTS.md written (22 accounts)` and
+
+   ```text
+   Loaded: 15 vendors, 19 PRs, 12 sourcings, 11 decisions, 4 POs
+   ```
+
+   It rewrites `docs/DEMO-ACCOUNTS.md` with the production reference in its header; commit it only if you want it in git. Every account uses `DEMO_SEED_PASSWORD` of
+   `.env.production.local`. Afterwards switch the flag off again:
+
+   ```sql
+   update public.demo_flag set enabled = false;
+   ```
+
+   Vercel needs no change (the demo variables are gone from the app; do not add `DEMO_SEED_PASSWORD` or `SUPABASE_DB_URL` there). `.env.production.local` still holds an unused
+   `DEMO_MODE=` line from the old demo tools: delete it.
+
 **Unattended mode** (`npm run demo:reset -- --unattended`, `npm run demo:load -- --unattended`) skips the typed confirmation, only when
 `DEMO_UNATTENDED_REF` in the env file equals the target project reference exactly (and the env file is not a production one). Set it in `.env.local`
 to the vms-dev reference and nowhere else: **never** in `.env.production.local`, on Vercel or with a real value in `.env.example`. Without the variable, or with
