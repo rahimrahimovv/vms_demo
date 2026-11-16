@@ -695,3 +695,8 @@ Migrations applied to vms-dev, not yet to vms-prod: `20261122100000_saving`, `20
 
 Checks: typecheck clean, 200+ unit tests, build ok, `demo:reset`, full RLS suite 269 of 269 passed (16 files), `demo:load` ended "Loaded: 15 vendors, 19 PRs, 12 sourcings, 11 decisions, 4 POs".
 Open: the visual check on vms-dev (Specialist comparison, Ege Tarim Kimya invitation page) was not done, see the summary.
+
+### vms-dev and the migration files agree (16 Nov 2026)
+
+Check: in one transaction on vms-dev the state before the three migrations was restored (new functions dropped, `app.comparison_json` back to its original, `public.po_view` from `20261116100000_purchase_orders.sql`), then `20261122100000_saving`, `20261122110000_proposal_receipt` and `20261122120000_saving_rounding` were applied in order, and every function they create or replace was compared with the vms-dev definition (`pg_get_functiondef`, whitespace normalised, plus the privileges). Nine functions (`app.round_half_up`, `app.saving_build`, `app.sourcing_saving`, `app.po_saving`, `app.comparison_json`, `app.comparison_base_json`, `public.po_view`, `public.sourcing_savings`, `public.proposal_receipt`): **0 differences**; the transaction was rolled back and vms-dev was unchanged afterwards. This covers the `po_view` statement that was first run by hand on vms-dev.
+Not done: applying the files to a freshly reset schema and re-running the saving and receipt suites (a schema reset is not cheap here; `demo:reset` resets data only). Both suites passed on vms-dev as part of the full run (269 of 269).
