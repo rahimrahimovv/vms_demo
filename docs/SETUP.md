@@ -144,7 +144,7 @@ flag since the rollout of 15 Nov 2026, with `demo_flag` **disabled**; nothing lo
 2. Load (PowerShell, on your machine; `.env.production.local` holds the production URL, keys, `SUPABASE_DB_URL` and `DEMO_SEED_PASSWORD`):
 
    ```powershell
-   cd C:Projectsms_demo
+   cd C:\Projects\vms_demo
    $env:ENV_FILE = ".env.production.local"
    npm run demo:load
    # it prints: Target project reference: bxomavkbdppdbpdklkeg   (env file: .env.production.local)
