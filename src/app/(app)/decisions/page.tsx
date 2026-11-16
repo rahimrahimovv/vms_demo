@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
 import { StatusBadge } from "@/components/status-badge";
@@ -29,6 +30,7 @@ export default async function DecisionsPage() {
   if (!allowed) return <NoAccess />;
 
   const t = await getTranslations();
+  const serverNow = new Date().toISOString();
   const supabase = await createClient();
   const [{ data }, { data: mine }] = await Promise.all([
     supabase
@@ -62,7 +64,10 @@ export default async function DecisionsPage() {
       status: { sort: d.status, node: <StatusBadge status={d.status} /> },
       yourVote: { sort: stateOf(d), node: t(`decisions.yourVote.${stateOf(d)}`) },
       opened: { sort: d.opened_at, node: formatDateTime(d.opened_at) },
-      deadline: { sort: d.deadline, node: formatDateTime(d.deadline) },
+      deadline: {
+        sort: d.deadline,
+        node: d.status === "VOTING" ? <DeadlineCountdown deadline={d.deadline} serverNow={serverNow} kind="voting" /> : formatDateTime(d.deadline),
+      },
       minutes: { sort: minutesNumber(d.minutes) ?? "", node: minutesNumber(d.minutes) ?? t("common.none") },
     },
   });

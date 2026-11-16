@@ -44,6 +44,7 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 38 stories
 │   ├── RFQ-08  Specialist requests a final (discounted) offer
 │   ├── RFQ-09  Specialist closes a sourcing early
 │   ├── RFQ-10  Internal users see the saving against the estimate
+│   ├── RFQ-11  Everyone sees the time left on a deadline
 ├── CMT  Committee
 │   ├── CMT-01  Admin configures the committee
 │   ├── CMT-02  Committee votes on a winner or a PO decision
@@ -820,6 +821,31 @@ TBD
 
 ---
 
+### RFQ-11 - Everyone Sees The Time Left On A Deadline
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-11 |
+| **Story title** | Every deadline shows the time left and updates without a reload; a vendor's form turns read-only when it passes. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Vendor, Procurement Specialist, Committee Member |
+| **I want to...** | see how long a deadline has left next to the deadline itself |
+| **So that...** | nobody misses a deadline or waits on one that has passed |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a deadline, **When** it is shown, **Then** the absolute date and time (Asia/Baku) is followed by "Closes in 2 days 4 hours" (24 hours or more), "Closes in 5 h 12 min" with an amber chip (under 24 hours) or "Closes in 42 min" (under 1 hour), and "Deadline passed" afterwards.
+2. **Given** the page stays open, **When** a minute passes, **Then** the text updates without a reload and without announcing itself to screen readers.
+3. **Given** the clock of the user's device is wrong, **When** the time left is shown, **Then** it is computed from the server time, so the wrong clock does not matter.
+4. **Given** a vendor has the invitation open, **When** the deadline passes, **Then** the page data refreshes and the proposal form is read-only with "The deadline has passed".
+5. **Given** the vendor's invitation list and invitation page, the sourcing record header (internal users), a running final-offer round ("Final offer closes in ...") and a committee decision in VOTING ("Voting closes in ..."), **When** they are opened, **Then** each shows the time left in the same way.
+
+---
+
 ### CMT-01 - Admin Configures The Committee
 
 | Field | Value |
@@ -1428,6 +1454,7 @@ Every number the system computes follows one of these rules; the examples are th
 | Deadline reminder | Sent once, 24 hours before the deadline, to invited vendors that have neither declined nor submitted | Deadline Mon 30 Nov 2026 10:00 → reminder Sun 29 Nov 2026 10:00 |
 | Certificate status | VALID when there is no expiry date or it is more than 30 days away; EXPIRING within 30 days; EXPIRED from the day after the expiry date | Today 10 Nov 2026: expiry 30 Nov 2026 → EXPIRING; 15 Jan 2027 → VALID; 09 Nov 2026 → EXPIRED |
 | Saving against the estimate | Per line with a winner: estimated = quantity × estimated unit price of the PR line; awarded = quantity × the winner's own latest unit price excluding VAT; amounts rounded half-up to 2 decimals. Saving = sum of estimated − sum of awarded; percent = saving ÷ sum of estimated × 100, rounded half-up to 1 decimal. Cancelled lines and lines without a winner are excluded; internal users only (RFQ-10) | Estimated 80,000.00, awarded 74,500.00 → saving 5,500.00 AZN = 6.9 %; awarded above the estimate → "Over estimate", amount with a plus sign |
+| Time left on a deadline | Deadline − server time. 24 hours or more: days and hours; under 24 hours: hours and minutes (amber); under 1 hour: minutes (at least 1); 0 or less: "Deadline passed". The device clock is never used (RFQ-11) | 52 h 10 min → "2 days 4 hours"; 5 h 12 min → "5 h 12 min"; 42 min → "42 min"; 0 → "Deadline passed" |
 | Years in business | Full years between the founding date and today | Founded 15 Mar 2012, today 10 Nov 2026 → 14 years |
 
 ## Demo Scenario Data

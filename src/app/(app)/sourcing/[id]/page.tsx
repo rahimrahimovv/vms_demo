@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActionButton, ActionDialog } from "@/components/action-dialog";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { ComparisonView } from "@/components/sourcing/comparison-view";
 import { CloseNow, RequestFinalOffer, SEND_FORM_ID, SendToCommittee } from "@/components/sourcing/owner-actions";
 import { QaPanel, type QaItem } from "@/components/sourcing/qa-panel";
@@ -101,6 +102,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
 
   const { id } = await params;
   const t = await getTranslations();
+  const serverNow = new Date().toISOString();
   const supabase = await createClient();
   const { data: s } = await supabase
     .from("sourcing")
@@ -418,7 +420,17 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
                       </Link>
                     ) : null}
                   </Field>
-                  <Field label={t("sourcing.fields.deadline")}>{s.deadline ? formatDateTime(s.deadline) : t("common.none")}</Field>
+                  <Field label={t("sourcing.fields.deadline")}>
+                    {s.deadline ? (
+                      s.status === "OPEN" ? (
+                        <DeadlineCountdown deadline={s.deadline} serverNow={serverNow} />
+                      ) : (
+                        formatDateTime(s.deadline)
+                      )
+                    ) : (
+                      t("common.none")
+                    )}
+                  </Field>
                   <Field label={t("sourcing.fields.extensions")}>{s.extension_count}</Field>
                   <Field label={t("sourcing.fields.incoterm")}>{s.required_incoterm ?? t("common.none")}</Field>
                   <Field label={t("sourcing.fields.namedPlace")}>{labelOf(placeRows as { id: string; name: string }[], s.named_place_id)}</Field>
@@ -601,6 +613,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
         {comparison && (
           <TabsContent value="comparison" className="pt-4">
             <ComparisonView
+              serverNow={serverNow}
               data={comparison}
               sendFormId={comparing ? SEND_FORM_ID : undefined}
               actions={

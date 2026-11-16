@@ -1100,6 +1100,15 @@
       "committed": "Committed = PRs pending approval, approved, in sourcing or completed."
     }
   },
+  "deadline": {
+    "closes": "Closes in {value}",
+    "finalOffer": "Final offer closes in {value}",
+    "voting": "Voting closes in {value}",
+    "passed": "Deadline passed",
+    "valueDays": "{days, plural, one {# day} other {# days}}{hours, plural, =0 {} one { # hour} other { # hours}}",
+    "valueHours": "{hours} h {minutes} min",
+    "valueMinutes": "{minutes} min"
+  },
   "saving": {
     "title": "Saving against the estimate",
     "hint": "AZN, excluding VAT · only lines that have a winner · the estimate and the saving are never shown to vendors",
@@ -1269,7 +1278,7 @@
       "lowCompetitionStored": "Reason for fewer eligible proposals than the minimum",
       "committeeRejected": "The committee rejected the proposed winner. The rejected vendor is excluded on its lines.",
       "committeeComment": "{name}: {comment}",
-      "roundOpen": "Final-offer round open until {deadline}. New prices stay hidden until it closes.",
+      "roundOpen": "New prices stay hidden until the round closes.",
       "responded": "Final offer received",
       "waiting": "No final offer yet",
       "sealed": "Prices open when the comparison starts.",
@@ -1365,7 +1374,7 @@
     "submittedNote": "Your proposal is submitted. Total {total}.",
     "finalOffer": {
       "title": "Final offer",
-      "intro": "You are asked for a final offer by {deadline}.",
+      "intro": "You are asked for a final offer.",
       "message": "Message: {message}",
       "previous": "Previous price",
       "newPrice": "Final price",
@@ -1385,8 +1394,6 @@
     },
     "accept": "Accept",
     "decline": "Decline",
-    "remaining": "Time remaining",
-    "remainingValue": "{days} d {hours} h {minutes} min",
     "declinedNote": "You declined this invitation."
   },
   "requisitions": {

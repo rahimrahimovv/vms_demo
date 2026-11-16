@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { useTranslations } from "next-intl";
 import { formatDateTime } from "@/lib/format";
 import { price } from "@/lib/sourcing/comparison";
@@ -17,12 +18,14 @@ export type FinalOfferLine = { id: string; item: string; unit: string; quantity:
 export function FinalOfferForm({
   lines,
   deadline,
+  serverNow,
   message,
   respondedAt,
   action,
 }: {
   lines: FinalOfferLine[];
   deadline: string;
+  serverNow: string;
   message: string | null;
   respondedAt: string | null;
   action: (prev: VendorFormState, formData: FormData) => Promise<VendorFormState>;
@@ -40,7 +43,10 @@ export function FinalOfferForm({
     <form onSubmit={onSubmit} className="flex flex-col gap-4 surface-glass border-sky-300 p-5" data-testid="final-offer-form">
       <div className="flex flex-col gap-1">
         <h3 className="text-base font-semibold">{t("proposal.finalOffer.title")}</h3>
-        <p className="text-sm">{t("proposal.finalOffer.intro", { deadline: formatDateTime(deadline) })}</p>
+        <p className="text-sm">{t("proposal.finalOffer.intro")}</p>
+        <p className="text-sm font-medium" data-testid="final-offer-deadline">
+          <DeadlineCountdown deadline={deadline} serverNow={serverNow} kind="finalOffer" />
+        </p>
         {message && <p className="text-sm text-muted-foreground">{t("proposal.finalOffer.message", { message })}</p>}
         {respondedAt && <p className="text-xs text-(--tone-green-fg)" data-testid="final-offer-responded">{t("proposal.finalOffer.responded", { date: formatDateTime(respondedAt) })}</p>}
       </div>

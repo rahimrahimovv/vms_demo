@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { ComparisonView } from "@/components/sourcing/comparison-view";
 import type { Comparison } from "@/lib/sourcing/comparison";
 import type { PoDifference, PoPackage } from "@/lib/purchase-orders/types";
@@ -195,7 +196,9 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
                 <Field label={t("decisions.fields.type")}>{t(`decisions.types.${d.type}`)}</Field>
                 <Field label={t("decisions.fields.owner")}>{d.sourcing.owner?.full_name}</Field>
                 <Field label={t("decisions.fields.opened")}>{formatDateTime(d.opened_at)}</Field>
-                <Field label={t("decisions.fields.deadline")}>{formatDateTime(d.deadline)}</Field>
+                <Field label={t("decisions.fields.deadline")}>
+                  {voting ? <DeadlineCountdown deadline={d.deadline} serverNow={new Date().toISOString()} kind="voting" /> : formatDateTime(d.deadline)}
+                </Field>
                 {d.closed_at && <Field label={t("decisions.fields.closed")}>{formatDateTime(d.closed_at)}</Field>}
                 {d.result_rule && <Field label={t("decisions.fields.rule")}>{t(`decisions.rules.${d.result_rule}`)}</Field>}
                 {minutes && (

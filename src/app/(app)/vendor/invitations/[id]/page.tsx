@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { formatAmount, formatDate, formatDateTime } from "@/lib/format";
-import { timeRemaining } from "@/lib/sourcing/dates";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { NoAccess } from "@/components/no-access";
 import { RecordHeader } from "@/components/record-header";
 import { DecisionPanel } from "@/components/decision-panel";
@@ -80,7 +80,7 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
 
   const deadlinePassed = new Date(view.deadline) <= new Date();
   const open = view.status === "OPEN" && !deadlinePassed;
-  const remaining = open ? timeRemaining(view.deadline) : null;
+  const serverNow = new Date().toISOString();
   const priceOf = new Map((priceRows ?? []).map((r) => [r.sourcing_line_id, String(Number(r.unit_price).toFixed(2))]));
   const lines: ProposalLine[] = view.lines.map((l) => ({
     id: l.id, item: l.item, unit: l.unit, quantity: Number(l.quantity), deliveryDate: l.deliveryDate,
@@ -125,11 +125,12 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
       <Card>
         <CardContent>
           <dl className="grid grid-cols-4 gap-x-8 gap-y-5" data-testid="invitation-details">
-            <Field label={t("sourcing.fields.deadline")}>{formatDateTime(view.deadline)}</Field>
-            <Field label={t("invitations.remaining")}>
-              <span data-testid="time-remaining">
-                {remaining ? t("invitations.remainingValue", remaining) : t("errors.deadlinePassed")}
-              </span>
+            <Field label={t("sourcing.fields.deadline")}>
+              {view.status === "OPEN" ? (
+                <DeadlineCountdown deadline={view.deadline} serverNow={serverNow} />
+              ) : (
+                formatDateTime(view.deadline)
+              )}
             </Field>
             <Field label={t("sourcing.fields.incoterm")}>{view.requiredIncoterm}</Field>
             <Field label={t("sourcing.fields.namedPlace")}>{name(places.data, view.namedPlaceId)}</Field>
@@ -233,6 +234,7 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
         <FinalOfferForm
           lines={finalOfferLines}
           deadline={view.finalOffer.deadline}
+          serverNow={serverNow}
           message={view.finalOffer.message}
           respondedAt={view.finalOffer.respondedAt}
           action={submitFinalOffer.bind(null, id)}

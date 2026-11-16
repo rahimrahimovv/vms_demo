@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { SavingTable } from "@/components/sourcing/saving-panel";
 
 type Action = (prev: DecisionState, formData: FormData) => Promise<DecisionState>;
@@ -58,12 +59,15 @@ export function ComparisonView({
   actions,
   sendFormId,
   linkVendors = true,
+  serverNow,
 }: {
   data: Comparison;
   actions?: ComparisonActions;
   /** Form id of Send to committee: the low-competition reason textarea belongs to that form. */
   sendFormId?: string;
   linkVendors?: boolean;
+  /** Server clock for the running final-offer round countdown (RFQ-11). */
+  serverNow?: string;
 }) {
   const t = useTranslations("sourcing.comparison");
   const s = data.sourcing;
@@ -100,7 +104,12 @@ export function ComparisonView({
 
       {roundOpen && s.finalOfferDeadline && (
         <section className="surface-glass border-sky-300 px-5 py-4 text-sm text-(--tone-sky-fg)" data-testid="round-open">
-          {t("roundOpen", { deadline: formatDateTime(s.finalOfferDeadline) })}
+          {serverNow ? (
+            <DeadlineCountdown deadline={s.finalOfferDeadline} serverNow={serverNow} kind="finalOffer" className="font-medium" />
+          ) : (
+            formatDateTime(s.finalOfferDeadline)
+          )}{" "}
+          {t("roundOpen")}
         </section>
       )}
 

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
+import { DeadlineCountdown } from "@/components/deadline-countdown";
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
 import { StatusBadge } from "@/components/status-badge";
@@ -26,6 +27,7 @@ export default async function VendorInvitationsPage() {
   const supabase = await createClient();
   const { data } = await supabase.rpc("vendor_invitation_list");
   const invitations = (data ?? []) as InvitationRow[];
+  const serverNow = new Date().toISOString();
 
   const rows: Row[] = invitations.map((i) => ({
     id: i.sourcing_id,
@@ -39,7 +41,7 @@ export default async function VendorInvitationsPage() {
         ),
       },
       type: { sort: i.type, node: t(`sourcing.types.${i.type}`) },
-      deadline: { sort: i.deadline, node: formatDateTime(i.deadline) },
+      deadline: { sort: i.deadline, node: i.sourcing_status === "OPEN" ? <DeadlineCountdown deadline={i.deadline} serverNow={serverNow} /> : formatDateTime(i.deadline) },
       invitation: { sort: i.invitation_status, node: <StatusBadge status={i.invitation_status} /> },
       proposal: {
         sort: i.proposal_status ?? "",
