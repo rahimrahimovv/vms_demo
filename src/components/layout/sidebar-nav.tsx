@@ -11,6 +11,7 @@ import {
   FolderTree,
   Gavel,
   House,
+  LayoutDashboard,
   ListChecks,
   Package,
   ScrollText,
@@ -26,6 +27,7 @@ import { sectionForPath, type Section } from "@/lib/auth/sections";
 
 const ICONS: Record<Section["icon"], LucideIcon> = {
   home: House,
+  layoutDashboard: LayoutDashboard,
   users: Users,
   fileText: FileText,
   clipboardCheck: ClipboardCheck,

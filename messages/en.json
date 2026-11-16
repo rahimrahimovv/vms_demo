@@ -5,6 +5,7 @@
   },
   "nav": {
     "home": "My tasks",
+    "dashboard": "Dashboard",
     "vendorRegistration": "Registration",
     "vendorQualification": "Qualification",
     "vendorCategories": "Categories",
@@ -328,6 +329,7 @@
     "foundedOnRequired": "Enter the founding date",
     "registrationReadOnly": "This registration can no longer be edited",
     "noAccess": "You do not have access to this page",
+    "invalidPeriod": "Choose a period from the list",
     "statusChanged": "This record has changed. Reload the page and try again",
     "commentRequired": "Enter a comment",
     "reasonRequired": "Enter a reason",
@@ -1134,6 +1136,83 @@
     "fingerprintNote": "Identifies the data you submitted. If any price, term or file changes, the fingerprint changes.",
     "download": "Download receipt (PDF)",
     "downloading": "Preparing the receipt..."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Procurement at a glance. Figures are in AZN excluding VAT.",
+    "periodLabel": "Period",
+    "periods": {
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "year": "This year",
+      "all": "All time"
+    },
+    "noData": "No data in this period",
+    "tiles": {
+      "awarded": "Awarded value",
+      "awardedSub": "AZN, {count, plural, one {# sourcing} other {# sourcings}} awarded",
+      "saving": "Saving against estimate",
+      "savingSub": "{amount} AZN saved of {estimated}",
+      "overSub": "{amount} AZN over the estimate of {estimated}",
+      "over": "Over estimate",
+      "cycle": "Cycle time",
+      "cycleValue": "{days} days",
+      "cycleSub": "From PR approval to released order",
+      "bids": "Bids per sourcing",
+      "bidsSub": "{proposals, plural, one {# proposal} other {# proposals}} in {sourcings, plural, one {# sourcing} other {# sourcings}}"
+    },
+    "stages": {
+      "title": "Sourcings by stage",
+      "total": "{count} in total",
+      "draft": "Draft",
+      "open": "Open for bids",
+      "evaluation": "Closed, in evaluation",
+      "committee": "In committee",
+      "awarded": "Awarded",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "aria": "{stage}: {count} of {total}"
+    },
+    "categories": {
+      "title": "Value by category",
+      "unit": "AZN",
+      "row": "{awarded} awarded · {progress} in progress",
+      "legendAwarded": "Awarded",
+      "legendProgress": "In progress (estimated)",
+      "aria": "{name}: {awarded} AZN awarded, {progress} AZN in progress"
+    },
+    "grades": {
+      "title": "Vendors by grade",
+      "centre": "vendors",
+      "a": "Grade A",
+      "b": "Grade B",
+      "c": "Grade C",
+      "d": "Grade D",
+      "notGraded": "Not graded",
+      "aria": "Vendors by grade: A {a}, B {b}, C {c}, D {d}, not graded {notGraded}",
+      "expiring": "{count, plural, one {# certificate expires} other {# certificates expire}} within 30 days",
+      "noneExpiring": "No certificates expire within 30 days"
+    },
+    "topVendors": {
+      "title": "Top vendors by awarded value",
+      "vendor": "Vendor",
+      "awards": "Awards",
+      "awarded": "Awarded, AZN",
+      "viewAll": "View all"
+    },
+    "needsAction": {
+      "title": "Needs action",
+      "open": "Open",
+      "none": "Nothing needs your action."
+    },
+    "committee": {
+      "title": "Committee",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "noDecision": "No decision",
+      "participation": "Participation: {percent}% of eligible votes were cast ({cast} of {eligible}).",
+      "aria": "Closed decisions: {approved} approved, {rejected} rejected, {noDecision} without a decision"
+    }
   },
   "deadline": {
     "closes": "Closes in {value}",

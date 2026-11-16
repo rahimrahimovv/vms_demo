@@ -7,6 +7,7 @@ import type { Role } from "./roles";
  */
 export type SectionKey =
   | "home"
+  | "dashboard"
   | "vendorRegistration"
   | "vendorQualification"
   | "vendorCategories"
@@ -33,6 +34,7 @@ export type SectionKey =
 
 export type SectionIcon =
   | "home"
+  | "layoutDashboard"
   | "users"
   | "fileText"
   | "clipboardCheck"
@@ -62,6 +64,8 @@ export type Section = {
 
 export const SECTIONS: Section[] = [
   { key: "home", href: "/", labelKey: "home", icon: "home", roles: null, group: "main" },
+  // PLT-04: "See the dashboard" = Approver, Procurement Specialist, Committee Member, Admin (the database function refuses the others)
+  { key: "dashboard", href: "/dashboard", labelKey: "dashboard", icon: "layoutDashboard", roles: ["APPROVER", "PROCUREMENT_SPECIALIST", "COMMITTEE_MEMBER", "ADMIN"], group: "main" },
   // Vendor portal (Role Matrix: register, questionnaire, apply for categories, keep own profile)
   { key: "vendorRegistration", href: "/vendor/registration", labelKey: "vendorRegistration", icon: "fileText", roles: ["VENDOR"], group: "main" },
   { key: "vendorQualification", href: "/vendor/qualification", labelKey: "vendorQualification", icon: "clipboardCheck", roles: ["VENDOR"], group: "main" },

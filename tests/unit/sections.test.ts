@@ -7,6 +7,7 @@ describe("Role Matrix sections", () => {
   it("Admin: plan, PRs (read), sourcing (read), vendor cards, AVL (view), users, questionnaire, dictionaries, categories, items", () => {
     expect(sectionsFor(["ADMIN"]).map((s) => s.key)).toEqual([
       "home",
+      "dashboard",
       "plan",
       "requisitions",
       "sourcing",
@@ -27,6 +28,7 @@ describe("Role Matrix sections", () => {
   it("Procurement Specialist: plan, PRs, sourcing, vendor cards, questionnaires, category applications, AVL", () => {
     expect(sectionsFor(["PROCUREMENT_SPECIALIST"]).map((s) => s.key)).toEqual([
       "home",
+      "dashboard",
       "plan",
       "requisitions",
       "sourcing",
@@ -42,7 +44,7 @@ describe("Role Matrix sections", () => {
   });
 
   it("Committee Member: sourcing (read), decisions, minutes and vendor cards (REG-06 AC7); no plan, no PRs, no committee setup", () => {
-    expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "sourcing", "purchaseOrders", "decisions", "minutes", "vendors"]);
+    expect(sectionsFor(["COMMITTEE_MEMBER"]).map((s) => s.key)).toEqual(["home", "dashboard", "sourcing", "purchaseOrders", "decisions", "minutes", "vendors"]);
     expect(canAccess(["COMMITTEE_MEMBER"], "adminCommittee")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "questionnaires")).toBe(false);
     expect(canAccess(["COMMITTEE_MEMBER"], "avl")).toBe(false);
@@ -85,7 +87,7 @@ describe("Role Matrix sections", () => {
   });
 
   it("Approver: plan, PRs and minutes (Role Matrix: view minutes), no committee setup", () => {
-    expect(sectionsFor(["APPROVER"]).map((s) => s.key)).toEqual(["home", "plan", "requisitions", "purchaseOrders", "decisions", "minutes"]);
+    expect(sectionsFor(["APPROVER"]).map((s) => s.key)).toEqual(["home", "dashboard", "plan", "requisitions", "purchaseOrders", "decisions", "minutes"]);
     expect(canAccess(["APPROVER"], "adminCommittee")).toBe(false);
   });
 

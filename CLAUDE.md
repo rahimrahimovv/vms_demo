@@ -2,7 +2,7 @@
 
 e-Procurement is a generic, 1C-free procurement platform. The product is called e-Procurement; the look is the Midnight Navy palette in the
 light glass style (see Design). This repo holds the MVP for the management demo (date to confirm, Q-003).
-The single source of truth for scope and acceptance criteria is `docs/backlog.md` (38 stories, Given/When/Then).
+The single source of truth for scope and acceptance criteria is `docs/backlog.md` (39 stories, Given/When/Then).
 If this file and the backlog disagree, the backlog wins; ask the BA.
 Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are in the backlog section "Decisions, Assumptions And Open Questions".
 

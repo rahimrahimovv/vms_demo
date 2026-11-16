@@ -11,11 +11,12 @@ e-Procurement is a generic, 1C-free procurement platform; this backlog covers th
 ### Backlog Hierarchy
 
 ```
-E-PROCUREMENT (Epic) - E2E procurement MVP, 38 stories
+E-PROCUREMENT (Epic) - E2E procurement MVP, 39 stories
 ├── PLT  Platform
 │   ├── PLT-01  Sign in and see only your role's screens
 │   ├── PLT-02  Get in-app notifications; keep an audit trail
-│   └── PLT-03  Change and reset passwords
+│   ├── PLT-03  Change and reset passwords
+│   └── PLT-04  Internal users see a dashboard of procurement figures
 ├── MDM  Master data
 │   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes
 │   └── MDM-02  Admin maintains the category tree and item catalogue
@@ -196,6 +197,34 @@ TBD
 6. **Given** a user marked "must change password", **When** they sign in with the temporary password, **Then** the Change password form opens and no other page opens until the password is changed.
 7. **Given** the sign-in page, **When** it is shown, **Then** it says "Forgot your password? Ask your buyer or your administrator to reset it." and has no reset link (no e-mail in this release).
 8. **Given** any reset or change, **When** it is stored, **Then** no password is saved in clear text, shown again or written to the audit trail.
+
+---
+
+### PLT-04 - Internal Users See A Dashboard
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | PLT-04 |
+| **Story title** | Approver, Procurement Specialist, Committee Member and Admin see the main procurement figures for a period on one screen. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Approver, Procurement Specialist, Committee Member or Admin |
+| **I want to...** | open a dashboard with the awarded value, the saving, the cycle time, the bids per sourcing and the state of the work |
+| **So that...** | I see how procurement is doing without opening each list |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a user with one of the four roles, **When** the Work group of the menu is shown, **Then** it has a Dashboard entry after My tasks and the page opens with "Last 90 days" selected; a Requester and every Vendor get no entry and the page refuses them; the database function refuses them and anonymous users too.
+2. **Given** the period control (Last 30 days, Last 90 days, This year, All time), **When** a period is chosen, **Then** every period-bound figure is recalculated, the period is in the address (`?period=`) so a reload keeps it, and "This year" starts on 1 January in Asia/Baku. Sourcing figures use the sourcing's creation date, committee figures the date a decision closed; vendor figures and Needs action are always current.
+3. **Given** the four tiles, **When** they are shown, **Then** Awarded value is the value at the vendors' own winning prices (award lines, excluding VAT, AZN) of sourcings in WINNER\_APPROVED or COMPLETED; Saving against estimate is the RFQ-10 saving over the same sourcings; Cycle time is the average number of days from the approval of a requisition to FULLY\_APPROVED of its purchase order; Bids per sourcing is the average number of submitted proposals (not DRAFT, not WITHDRAWN) per sourcing that is not a draft.
+4. **Given** the card Sourcings by stage, **When** it is shown, **Then** it counts the sourcings of the period in the stages Draft (DRAFT), Open for bids (OPEN), Closed, in evaluation (CLOSED, AWAITING\_OPENING, TECHNICAL\_EVALUATION, COMPARISON, FINAL\_OFFER\_ROUND), In committee (IN\_COMMITTEE), Awarded (WINNER\_APPROVED), Completed (COMPLETED) and Cancelled (CANCELLED).
+5. **Given** the cards Value by category, Vendors by grade and Top vendors, **When** they are shown, **Then** Value by category lists the five categories with the highest awarded plus in-progress value (in progress = the estimated value of sourcings from OPEN to IN\_COMMITTEE); Vendors by grade shows the counts of grades A, B, C, D and not graded as a donut and as text, and the number of certificates expiring within 30 days; Top vendors lists the five vendors with the highest awarded value and their number of awards (sourcings won).
+6. **Given** the card Needs action, **When** it is shown, **Then** it lists the same items and counts as the user's My tasks, each with a link; the card Committee shows the closed decisions of the period by result (APPROVED, REJECTED, NO\_DECISION) and the share of eligible votes cast.
+7. **Given** a period without data, **When** a card is shown, **Then** it says "No data in this period"; every chart also prints its numbers as text and has an aria-label, and colour is never the only signal.
+8. **Given** a vendor, **When** it uses the application, **Then** it never receives the estimate or the saving: the function is not callable for a vendor and no vendor page calls it (D-026).
 
 ---
 
@@ -1215,12 +1244,13 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 | Approve the opening of tender bids | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
-| See the estimate and the saving against it (comparison, package, purchase order, sourcing list) | ✅ (purchase order) | ✅ (purchase order only) | ✅ | ✅ | ✅ | ❌ |
+| See the estimate and the saving against it (comparison, package, purchase order, sourcing list, dashboard) | ✅ (purchase order) | ✅ (purchase order and dashboard) | ✅ | ✅ | ✅ | ❌ |
 | Add extra costs; request a final offer | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Submit a final offer | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (if chosen) |
 | Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | View a vendor card, including owners | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
 | View a sourcing record, read-only (sealed data stays sealed until its opening rule) | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ (own invitation only) |
+| See the dashboard | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Change own password | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Reset a forgotten password (temporary password) | ❌ | ❌ | ✅ (vendor accounts) | ❌ | ✅ (internal users) | ❌ |
 | Request a change to company data, owners, bank accounts or documents | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
