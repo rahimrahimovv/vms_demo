@@ -680,3 +680,18 @@ the region, with a PDF); S10 1,000 x 24 + 800 x 30 + 80 x 300, three winners (23
 - Replaces the summary rail (2f46b9f): a header strip (avatar, name, badges, subline, actions, Activity button), one "Needs attention" strip, and three columns of compact cards (Qualification, Company | Owners, Contact persons, Bank accounts | Certificates, Categories, Registration documents). Long lists show their first rows and "Show all (N)" opens the full list in a 440 px side panel; the history is in the panel behind the Activity button (`src/components/vendor/side-panel.tsx`). Behaviour, permissions and RLS unchanged.
 - Checked on vms-dev in Edge headless at 1440 x 900 as the Procurement Specialist: Ege, Caspian, Baku Pack, Mugan, Sumgait, Zaqatala, Mingachevir all measure scrollHeight 900 = window height (no vertical scroll). At 1280 and 1366 px two columns, the page scrolls, no horizontal overflow.
 - Side panel tested in Edge headless (reduced motion emulated): 440 px wide, Esc closes it, focus returns to the Activity button or the "Show all (N)" link, and every "Show all" list (owners, contacts, bank accounts, certificates, categories, documents) shows all N rows. Dialogs and side panels now skip their animation when the person prefers reduced motion (`globals.css`). The unused `stacked` option of `DecisionPanel` and the `className` option of `ResetPasswordButton` were removed again.
+
+## RFQ-10, RFQ-11, RFQ-12 (16 Nov 2026)
+
+Backlog: 38 stories, D-026. The story, rule and decision wording in `docs/backlog.md` is drafted from the brief; replace it with the claude.ai export if it differs.
+
+| Story | Status | Notes |
+| --- | --- | --- |
+| RFQ-10 Saving against the estimate | done | Computed in the database (`app.sourcing_saving`, `app.po_saving`); shown in the comparison, stored in the frozen WINNER package, on the PO for internal readers (Approver on the order only) and as the Saving column for WINNER_APPROVED and COMPLETED. Over estimate: amber chip and plus sign. Half-up on the absolute value, then the sign. Never returned to a vendor (RLS test with two vendors). |
+| RFQ-11 Time left on every deadline | done | `DeadlineCountdown` (client, server time passed in, offset computed once, updates each minute, no aria-live, refreshes the page when the deadline passes). Used on the vendor invitation list and page, the sourcing record, a running final-offer round and decisions in VOTING (record and list). |
+| RFQ-12 Proposal receipt | done | `GET /api/proposals/[id]/receipt` (owning vendor, SUBMITTED only; internal 403, other 404) with `public.proposal_receipt`; PDF via pdf-lib; fingerprint = first 16 hex of SHA-256 of canonical JSON. Button on the invitation page while SUBMITTED. |
+
+Migrations applied to vms-dev, not yet to vms-prod: `20261122100000_saving`, `20261122110000_proposal_receipt`, `20261122120000_saving_rounding`.
+
+Checks: typecheck clean, 200+ unit tests, build ok, `demo:reset`, full RLS suite 269 of 269 passed (16 files), `demo:load` ended "Loaded: 15 vendors, 19 PRs, 12 sourcings, 11 decisions, 4 POs".
+Open: the visual check on vms-dev (Specialist comparison, Ege Tarim Kimya invitation page) was not done, see the summary.
