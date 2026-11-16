@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { statusTone, type StatusTone } from "@/lib/status";
@@ -9,6 +10,15 @@ const TONE_CLASSES: Record<StatusTone, string> = {
   green: "bg-(--tone-green-bg) text-(--tone-green-fg)",
   red: "bg-(--tone-red-bg) text-(--tone-red-fg)",
 };
+
+/** A chip in one of the status tones, for texts that are not a status name (it always carries its words). */
+export function ToneChip({ tone, className, children }: { tone: StatusTone; className?: string; children: ReactNode }) {
+  return (
+    <span className={cn("inline-flex h-5 items-center rounded-full px-2.5 text-xs font-semibold whitespace-nowrap", TONE_CLASSES[tone], className)}>
+      {children}
+    </span>
+  );
+}
 
 /** Status badge; colour by CLAUDE.md Design, label from messages "status.<STATUS>". */
 export function StatusBadge({ status, className }: { status: string; className?: string }) {

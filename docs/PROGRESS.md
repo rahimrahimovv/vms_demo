@@ -668,3 +668,9 @@ the region, with a PDF); S10 1,000 x 24 + 800 x 30 + 80 x 300, three winners (23
   production data unchanged (6 vendors, 0 sourcings).
 - The exact SQL and PowerShell lines to enable the flag and load the demo data on production are in `docs/SETUP.md` (section "Demo data on production"). They are for the developer to run; the
   flag stays off until then. `docs/DEMO-ACCOUNTS.md` now names the project reference it was generated from.
+
+## Vendor card redesign (16 Nov 2026)
+
+- The vendor card (`/vendors/[id]`) is one page in the light glass style: a sticky summary rail (avatar, badges, grade ring, "Needs attention" that follows the My tasks counts, key facts, actions) and a card grid (owners, contacts, bank accounts, certificates, categories, documents, more details) with a full-width Activity card; no tabs. Behaviour, permissions and RLS unchanged; logic in `src/lib/vendors/attention.ts` (unit tests in `tests/unit/vendor-attention.test.ts`).
+- Checked on vms-dev in Edge at 1440 and 1280 px (Caspian, Baku Pack, Sumgait, Zaqatala, Mingachevir, Mugan): rail 340 / 300 px, two columns / one column. Kept differences from the mockup: no city (not stored), IBAN as stored, extra "More details" card, "Categories" lists every application.
+- The global `html` min-width went from 1280 to 1240 px so a vertical scrollbar no longer causes a horizontal one; My tasks, the vendor card and the comparison checked at 1280 and 1366 px.

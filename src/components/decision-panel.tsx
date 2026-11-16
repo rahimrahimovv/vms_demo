@@ -37,9 +37,12 @@ export type DecisionOption = {
 export function DecisionPanel({
   action,
   options,
+  stacked = false,
 }: {
   action: (prev: DecisionState, formData: FormData) => Promise<DecisionState>;
   options: DecisionOption[];
+  /** Buttons one under the other at full width (a narrow side rail); the default is one row. */
+  stacked?: boolean;
 }) {
   const t = useTranslations();
   const [state, formAction, pending] = useActionState(action, { error: null });
@@ -51,13 +54,13 @@ export function DecisionPanel({
     setOpened(option ? { option, since: state.attempt ?? 0 } : null);
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      <div className="flex items-center gap-2">
+    <div className={stacked ? "flex flex-col items-stretch gap-2" : "flex flex-col items-end gap-2"}>
+      <div className={stacked ? "flex flex-col gap-2" : "flex items-center gap-2"}>
         {options.map((o) =>
           o.comment === "none" ? (
             <form key={o.value} action={formAction}>
               <input type="hidden" name="decision" value={o.value} />
-              <Button type="submit" variant={o.variant ?? "default"} disabled={pending} data-testid={`decision-${o.value}`}>
+              <Button type="submit" variant={o.variant ?? "default"} disabled={pending} className={stacked ? "w-full" : undefined} data-testid={`decision-${o.value}`}>
                 {o.label}
               </Button>
             </form>
@@ -66,6 +69,7 @@ export function DecisionPanel({
               key={o.value}
               variant={o.variant ?? "default"}
               disabled={pending}
+              className={stacked ? "w-full" : undefined}
               onClick={() => setOpen(o)}
               data-testid={`decision-${o.value}`}
             >

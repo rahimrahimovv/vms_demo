@@ -1,49 +1,48 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate } from "@/lib/format";
 import { flattenTree, type CategoryRow } from "@/lib/categories";
-import { bakuToday, certificateStatus, yearsInBusiness } from "@/lib/vendors/rules";
+import { bakuToday } from "@/lib/vendors/rules";
+import { buildAttention } from "@/lib/vendors/attention";
 import { loadContacts, loadVendor } from "@/lib/vendors/queries";
 import { NoAccess } from "@/components/no-access";
-import { RecordHeader } from "@/components/record-header";
-import { HistoryTab } from "@/components/history-tab";
-import { StatusBadge } from "@/components/status-badge";
-import { FileList } from "@/components/file-list";
 import { DecisionPanel } from "@/components/decision-panel";
 import { ResetPasswordButton } from "@/components/reset-password-button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActionDialog } from "@/components/action-dialog";
 import { FormField } from "@/components/form-field";
-import { ChangeRequestHistory } from "@/components/vendor/change-request-history";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  ActivityCard,
+  BankAccountsCard,
+  CategoriesCard,
+  CertificatesCard,
+  ChangeRequestBanner,
+  ContactsCard,
+  DocumentsCard,
+  DraftNotice,
+  MoreDetailsCard,
+  OwnersCard,
+  VendorRail,
+  type OpenRequest,
+  type OwnerShare,
+} from "@/components/vendor/vendor-card";
 import { decideRegistration, reopenRegistration } from "./actions";
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm">{children}</dd>
-    </div>
-  );
-}
+const norm = (s: string) => s.trim().toUpperCase();
 
 /**
- * REG-06 AC7-AC8: the vendor card for PS, CM and Admin; REG-02: the specialist decides on a
- * SUBMITTED registration from its header.
+ * REG-06 AC7-AC8: the vendor card for PS, CM and Admin, one page: a summary rail on the left, the working cards on the right.
+ * REG-02: the specialist decides on a SUBMITTED registration from the rail. Data, permissions and RLS are those of the
+ * earlier tabbed page; only the layout changed.
  */
-export default async function VendorCardPage({ params }: PageProps<"/vendors/[id]">) {
+export default async function VendorCardPage({ params, searchParams }: PageProps<"/vendors/[id]">) {
   const { user, allowed } = await checkSection("vendors");
   if (!allowed) return <NoAccess />;
 
   const { id } = await params;
+  const { activity } = await searchParams;
   const t = await getTranslations();
   const supabase = await createClient();
   const today = bakuToday();
@@ -51,7 +50,7 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
   const contacts = await loadContacts(supabase, id);
   if (!vendor) return <NoAccess />;
 
-  const [{ data: brands }, { data: certificates }, { data: applications }, { data: responses }, { data: categories }, { data: shared }] =
+  const [{ data: brands }, { data: certificates }, { data: applications }, { data: responses }, { data: categories }, { data: shared }, { data: requests }] =
     await Promise.all([
       supabase.from("vendor_brand").select("id, brand, is_official_dealer").eq("vendor_id", id).order("brand"),
       supabase.from("vendor_certificate").select("id, type, number, issuer, issued_on, expires_on").eq("vendor_id", id).order("created_at"),
@@ -67,363 +66,117 @@ export default async function VendorCardPage({ params }: PageProps<"/vendors/[id
         .order("attempt_no", { ascending: false }),
       supabase.from("category").select("id, parent_id, name, licence_required, is_active").returns<CategoryRow[]>(),
       supabase.rpc("vendor_shared_owners", { p_vendor: id }),
+      supabase
+        .from("vendor_change_request")
+        .select("id, section, status, submitted_at, created_at")
+        .eq("vendor_id", id)
+        .eq("status", "SUBMITTED")
+        .order("submitted_at", { ascending: true })
+        .returns<(OpenRequest & { status: string })[]>(),
     ]);
 
   const paths = new Map(flattenTree(categories ?? []).map((c) => [c.id, c.path]));
-  const grade = (responses ?? []).find((r) => r.status === "GRADED" && r.valid_until && r.valid_until >= today);
-  const qualified = (applications ?? []).filter((a) => a.status === "QUALIFIED" && a.valid_until && a.valid_until >= today);
+  const categoryName = (cid: string) => paths.get(cid) ?? "";
+  const grade = (responses ?? []).find((r) => r.status === "GRADED" && r.valid_until && r.valid_until >= today) ?? null;
   const sharedWith = (shared ?? []) as { vendor_id: string; legal_name: string }[];
-  const none = t("common.none");
+  const openRequests = requests ?? [];
 
-  const canDecide = user.roles.includes("PROCUREMENT_SPECIALIST") && vendor.status === "SUBMITTED";
-  // PLT-03 AC5: a Procurement Specialist resets the sign-in account of the vendor; an Admin cannot
-  const resetButton = user.roles.includes("PROCUREMENT_SPECIALIST") ? (
-    <ResetPasswordButton vendorId={vendor.id} name={vendor.legal_name} />
-  ) : null;
-  const decisionPanel = canDecide ? (
-    <DecisionPanel
-      action={decideRegistration.bind(null, vendor.id)}
-      options={[
-        { value: "APPROVE", label: t("decision.approve"), comment: "none" },
-        { value: "RETURN", label: t("decision.return"), variant: "outline", comment: "required", commentLabel: t("decision.comment") },
-        { value: "REJECT", label: t("decision.reject"), variant: "destructive", comment: "required", commentLabel: t("decision.reason") },
-      ]}
-    />
-  ) : null;
-  // REG-02 AC5, REG-08 AC14: reopen a rejected registration with a comment
-  const reopenButton =
-    user.roles.includes("PROCUREMENT_SPECIALIST") && vendor.status === "REJECTED" ? (
-      <ActionDialog
-        action={reopenRegistration.bind(null, vendor.id)}
-        trigger={t("rejected.reopen")}
-        triggerVariant="default"
-        title={t("rejected.reopenTitle")}
-        testId="reopen"
-      >
-        <FormField id="comment" label={t("decision.comment")} required>
-          <Textarea id="comment" name="comment" rows={3} />
-        </FormField>
-      </ActionDialog>
-    ) : null;
+  // which owner is the shared one: the same ID number among the owners of the other vendors (read as the signed-in user)
+  const shares: OwnerShare[] = [];
+  if (sharedWith.length > 0) {
+    const { data: others } = await supabase.from("vendor_owner").select("vendor_id, id_number").in("vendor_id", sharedWith.map((s) => s.vendor_id));
+    for (const s of sharedWith) {
+      const ids = new Set((others ?? []).filter((o) => o.vendor_id === s.vendor_id).map((o) => norm(o.id_number)));
+      for (const o of owners) if (ids.has(norm(o.id_number))) shares.push({ ownerName: o.full_name, vendorId: s.vendor_id, vendorName: s.legal_name });
+    }
+  }
+
+  const attention = buildAttention({
+    today,
+    vendor,
+    sharedWith,
+    certificates: certificates ?? [],
+    changeRequests: openRequests,
+    questionnaires: responses ?? [],
+    applications: applications ?? [],
+  });
+
+  const isSpecialist = user.roles.includes("PROCUREMENT_SPECIALIST");
+  const canDecide = isSpecialist && vendor.status === "SUBMITTED";
+  const canReopen = isSpecialist && vendor.status === "REJECTED";
+  const canReviewChange = isSpecialist && vendor.status === "APPROVED" && openRequests.length > 0;
+
+  // The same dialogs, messages and permissions as before; the buttons only sit in the rail now.
   const actions =
-    resetButton || decisionPanel || reopenButton ? (
+    canDecide || canReopen || canReviewChange || isSpecialist ? (
       <>
-        {resetButton}
-        {reopenButton}
-        {decisionPanel}
+        {canDecide && (
+          <DecisionPanel
+            stacked
+            action={decideRegistration.bind(null, vendor.id)}
+            options={[
+              { value: "APPROVE", label: t("decision.approve"), comment: "none" },
+              { value: "RETURN", label: t("decision.return"), variant: "outline", comment: "required", commentLabel: t("decision.comment") },
+              { value: "REJECT", label: t("decision.reject"), variant: "destructive", comment: "required", commentLabel: t("decision.reason") },
+            ]}
+          />
+        )}
+        {canReopen && (
+          <ActionDialog
+            action={reopenRegistration.bind(null, vendor.id)}
+            trigger={t("rejected.reopen")}
+            triggerVariant="default"
+            triggerClassName="w-full"
+            title={t("rejected.reopenTitle")}
+            testId="reopen"
+          >
+            <FormField id="comment" label={t("decision.comment")} required>
+              <Textarea id="comment" name="comment" rows={3} />
+            </FormField>
+          </ActionDialog>
+        )}
+        {canReviewChange && (
+          <Button asChild className="w-full">
+            <Link
+              href={openRequests.length === 1 ? `/change-requests/${openRequests[0].id}` : "/change-requests"}
+              data-testid="review-change-request"
+            >
+              {t("vendorCard.reviewChangeRequest", { count: openRequests.length })}
+            </Link>
+          </Button>
+        )}
+        {/* PLT-03 AC5: a Procurement Specialist resets the sign-in account of the vendor; an Admin cannot */}
+        {isSpecialist && <ResetPasswordButton vendorId={vendor.id} name={vendor.legal_name} className="w-full" />}
       </>
-    ) : undefined;
+    ) : null;
 
   return (
-    <div className="flex flex-col gap-6">
-      <RecordHeader
-        title={vendor.legal_name}
-        subtitle={`${t(`vendorTypes.${vendor.vendor_type}`)} · ${t(`countries.${vendor.country_code}`)}`}
-        status={vendor.status}
+    <div className="flex items-start gap-4" data-testid="vendor-card">
+      <VendorRail
+        vendor={vendor}
+        attention={attention}
+        grade={grade}
+        brands={brands ?? []}
+        today={today}
+        categoryName={categoryName}
         actions={actions}
       />
-
-      {sharedWith.length > 0 && (
-        <Alert className="surface-warning" data-testid="shared-owner">
-          <Users className="size-4" aria-hidden />
-          <AlertDescription>
-            {sharedWith.map((s, i) => (
-              <span key={s.vendor_id}>
-                {i > 0 && ", "}
-                {t("vendorCard.sharesOwner")}{" "}
-                <Link href={`/vendors/${s.vendor_id}`} className="font-medium underline">
-                  {s.legal_name}
-                </Link>
-              </span>
-            ))}
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <Tabs defaultValue="details">
-        <TabsList>
-          <TabsTrigger value="details">{t("record.tabs.details")}</TabsTrigger>
-          <TabsTrigger value="owners">{t("vendorCard.tabs.owners")}</TabsTrigger>
-          <TabsTrigger value="certificates">{t("vendorCard.tabs.certificates")}</TabsTrigger>
-          <TabsTrigger value="categories">{t("vendorCard.tabs.categories")}</TabsTrigger>
-          <TabsTrigger value="files">{t("record.tabs.files")}</TabsTrigger>
-          <TabsTrigger value="history">{t("record.tabs.history")}</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="details" className="pt-4">
-          <Card>
-            <CardContent>
-              <dl className="grid grid-cols-3 gap-x-8 gap-y-5" data-testid="vendor-details">
-                <Field label={t("vendors.columns.taxNumber")}>{vendor.voen ?? vendor.foreign_tax_number ?? none}</Field>
-                <Field label={t("vendorCard.founded")}>
-                  {vendor.founded_on
-                    ? t("vendorCard.foundedValue", {
-                        date: formatDate(vendor.founded_on),
-                        years: yearsInBusiness(vendor.founded_on, today),
-                      })
-                    : none}
-                </Field>
-                <Field label={t("vendors.columns.standing")}>
-                  {vendor.standing ? <StatusBadge status={vendor.standing} /> : none}
-                  {vendor.standing === "HOLD" && vendor.standing_until && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {t("vendorCard.holdUntil", { date: formatDate(vendor.standing_until) })}
-                    </span>
-                  )}
-                </Field>
-                <Field label={t("qualification.grade")}>
-                  {grade ? (
-                    <span data-testid="card-grade">
-                      {grade.grade} · {t("qualification.validUntil")} {formatDate(grade.valid_until!)}
-                    </span>
-                  ) : (
-                    none
-                  )}
-                </Field>
-                <Field label={t("vendorCard.qualifiedCategories")}>
-                  {qualified.length > 0 ? qualified.map((a) => paths.get(a.category_id)).join(", ") : none}
-                </Field>
-                <Field label={t("profile.fields.mainActivity")}>
-                  {vendor.main_activity ? t(`activities.${vendor.main_activity}`) : none}
-                </Field>
-                <Field label={t("profile.sections.brands")}>
-                  {(brands ?? []).length > 0
-                    ? (brands ?? [])
-                        .map((b) => (b.is_official_dealer ? `${b.brand} (${t("profile.fields.officialDealer")})` : b.brand))
-                        .join(", ")
-                    : none}
-                </Field>
-                <Field label={t("profile.fields.mainGoods")}>{vendor.main_goods.length > 0 ? vendor.main_goods.join(", ") : none}</Field>
-                <Field label={t("profile.fields.bankGuarantee")}>
-                  {vendor.bank_guarantee_available
-                    ? [
-                        vendor.bank_guarantee_types.map((g) => t(`guaranteeTypes.${g}`)).join(", "),
-                        vendor.bank_guarantee_max
-                          ? `${t("profile.fields.guaranteeMax")} ${Number(vendor.bank_guarantee_max).toLocaleString("en-US", { minimumFractionDigits: 2 })} ${vendor.bank_guarantee_currency}`
-                          : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" · ") || t("common.yes")
-                    : t("common.no")}
-                </Field>
-                <Field label={t("registration.fields.legalAddress")}>{vendor.legal_address ?? none}</Field>
-                <Field label={t("registration.fields.directorName")}>{vendor.director_name ?? none}</Field>
-                <Field label={t("registration.fields.vatPayer")}>
-                  {vendor.is_vat_payer === null ? none : t(vendor.is_vat_payer ? "common.yes" : "common.no")}
-                </Field>
-                {vendor.id_card_number && <Field label={t("registration.fields.idCardNumber")}>{vendor.id_card_number}</Field>}
-                <Field label={t("registration.fields.contactPerson")}>{vendor.contact_person}</Field>
-                <Field label={t("registration.fields.contactEmail")}>{vendor.contact_email}</Field>
-                <Field label={t("registration.fields.phone")}>{vendor.phone}</Field>
-                {vendor.review_comment && <Field label={t("vendorCard.reviewComment")}>{vendor.review_comment}</Field>}
-              </dl>
-
-              {/* REG-06 AC7: every bank account, the main one marked. */}
-              <h3 className="mt-6 mb-2 text-sm font-medium">{t("bankAccounts.title")}</h3>
-              <div className="surface-solid overflow-hidden">
-                <Table data-testid="bank-accounts">
-                  <TableHeader className="bg-muted/60">
-                    <TableRow>
-                      <TableHead>{t("bankAccounts.bankName")}</TableHead>
-                      <TableHead>{t("bankAccounts.iban")}</TableHead>
-                      <TableHead>{t("bankAccounts.swift")}</TableHead>
-                      <TableHead>{t("bankAccounts.currency")}</TableHead>
-                      <TableHead />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {bankAccounts.map((a) => (
-                      <TableRow key={a.id} data-testid="bank-account-row">
-                        <TableCell>{a.bank_name}</TableCell>
-                        <TableCell className="font-mono text-xs">{a.iban}</TableCell>
-                        <TableCell>{a.swift}</TableCell>
-                        <TableCell>{a.currency}</TableCell>
-                        <TableCell className="text-right">
-                          {a.is_main && <Badge variant="secondary">{t("bankAccounts.main")}</Badge>}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-
-              {/* REG-06 AC7: contact persons, the legal representatives and their proof files marked. */}
-              <h3 className="mt-6 mb-2 text-sm font-medium">{t("vendorCard.contacts")}</h3>
-              <div className="surface-solid overflow-hidden">
-                <Table data-testid="contacts">
-                  <TableHeader className="bg-muted/60">
-                    <TableRow>
-                      <TableHead>{t("owners.fullName")}</TableHead>
-                      <TableHead>{t("registration.contacts.position")}</TableHead>
-                      <TableHead>{t("registration.fields.phone")}</TableHead>
-                      <TableHead>{t("registration.fields.contactEmail")}</TableHead>
-                      <TableHead>{t("registration.contacts.legalRepresentative")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {contacts.map((c) => (
-                      <TableRow key={c.id} data-testid="contact-row">
-                        <TableCell>
-                          {c.full_name} {c.is_primary && <Badge variant="secondary">{t("registration.contacts.primary")}</Badge>}
-                        </TableCell>
-                        <TableCell>{c.position ?? none}</TableCell>
-                        <TableCell>{c.phone}</TableCell>
-                        <TableCell>{c.email}</TableCell>
-                        <TableCell>
-                          {c.is_legal_representative ? (
-                            <span className="flex flex-col gap-1">
-                              <Badge variant="secondary" className="self-start">{t("registration.contacts.legalRepresentative")}</Badge>
-                              {c.proof.map((f) => (
-                                <a key={f.id} href={"/api/files/" + f.id} className="text-xs text-primary hover:underline" data-testid="proof-file">
-                                  {f.file_name}
-                                </a>
-                              ))}
-                            </span>
-                          ) : (
-                            none
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="owners" className="pt-4">
-          <div className="surface-solid overflow-hidden">
-            <Table data-testid="owners">
-              <TableHeader className="bg-muted/60">
-                <TableRow>
-                  <TableHead>{t("owners.fullName")}</TableHead>
-                  <TableHead>{t("owners.idNumber")}</TableHead>
-                  <TableHead className="text-right">{t("owners.share")}</TableHead>
-                  <TableHead>{t("owners.role")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {owners.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-muted-foreground">
-                      {t("profile.noOwners")}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  owners.map((o) => (
-                    <TableRow key={o.id}>
-                      <TableCell>{o.full_name}</TableCell>
-                      <TableCell>{o.id_number}</TableCell>
-                      <TableCell className="text-right tabular-nums">{o.share_percent !== null ? `${Number(o.share_percent)}%` : none}</TableCell>
-                      <TableCell>{t(`ownerRoles.${o.role}`)}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="certificates" className="pt-4">
-          <div className="surface-solid overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/60">
-                <TableRow>
-                  <TableHead>{t("profile.fields.certificateType")}</TableHead>
-                  <TableHead>{t("profile.fields.number")}</TableHead>
-                  <TableHead>{t("profile.fields.issuer")}</TableHead>
-                  <TableHead>{t("profile.fields.expiresOn")}</TableHead>
-                  <TableHead>{t("profile.fields.status")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(certificates ?? []).length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-muted-foreground">
-                      {t("vendorCard.noCertificates")}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  (certificates ?? []).map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell>{t(`certificateTypes.${c.type}`)}</TableCell>
-                      <TableCell>{c.number ?? none}</TableCell>
-                      <TableCell>{c.issuer ?? none}</TableCell>
-                      <TableCell>{c.expires_on ? formatDate(c.expires_on) : t("profile.noExpiry")}</TableCell>
-                      <TableCell>
-                        <StatusBadge status={certificateStatus(c.expires_on, today)} />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="categories" className="pt-4">
-          <div className="surface-solid overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/60">
-                <TableRow>
-                  <TableHead>{t("categories.columns.category")}</TableHead>
-                  <TableHead>{t("categories.columns.applied")}</TableHead>
-                  <TableHead>{t("categories.columns.status")}</TableHead>
-                  <TableHead>{t("qualification.validUntil")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(applications ?? []).length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-muted-foreground">
-                      {t("vendorCard.noApplications")}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  (applications ?? []).map((a) => {
-                    const shown = a.status === "QUALIFIED" && a.valid_until && a.valid_until < today ? "EXPIRED" : a.status;
-                    return (
-                      <TableRow key={a.id}>
-                        <TableCell>
-                          {user.roles.includes("PROCUREMENT_SPECIALIST") ? (
-                            <Link href={`/category-applications/${a.id}`} className="text-primary hover:underline">
-                              {paths.get(a.category_id)}
-                            </Link>
-                          ) : (
-                            paths.get(a.category_id)
-                          )}
-                        </TableCell>
-                        <TableCell>{formatDate(a.created_at)}</TableCell>
-                        <TableCell>
-                          <StatusBadge status={shown} />
-                        </TableCell>
-                        <TableCell>{a.valid_until ? formatDate(a.valid_until) : none}</TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="files" className="pt-4">
-          <Card>
-            <CardContent>
-              <FileList files={files} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="history" className="flex flex-col gap-4 pt-4">
-          <HistoryTab recordType="vendor" recordId={vendor.id} />
-          <h3 className="text-sm font-semibold">{t("changeRequest.history")}</h3>
-          <ChangeRequestHistory vendorId={vendor.id} audience="internal" />
-          <h3 className="text-sm font-semibold">{t("vendorCard.standingHistory")}</h3>
-          <HistoryTab recordType="vendor_standing" recordId={vendor.id} />
-        </TabsContent>
-      </Tabs>
+      <div className="flex min-w-0 flex-1 flex-col gap-(--density-gap)">
+        {vendor.status === "DRAFT" && <DraftNotice />}
+        {openRequests.map((r) => (
+          <ChangeRequestBanner key={r.id} request={r} canReview={isSpecialist} />
+        ))}
+        <div className="grid grid-cols-1 items-start gap-(--density-gap) min-[1400px]:grid-cols-2">
+          <OwnersCard owners={owners} shares={shares} />
+          <ContactsCard contacts={contacts} />
+          <BankAccountsCard accounts={bankAccounts} />
+          <CertificatesCard certificates={certificates ?? []} today={today} />
+          <CategoriesCard applications={applications ?? []} categoryName={categoryName} today={today} canOpen={isSpecialist} />
+          <DocumentsCard files={files} />
+          <MoreDetailsCard vendor={vendor} />
+        </div>
+        <ActivityCard vendorId={vendor.id} showAll={activity === "all"} />
+      </div>
     </div>
   );
 }

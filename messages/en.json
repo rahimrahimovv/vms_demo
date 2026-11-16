@@ -755,16 +755,63 @@
     "holdUntil": "until {date}",
     "qualifiedCategories": "Qualified categories",
     "reviewComment": "Review comment",
-    "noCertificates": "No certificates.",
-    "noApplications": "No category applications.",
     "standingHistory": "Standing",
-    "tabs": {
+    "contacts": "Contact persons",
+    "summary": "Vendor summary",
+    "inBusiness": "In business",
+    "years": "{years, plural, one {# year} other {# years}}",
+    "qualification": "Qualification",
+    "points": "{score} points",
+    "gradeAria": "Grade {grade}, {score} points",
+    "noGrade": "No grade yet",
+    "gradeBadge": "Grade {grade}",
+    "attention": {
+      "title": "Needs attention",
+      "none": "Nothing needs attention",
+      "registration": "Registration waiting for a decision",
+      "certificateExpiring": "{type} expires {days, plural, =0 {today} one {in # day} other {in # days}}",
+      "certificateExpired": "{type} expired {days, plural, one {# day} other {# days}} ago",
+      "changeRequest": "{section} change request waiting",
+      "questionnaire": "Questionnaire waiting for a grade",
+      "application": "Category application waiting: {category}",
+      "hold": "On hold",
+      "holdUntil": "On hold until {date}"
+    },
+    "reviewChangeRequest": "{count, plural, one {Review change request} other {Review change requests (#)}}",
+    "banner": {
+      "title": "A change request for {section} is waiting",
+      "body": "Submitted on {date}. The current data stays in force until you decide.",
+      "review": "Review"
+    },
+    "draft": "Registration not submitted yet",
+    "cards": {
       "owners": "Owners",
+      "contacts": "Contact persons",
+      "bankAccounts": "Bank accounts",
       "certificates": "Certificates",
       "categories": "Categories",
-      "contacts": "Contact persons"
+      "documents": "Registration documents",
+      "details": "More details",
+      "activity": "Activity"
     },
-    "contacts": "Contact persons"
+    "empty": {
+      "owners": "No owners yet",
+      "contacts": "No contact persons yet",
+      "bankAccounts": "No bank accounts yet",
+      "certificates": "No certificates yet",
+      "categories": "No categories yet",
+      "documents": "No documents yet",
+      "details": "No more details yet",
+      "activity": "No activity yet"
+    },
+    "sharedOwnerChip": "{owner} also owns {vendor}",
+    "idNumber": "ID {number}",
+    "appliedOn": "applied {date}",
+    "until": "until {date}",
+    "showAll": "Show all",
+    "showLess": "Show less",
+    "download": "Download",
+    "activityChangeRequest": "Change request: {section}"
   },
   "questionnaires": {
     "emptyReview": "No questionnaires are waiting for review.",
