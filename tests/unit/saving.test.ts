@@ -42,7 +42,25 @@ describe("RFQ-10 saving against the estimate", () => {
   it("rounds half-up", () => {
     expect(roundHalfUp(6.875, 1)).toBe(6.9);
     expect(roundHalfUp(0.125, 2)).toBe(0.13);
-    expect(roundHalfUp(-3.25, 1)).toBe(-3.2);
+    expect(roundHalfUp(-3.25, 1)).toBe(-3.3);
+  });
+
+  it("rounds the absolute value, so both signs and every 0.05 step agree", () => {
+    for (let i = 0; i <= 200; i++) {
+      const v = i * 0.05; // 0.00, 0.05, ... 10.00
+      const expected = Math.floor(Math.round(v * 100) / 10 + 0.5) / 10; // exact on integers of hundredths
+      expect(roundHalfUp(v, 1), String(v)).toBe(expected);
+      expect(roundHalfUp(-v, 1), String(-v)).toBe(expected === 0 ? 0 : -expected);
+    }
+    expect(roundHalfUp(3.25, 1)).toBe(3.3);
+    expect(roundHalfUp(-3.25, 1)).toBe(-3.3);
+    expect(roundHalfUp(0.05, 1)).toBe(0.1);
+    expect(roundHalfUp(-0.05, 1)).toBe(-0.1);
+    const over = computeSaving([{ lineId: "a", estimateUnit: 100, winnerUnit: 103.25, quantity: 1 }]);
+    expect(over.percent).toBe(-3.3);
+    expect(formatPercent(over.percent)).toBe("+3.3%");
+    const under = computeSaving([{ lineId: "a", estimateUnit: 100, winnerUnit: 96.75, quantity: 1 }]);
+    expect(under.percent).toBe(3.3);
   });
 
   it("vendor-facing code never reads the estimate or the saving (PO PDF, PO vendor page, invitation and proposal screens)", () => {

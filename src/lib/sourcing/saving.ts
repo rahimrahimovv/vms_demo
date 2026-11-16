@@ -18,10 +18,11 @@ export type Saving = {
   over: boolean;
 };
 
-/** Half-up rounding at `digits` decimals, exact on the 2-decimal amounts used here. */
+/** Half-up rounding of the absolute value at `digits` decimals, then the sign: -3.25 gives -3.3 as 3.25 gives 3.3. */
 export function roundHalfUp(value: number, digits: number): number {
   const f = 10 ** digits;
-  return Math.floor(Number((value * f).toFixed(6)) + 0.5) / f;
+  const r = Math.floor(Number((Math.abs(value) * f).toFixed(6)) + 0.5) / f;
+  return value < 0 ? -r : r;
 }
 
 export type SavingInput = { lineId: string; estimateUnit: number; winnerUnit: number; quantity: number };
