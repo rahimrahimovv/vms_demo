@@ -231,6 +231,15 @@
   }
 }
 
+/* A person who prefers reduced motion (and automated browsers that ask for it) gets dialogs and side panels without animation. */
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="dialog-content"],
+  [data-slot="dialog-overlay"] {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring;

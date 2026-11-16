@@ -13,12 +13,12 @@ const INITIAL: ResetState = { error: null };
  * PLT-03 AC4, AC5: "Reset password" with a confirmation, then the temporary password once, with a Copy button.
  * The dialog is remounted when it closes, so the password leaves the browser's memory with it.
  */
-export function ResetPasswordButton({ userId, vendorId, name, className }: { userId?: string; vendorId?: string; name: string; className?: string }) {
+export function ResetPasswordButton({ userId, vendorId, name }: { userId?: string; vendorId?: string; name: string }) {
   const [round, setRound] = useState(0);
-  return <ResetDialog key={round} userId={userId} vendorId={vendorId} name={name} className={className} onClosed={() => setRound((r) => r + 1)} />;
+  return <ResetDialog key={round} userId={userId} vendorId={vendorId} name={name} onClosed={() => setRound((r) => r + 1)} />;
 }
 
-function ResetDialog({ userId, vendorId, name, className, onClosed }: { userId?: string; vendorId?: string; name: string; className?: string; onClosed: () => void }) {
+function ResetDialog({ userId, vendorId, name, onClosed }: { userId?: string; vendorId?: string; name: string; onClosed: () => void }) {
   const t = useTranslations();
   const [state, formAction, pending] = useActionState(resetPassword, INITIAL);
   const [open, setOpen] = useState(false);
@@ -36,7 +36,7 @@ function ResetDialog({ userId, vendorId, name, className, onClosed }: { userId?:
 
   return (
     <>
-      <Button type="button" variant="outline" className={className} onClick={() => setOpen(true)} data-testid="reset-password">
+      <Button type="button" variant="outline" onClick={() => setOpen(true)} data-testid="reset-password">
         <KeyRound className="size-4" aria-hidden />
         {t("password.reset.button")}
       </Button>
