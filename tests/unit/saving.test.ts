@@ -13,12 +13,22 @@ describe("RFQ-10 saving against the estimate", () => {
     expect(formatPercent(s.percent)).toBe("6.9%");
   });
 
+  it("per line: estimated unit price, winner unit price and the difference in percent with one decimal, sign after rounding", () => {
+    const s = computeSaving([
+      { lineId: "a", estimateUnit: 800, winnerUnit: 745, quantity: 100 },
+      { lineId: "b", estimateUnit: 100, winnerUnit: 103.25, quantity: 1 },
+      { lineId: "c", estimateUnit: 100, winnerUnit: 96.75, quantity: 1 },
+    ]);
+    expect(s.lines.map((l) => [l.estimateUnit, l.winnerUnit, l.percent])).toEqual([[800, 745, 6.9], [100, 103.25, -3.3], [100, 96.75, 3.3]]);
+    expect(formatPercent(s.lines[1].percent!)).toBe("+3.3%");
+  });
+
   it("sums several lines, each rounded to two decimals first", () => {
     const s = computeSaving([
       { lineId: "a", estimateUnit: 10.005, winnerUnit: 9.999, quantity: 3 },
       { lineId: "b", estimateUnit: 20, winnerUnit: 15, quantity: 2 },
     ]);
-    expect(s.lines[0]).toEqual({ lineId: "a", estimated: 30.02, awarded: 30, saving: 0.02 });
+    expect(s.lines[0]).toMatchObject({ lineId: "a", estimated: 30.02, awarded: 30, saving: 0.02 });
     expect(s.estimated).toBe(70.02);
     expect(s.awarded).toBe(60);
     expect(s.saving).toBe(10.02);

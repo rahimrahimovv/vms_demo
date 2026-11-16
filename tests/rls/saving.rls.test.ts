@@ -240,9 +240,10 @@ describe("RFQ-10 saving against the estimate", () => {
     expect(c.saving.saving).toBe(550);
     expect(c.saving.percent).toBe(6.9);
     expect(c.saving.over).toBe(false);
-    expect(c.saving.lines).toEqual([expect.objectContaining({ estimated: 8000, awarded: 7450, saving: 550 })]);
+    expect(c.saving.lines).toEqual([expect.objectContaining({ estimated: 8000, awarded: 7450, saving: 550, estimateUnit: 800, winnerUnit: 745, percent: 6.9 })]);
     const o = (await actors.specialist.client.rpc("sourcing_comparison", { p_id: over })).data as { saving: SavingJson };
     expect(o.saving).toMatchObject({ estimated: 7000, awarded: 7450, saving: -450, over: true });
+    expect(o.saving.lines[0]).toMatchObject({ estimateUnit: 700, winnerUnit: 745, percent: -6.4 }); // -6.43 rounds to -6.4
   });
 
   it("sealed and role-bound: the Approver, the Requester and vendors get no comparison", async () => {
@@ -290,6 +291,10 @@ describe("RFQ-10 saving against the estimate", () => {
     const own = (await actors.vendorA.client.rpc("po_view", { p_id: poA })).data as Record<string, unknown>;
     expect(own).toMatchObject({ total: 7450 });
     expect(own.saving ?? null).toBeNull();
+    // RFQ-12: the vendor gets the id of its own proposal (for the receipt link); an internal reader does not
+    expect(own.proposalId).toEqual(expect.any(String));
+    expect(((await actors.specialist.client.rpc("po_view", { p_id: poA })).data as Record<string, unknown>).proposalId).toBeUndefined();
+    expect((await actors.vendorA.client.rpc("proposal_receipt", { p_proposal: own.proposalId })).data).not.toBeNull();
     expect(leaks(own)).toBe(false);
     expect((await actors.vendorB.client.rpc("po_view", { p_id: poA })).data).toBeNull();
   });

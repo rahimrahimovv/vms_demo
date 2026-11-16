@@ -280,4 +280,18 @@ describe("RFQ-12 proposal receipt", () => {
     expect(await receiptOf("vendorB", pB)).toBeNull();
     expect(await receiptOf("vendorA", pA)).not.toBeNull();
   });
+
+  it("after the deadline a PASSED, DISQUALIFIED, AWARDED or NOT_AWARDED proposal still has its receipt; a cancelled sourcing hides it", async () => {
+    for (const status of ["PASSED", "DISQUALIFIED", "AWARDED", "NOT_AWARDED"]) {
+      await db.query("update public.proposal set status = $2, disqualify_reason = case when $2 = 'DISQUALIFIED' then 'Missing certificate' else null end where id = $1", [pA, status]);
+      const own = await receiptOf("vendorA", pA);
+      expect(own, status).not.toBeNull();
+      expect(JSON.stringify(own)).not.toMatch(/estimat|saving|committee/i);
+      // another vendor and every internal user are still refused
+      expect(await receiptOf("vendorB", pA), status).toBeNull();
+      for (const k of ["specialist", "approver", "admin", "cm1"] as const) expect(await receiptOf(k, pA), status + " " + k).toBeNull();
+    }
+    await db.query("update public.sourcing set status = 'CANCELLED' where id = $1", [id]);
+    expect(await receiptOf("vendorA", pA)).toBeNull();
+  });
 });

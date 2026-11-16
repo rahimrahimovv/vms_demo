@@ -48,6 +48,8 @@ export type PoView = PoBody & {
   requesterId: string | null;
   winnerMinutes: { id: string; number: string } | null;
   decision: { id: string; status: string } | null;
+  /** RFQ-12: set for a vendor only: the proposal this order came from (for its receipt). */
+  proposalId?: string;
   /** RFQ-10: set for internal readers only, never for a vendor. */
   saving?: Saving | null;
 };

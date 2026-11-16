@@ -16,7 +16,7 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 39 stories
 │   ├── PLT-01  Sign in and see only your role's screens
 │   ├── PLT-02  Get in-app notifications; keep an audit trail
 │   ├── PLT-03  Change and reset passwords
-│   └── PLT-04  Internal users see a dashboard of procurement figures
+│   └── PLT-04  Internal users see the dashboard
 ├── MDM  Master data
 │   ├── MDM-01  Admin maintains Incoterms, payment terms, delivery places, modes
 │   └── MDM-02  Admin maintains the category tree and item catalogue
@@ -45,8 +45,8 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 39 stories
 │   ├── RFQ-08  Specialist requests a final (discounted) offer
 │   ├── RFQ-09  Specialist closes a sourcing early
 │   ├── RFQ-10  Internal users see the saving against the estimate
-│   ├── RFQ-11  Everyone sees the time left on a deadline
-│   ├── RFQ-12  Vendor downloads a receipt of the submitted proposal
+│   ├── RFQ-11  Every deadline shows the time left
+│   └── RFQ-12  Vendor downloads a receipt for its proposal
 ├── CMT  Committee
 │   ├── CMT-01  Admin configures the committee
 │   ├── CMT-02  Committee votes on a winner or a PO decision
@@ -57,7 +57,7 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 39 stories
 │   ├── PO-02   Approver, then committee, approve the PO
 │   └── PO-03   Vendor accepts or declines the PO
 └── DEMO Demo mode
-    ├── DEMO-01 Presenter uses demo tools (withdrawn, D-024)
+    ├── DEMO-01 Presenter uses demo tools
     ├── DEMO-02 System seeds and resets the demo scenario
     └── DEMO-03 System loads the populated demo data
 ```
@@ -81,10 +81,10 @@ The release covers one end-to-end path with two sourcing types (RFQ and Tender);
 - Vendor onboarding: a short account form for local companies, individuals and foreign companies, then the vendor completes the registration in steps in its own cabinet (company details, owners, contact persons with at least one legal representative and a proof file, bank accounts, documents) and submits it; later changes to company data, owners, bank accounts and documents go through a change request that a Procurement Specialist approves (#99); users change their password and staff reset a forgotten one; specialist review (approve, return for correction, reject); a qualification questionnaire with scoring and an A–D grade; a company profile with owners, founding date, activity, brands, main goods, bank guarantee and a certificate register with 30-day expiry reminders, shown on one vendor card; category applications with licence proof where the category requires it; category qualification valid for 12 months; the Approved Vendor List (AVL) per category.
 - Planning: annual plan lines; every PR is linked to a plan line and shows the remaining amount.
 - Purchase requisition: lines picked from the item catalogue; single-level approval.
-- Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner.
+- Sourcing: Competitive bidding (RFQ or Tender chosen by value against a threshold) or Single Source Purchase (SSP) to one AVL vendor, with a justification above 1,000 AZN; invitations to AVL vendors; accept or decline with a reason; sealed proposals with Incoterm, delivery and payment terms picked from Admin dictionaries, and VAT basis; Q\&A; deadline handling (extend, continue with a reason, cancel); Tender bid opening approved by the committee and two envelopes (prices open after the technical pass or fail); default deadlines of 3 days (RFQ, SSP) and 14 days (Tender) with a 24-hour reminder; price comparison on the evaluated price with extra costs (customs, delivery); one final (discounted) offer round; proposed winner; the saving against the estimate (internal only); the time left on every deadline; a PDF receipt for each vendor proposal.
 - Committee: configuration, a winner vote and a PO vote, numbered minutes for each decision.
 - Purchase order: one PO per winning vendor; Approver, then committee, then vendor acceptance.
-- Demo mode: role switcher and end-deadline-now behind a demo code; reset and load of demo data by command; one seeded scenario and a populated demo dataset.
+- Demo mode: no demo tools in the app (D-024); reset and load of demo data by command; one seeded scenario and a populated demo dataset.
 - High-urgency items delivered (24 of 46): #1 (plan lines only), #9, #15, #16 (limit and justification; the committee approves it in the winner vote), #26, #29, #30, #31, #33, #34, #41 (result notice only, no debrief), #46 (minutes in English, no chair sign-off yet), #55 (grade and category valid 12 months, then re-qualification), #83, #86, #90, #91 (format, VAT status, duplicates; no Tax Service lookup), #105, #106 (certificate register with 30-day reminders), #110, plus #54 (owners), #97 (bank guarantee), #99 (bank-detail change request, approved by the Procurement Specialist because the MVP has no Finance role) and #100 (activity and brands).
 
 **If time allows (cut first when late)**
@@ -197,34 +197,6 @@ TBD
 6. **Given** a user marked "must change password", **When** they sign in with the temporary password, **Then** the Change password form opens and no other page opens until the password is changed.
 7. **Given** the sign-in page, **When** it is shown, **Then** it says "Forgot your password? Ask your buyer or your administrator to reset it." and has no reset link (no e-mail in this release).
 8. **Given** any reset or change, **When** it is stored, **Then** no password is saved in clear text, shown again or written to the audit trail.
-
----
-
-### PLT-04 - Internal Users See A Dashboard
-
-| Field | Value |
-| --- | --- |
-| **Story ID** | PLT-04 |
-| **Story title** | Approver, Procurement Specialist, Committee Member and Admin see the main procurement figures for a period on one screen. |
-
-**Story Description**
-
-|  |  |
-| --- | --- |
-| **As a...** | Approver, Procurement Specialist, Committee Member or Admin |
-| **I want to...** | open a dashboard with the awarded value, the saving, the cycle time, the bids per sourcing and the state of the work |
-| **So that...** | I see how procurement is doing without opening each list |
-
-**Acceptance Criteria** (Given / When / Then)
-
-1. **Given** a user with one of the four roles, **When** the Work group of the menu is shown, **Then** it has a Dashboard entry after My tasks and the page opens with "Last 90 days" selected; a Requester and every Vendor get no entry and the page refuses them; the database function refuses them and anonymous users too.
-2. **Given** the period control (Last 30 days, Last 90 days, This year, All time), **When** a period is chosen, **Then** every period-bound figure is recalculated, the period is in the address (`?period=`) so a reload keeps it, and "This year" starts on 1 January in Asia/Baku. Sourcing figures use the sourcing's creation date, committee figures the date a decision closed; vendor figures and Needs action are always current.
-3. **Given** the four tiles, **When** they are shown, **Then** Awarded value is the value at the vendors' own winning prices (award lines, excluding VAT, AZN) of sourcings in WINNER\_APPROVED or COMPLETED; Saving against estimate is the RFQ-10 saving over the same sourcings; Cycle time is the average number of days from the approval of a requisition to the release (FULLY_APPROVED) of its purchase order, taken from the business timestamps of the two records, not from audit rows; Bids per sourcing is the average number of submitted proposals (not DRAFT, not WITHDRAWN) per sourcing that is not a draft.
-4. **Given** the card Sourcings by stage, **When** it is shown, **Then** it counts the sourcings of the period in the stages Draft (DRAFT), Open for bids (OPEN), Closed, in evaluation (CLOSED, AWAITING\_OPENING, TECHNICAL\_EVALUATION, COMPARISON, FINAL\_OFFER\_ROUND), In committee (IN\_COMMITTEE), Awarded (WINNER\_APPROVED), Completed (COMPLETED) and Cancelled (CANCELLED).
-5. **Given** the cards Value by category, Vendors by grade and Top vendors, **When** they are shown, **Then** Value by category lists the five categories with the highest awarded plus in-progress value (in progress = the estimated value of sourcings from OPEN to IN\_COMMITTEE); Vendors by grade shows the counts of grades A, B, C, D and not graded as a donut and as text, and the number of certificates expiring within 30 days; Top vendors lists the five vendors with the highest awarded value and their number of awards (sourcings won).
-6. **Given** the card Needs action, **When** it is shown, **Then** it lists the company-wide counts of registrations to review, requisitions to approve, purchase orders to approve, sourcings below the minimum and committee votes still open, the same for all four roles, each with an Open link to the matching list only when the role can open that list (otherwise no link); the empty message "Nothing needs your action." appears only when all counts are 0; the card Committee shows the closed decisions of the period by result (APPROVED, REJECTED, NO_DECISION) and the share of eligible votes cast.
-7. **Given** a period without data, **When** a card is shown, **Then** it says "No data in this period"; every chart also prints its numbers as text and has an aria-label, and colour is never the only signal.
-8. **Given** a vendor, **When** it uses the application, **Then** it never receives the estimate or the saving: the function is not callable for a vendor and no vendor page calls it (D-026).
 
 ---
 
@@ -803,24 +775,24 @@ TBD
 | Field | Value |
 | --- | --- |
 | **Story ID** | RFQ-09 |
-| **Story title** | The owner closes an OPEN sourcing before its deadline once every invited vendor has answered. |
+| **Story title** | The sourcing owner closes an OPEN sourcing before its deadline, but only when every invited vendor has already answered. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
-| **As a...** | Procurement Specialist (owner of the sourcing) |
-| **I want to...** | close an OPEN sourcing now, with a reason, when every invited vendor has answered |
-| **So that...** | the buying does not wait for a deadline that no longer matters |
+| **As a...** | Procurement Specialist (the sourcing owner) |
+| **I want to...** | stop waiting for the deadline when nobody else can still bid |
+| **So that...** | the procurement moves on without cutting off any vendor, and the decision is on record |
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** an OPEN sourcing whose invited vendors have all answered (a submitted proposal or a declined invitation), **When** the owner clicks Close now, sees the deadline that will be replaced and enters a reason, **Then** the deadline becomes the current time and the sourcing closes exactly as at a normal deadline: a Tender goes to AWAITING_OPENING, an RFQ or an SSP to COMPARISON, or the sourcing stays CLOSED when it is below the minimum.
-2. **Given** an OPEN sourcing with at least one invited vendor that has not answered (invited, accepted without a submitted proposal, a saved or withdrawn proposal), **When** the owner looks at Close now, **Then** it is disabled and shows "N invited vendors have not answered yet" with the names of those vendors; a call to the database is refused with the same message and nothing changes.
-3. **Given** the reason is empty, **When** the owner confirms, **Then** "Enter a reason" appears and nothing changes.
-4. **Given** a user who is not the owner (another specialist, or any other role or a vendor), or a sourcing that is not OPEN, **When** Close now is called, **Then** it is refused and nothing changes.
-5. **Given** a sourcing closed early, **When** the History tab is opened, **Then** each status change (OPEN to CLOSED and the next one) has an entry with the user, the time, the reason and the original deadline.
-6. **Given** a sourcing closed early, **When** it closes, **Then** every vendor with a submitted proposal is notified "Sourcing closed early"; the reason stays internal and no declined vendor is notified.
+1. **Given** an OPEN sourcing in which every invited vendor has answered (a SUBMITTED proposal or a DECLINED invitation), **When** the owner clicks Close now, **Then** a dialog shows the deadline that will be replaced and asks for a reason ("Enter a reason"); on confirm the sourcing becomes CLOSED, its deadline is set to the current time and the same follow-up as at a normal deadline applies (RFQ-04 AC1 to AC5).
+2. **Given** an OPEN sourcing with at least one invited vendor that has not answered (invitation INVITED, or ACCEPTED without a submitted proposal), **When** the owner opens it, **Then** Close now is disabled with "N invited vendors have not answered yet" and the names of those vendors; Extend and Cancel stay available (RFQ-04).
+3. **Given** an early close, **When** it is saved, **Then** an audit entry records the user, the time, the reason and the original deadline, the History tab shows it, and every vendor with a submitted proposal is notified that the sourcing closed before its deadline because all invited vendors had answered; the reason itself stays internal.
+4. **Given** a Single Source Purchase, **When** its one vendor has answered, **Then** the owner can close it early in the same way.
+5. **Given** any user other than the owner (another specialist, a Committee Member, the Admin, a vendor), **When** they open the sourcing, **Then** Close now is not offered and a direct call is refused.
+6. **Given** a closed sourcing, **When** a vendor tries to submit, edit or withdraw a proposal, **Then** "The deadline has passed" appears (RFQ-02 AC7), exactly as after a normal deadline.
 
 ---
 
@@ -829,74 +801,106 @@ TBD
 | Field | Value |
 | --- | --- |
 | **Story ID** | RFQ-10 |
-| **Story title** | The system shows, to internal users only, how far the awarded value is below the PR estimate. |
+| **Story title** | The comparison, the winner decision and the purchase order show the estimated value, the awarded value and the saving, for internal users only. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
-| **As a...** | Procurement Specialist, Committee Member, Admin (and the Approver on the purchase order) |
-| **I want to...** | see the estimate, the winning price and the saving for every awarded line and for the whole sourcing |
-| **So that...** | the value of the buying is visible at the decision and afterwards |
+| **As a...** | Procurement Specialist, Committee Member, Approver or Admin |
+| **I want to...** | see how far the winning prices are from the estimate |
+| **So that...** | the value of the competition is visible at a glance |
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a sourcing in COMPARISON, **When** the owner (or a committee member or the Admin) opens the comparison, **Then** below the price table each line with a winner shows the estimate (quantity × estimated unit price of the PR line), the winner's price (quantity × the vendor's own latest unit price excluding VAT) and the difference, and a footer shows the estimated value, the awarded value, the saving amount and the saving percent; cancelled lines and lines without a winner are not counted.
-2. **Given** a winner whose price is above the estimate, **When** the saving is shown, **Then** the line (and the total) shows an amber "Over estimate" chip and the amount with a plus sign.
-3. **Given** the owner sends the winner proposal to the committee, **When** the package is frozen, **Then** the saving is stored inside the package and shown unchanged to the committee.
-4. **Given** a purchase order, **When** an internal user opens it (the Approver sees the saving on the order only), **Then** the order shows the saving of its own lines.
-5. **Given** the sourcing list, **When** a sourcing is WINNER\_APPROVED or COMPLETED, **Then** the Saving column shows the amount and percent, and a dash for every other status.
-6. **Given** any vendor (invitation view, proposal, final offer, purchase order view, purchase order PDF, notification or export), **When** it reads its data, **Then** the estimate and the saving are never returned; a function that a vendor can call does not contain them.
-7. **Given** the backlog example (estimated 80,000.00 AZN, awarded 74,500.00 AZN), **When** the saving is computed, **Then** it is 5,500.00 AZN = 6.9 %.
+1. **Given** a sourcing in COMPARISON or later with at least one line that has a proposed winner, **When** an internal user opens the comparison, **Then** each such line shows the estimated unit price from the PR line, the winner's unit price (excluding VAT, the vendor's own latest price) and the difference in percent with one decimal, and a footer shows the estimated value, the awarded value and the saving as an amount and as a percent, counting only lines that have a winner.
+2. **Given** a winner priced above the estimate, **When** the figures are shown, **Then** the line and the footer read "Over estimate" with an amber chip and a plus sign instead of a saving.
+3. **Given** a WINNER decision, **When** a committee member opens it, **Then** the same figures are part of the frozen package (CMT-02).
+4. **Given** a purchase order, **When** an internal user opens it, **Then** it shows the estimated value of its lines, the order value and the saving; the Approver sees these figures on the order only.
+5. **Given** the sourcing list, **When** a sourcing is WINNER\_APPROVED or COMPLETED, **Then** a Saving column shows the percent; other sourcings show a dash.
+6. **Given** any vendor screen, file, notification or export, **When** it is produced, **Then** no estimated price, estimated value or saving appears in it.
 
 ---
 
-### RFQ-11 - Everyone Sees The Time Left On A Deadline
+### RFQ-11 - Everyone Sees How Long A Deadline Still Runs
 
 | Field | Value |
 | --- | --- |
 | **Story ID** | RFQ-11 |
-| **Story title** | Every deadline shows the time left and updates without a reload; a vendor's form turns read-only when it passes. |
+| **Story title** | Every deadline shows the time left next to its date. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
-| **As a...** | Vendor, Procurement Specialist, Committee Member |
-| **I want to...** | see how long a deadline has left next to the deadline itself |
-| **So that...** | nobody misses a deadline or waits on one that has passed |
+| **As a...** | Vendor, Procurement Specialist or Committee Member |
+| **I want to...** | see at a glance how long a sourcing, a final-offer round or a vote is still open |
+| **So that...** | nobody misses a deadline |
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a deadline, **When** it is shown, **Then** the absolute date and time (Asia/Baku) is followed by "Closes in 2 days 4 hours" (24 hours or more), "Closes in 5 h 12 min" with an amber chip (under 24 hours) or "Closes in 42 min" (under 1 hour), and "Deadline passed" afterwards.
-2. **Given** the page stays open, **When** a minute passes, **Then** the text updates without a reload and without announcing itself to screen readers.
-3. **Given** the clock of the user's device is wrong, **When** the time left is shown, **Then** it is computed from the server time, so the wrong clock does not matter.
-4. **Given** a vendor has the invitation open, **When** the deadline passes, **Then** the page data refreshes and the proposal form is read-only with "The deadline has passed".
-5. **Given** the vendor's invitation list and invitation page, the sourcing record header (internal users), a running final-offer round ("Final offer closes in ...") and a committee decision in VOTING ("Voting closes in ..."), **When** they are opened, **Then** each shows the time left in the same way.
+1. **Given** an OPEN sourcing, **When** a vendor opens its invitation list or invitation page, or the owner opens the sourcing, **Then** the deadline date (Asia/Baku) is followed by "Closes in 2 days 4 hours", "Closes in 5 h 12 min" or "Closes in 42 min" according to the Calculation Rules.
+2. **Given** less than 24 hours left, **When** the line is shown, **Then** it has an amber chip; once the deadline has passed it reads "Deadline passed".
+3. **Given** an open page, **When** a minute passes, **Then** the text updates without a reload; when the deadline passes, the page refreshes its data and the vendor's form becomes read-only with "The deadline has passed" (RFQ-02 AC7).
+4. **Given** a running final-offer round or a decision in VOTING, **When** it is shown, **Then** it has the same line: "Final offer closes in ..." and "Voting closes in ...".
+5. **Given** a device with a wrong clock, **When** the line is computed, **Then** it uses the server time, so the text is right anyway.
+6. **Given** a screen reader, **When** the text updates, **Then** it is not announced every minute; the date is in a time element with its full value.
 
 ---
 
-### RFQ-12 - Vendor Downloads A Receipt Of The Submitted Proposal
+### RFQ-12 - Vendor Downloads A Receipt For Its Proposal
 
 | Field | Value |
 | --- | --- |
 | **Story ID** | RFQ-12 |
-| **Story title** | The vendor gets a PDF receipt with a fingerprint of exactly what it submitted. |
+| **Story title** | After submitting a proposal, the vendor can download a PDF receipt with the submitted data and a fingerprint. |
 
 **Story Description**
 
 |  |  |
 | --- | --- |
 | **As a...** | Vendor |
-| **I want to...** | download a receipt of my submitted proposal |
-| **So that...** | I can prove what I submitted and when |
+| **I want to...** | keep proof of what I submitted and when |
+| **So that...** | there is no doubt about my proposal after the deadline |
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** a SUBMITTED proposal, **When** the owning vendor clicks "Download receipt (PDF)" (shown after Submit and on the invitation page while the proposal is SUBMITTED), **Then** an English PDF opens with the e-Procurement header, "Proposal receipt", the sourcing number and category, the vendor's legal name and tax number, the submission date and time (Asia/Baku), the round (First offer or Final offer), each priced line with quantity, unit, unit price as entered, VAT basis and rate and line total, the Incoterm, named place, delivery mode, payment term, delivery days and validity, the names of the attached files and the fingerprint.
-2. **Given** a DRAFT or WITHDRAWN proposal, another vendor's proposal, or any internal user, **When** the receipt is requested, **Then** it is refused and nothing is returned.
-3. **Given** the receipt, **When** it is read, **Then** it holds no estimate, no other vendor's data and no committee data.
-4. **Given** the same submitted data, **When** the receipt is generated twice, **Then** the fingerprint is the same; **When** a price (or any term or file name) differs, **Then** the fingerprint differs. The fingerprint is the first 16 characters of the SHA-256 of the submitted data (sourcing, vendor, round, lines, terms, file names) as canonical JSON with a fixed key order, in capitals in groups of four.
+1. **Given** a submitted proposal (status SUBMITTED, PASSED, DISQUALIFIED, AWARDED or NOT_AWARDED), **When** the vendor submits it, opens its invitation page or opens the purchase order that came from it, **Then** a "Download receipt (PDF)" button (on the purchase order a "Proposal receipt" link) is shown; DRAFT and WITHDRAWN proposals and cancelled sourcings show none.
+2. **Given** the receipt, **When** it is generated, **Then** it is an English PDF with the e-Procurement header, the title "Proposal receipt", the sourcing number and category, the vendor's legal name and tax number, the submission date and time (Asia/Baku), the round (First offer or Final offer), every priced line with quantity, unit, unit price as entered, VAT basis and rate and line total, the Incoterm, named place, delivery mode and payment term, delivery days, validity, the names of the attached files, and the fingerprint.
+3. **Given** a resubmission or a final offer, **When** the vendor downloads the receipt, **Then** it shows the latest submitted data and time; earlier versions are not kept.
+4. **Given** any other vendor or any internal user, **When** they request the receipt, **Then** it is refused; internal users read the proposal on the comparison once its prices are open.
+5. **Given** the receipt, **When** it is produced, **Then** it holds no estimate, no other vendor's data and no committee data.
+6. **Given** the vendor on its Purchase orders and invitation pages, **When** it opens a sourcing it has bid on, **Then** the receipt button stays available until the sourcing is cancelled.
+
+---
+
+### PLT-04 - Internal Users See The Dashboard
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | PLT-04 |
+| **Story title** | A dashboard shows spend, saving, cycle time, competition, vendors and open work for the chosen period. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Approver, Procurement Specialist, Committee Member or Admin |
+| **I want to...** | see the state of procurement on one screen |
+| **So that...** | I can judge results and spot work that is waiting without opening lists |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a signed-in Approver, Specialist, Committee Member or Admin, **When** they open Dashboard in the Work group of the menu, **Then** they see it; a Requester and a Vendor get no menu entry and a direct request is refused.
+2. **Given** the dashboard, **When** it opens, **Then** a period control offers Last 30 days, Last 90 days (default), This year and All time; sourcing figures follow the period by the sourcing's creation date and committee figures by the date a decision closed; the vendor figures and Needs action always show the current state.
+3. **Given** the four tiles, **When** they are shown, **Then** Awarded value is the value at the vendors' own winning prices of sourcings in WINNER\_APPROVED or COMPLETED, excluding VAT, in AZN; Saving is the amount and percent against the estimate for the same sourcings (RFQ-10 rules); Cycle time is the average number of days from the approval of a requisition to the release of its purchase order (FULLY\_APPROVED); Bids per sourcing is the average number of proposals per sourcing that are not drafts or withdrawn; "This year" starts on 1 January in Asia/Baku; the number of awards of a vendor counts the sourcings it won.
+4. **Given** the charts, **When** they are shown, **Then** Sourcings by stage counts Draft, Open for bids, Closed in evaluation, In committee, Awarded, Completed and Cancelled; Value by category shows for each category the awarded value and the estimated value of sourcings still in progress; Vendors by grade counts grades A to D and the vendors not yet graded.
+5. **Given** the Top vendors table, **When** it is shown, **Then** it lists the five vendors with the highest awarded value in the period, with the number of awards.
+6. **Given** Needs action, **When** it is shown, **Then** it counts registrations to review, requisitions to approve, purchase orders to approve, sourcings below the minimum and committee votes still open, each with an Open link to the matching list when the role may open that list (otherwise no link); certificates expiring within 30 days are shown beside the grade chart.
+7. **Given** the Committee card, **When** it is shown, **Then** it counts the decisions closed in the period as approved, rejected and no decision, and the share of eligible votes that were cast.
+8. **Given** a chart, **When** it is read by a screen reader or without colour, **Then** every figure is also written as text and the donut and bars carry an aria-label.
+9. **Given** a period without data, **When** a card is shown, **Then** it reads "No data in this period" in one calm line instead of an empty chart.
+10. **Given** the figures, **When** they are requested, **Then** one database function returns all of them for the period in one call, refuses a Requester and every Vendor, and no vendor ever receives a figure; the demo data loads in under 2 seconds.
 
 ---
 
@@ -1077,14 +1081,12 @@ TBD
 
 ---
 
-### DEMO-01 - Presenter Uses Demo Tools (withdrawn, D-024)
-
-**Withdrawn (D-024).** The app has no demo tools: no demo access page or code, no demo bar, no Switch user, Lock or End deadline now. Closing a sourcing early is the business function of RFQ-09. The criteria below are kept for history only.
+### DEMO-01 - Presenter Uses Demo Tools
 
 | Field | Value |
 | --- | --- |
 | **Story ID** | DEMO-01 |
-| **Story title** | In demo mode the presenter switches users, fills forms and ends deadlines with one click. |
+| **Story title** | Withdrawn (D-024): the presenter signs in as each user instead of using in-app demo tools. |
 
 **Story Description**
 
@@ -1096,11 +1098,7 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode is switched on by an environment setting and the presenter has entered the demo code (DEMO\_ACCESS\_CODE; the browser session stays unlocked for 8 hours, and without it every demo endpoint answers "Not available"), **When** any page loads, **Then** a demo bar shows Switch user and Lock.
-2. **Given** the demo bar, **When** the presenter picks a seeded user from Switch user, **Then** the session changes to that user without a password and the page reloads with that user's menu.
-3. **Given** (later addition, not in this release) a scenario form (registration, category application, PR, sourcing, proposal, question, answer, vote, decline reason), **When** the presenter clicks Fill sample, **Then** the form fills with the values in Demo Scenario Data and nothing is saved until the presenter clicks Save or Submit.
-4. (Removed, D-025) Closing a sourcing early is the business function of RFQ-09, not a demo tool.
-5. **Given** demo mode is switched off, **When** any page loads, **Then** no demo control is shown and every demo endpoint answers "Not available" with no effect.
+1. Withdrawn (D-024): the application has no demo tools. Demo data is loaded and reset only by `npm run demo:load` and `npm run demo:reset`.
 
 ---
 
@@ -1145,7 +1143,7 @@ TBD
 
 **Acceptance Criteria** (Given / When / Then)
 
-1. **Given** demo mode, **When** a developer runs the command npm run demo:load against a database whose demo flag is enabled, sees the target database and types the last 6 characters of its project reference to confirm, **Then** within 60 seconds all data is replaced by the Populated Data Catalogue below and every user is signed out; npm run demo:reset (DEMO-02) is the other mode.
+1. **Given** demo mode, **When** a developer runs the command npm run demo:load against a database whose demo flag is enabled, sees the target database and types the last 6 characters of its project reference to confirm, **Then** in about 5 minutes (it may take a little longer) all data is replaced by the Populated Data Catalogue below and every user is signed out; npm run demo:reset (DEMO-02) is the other mode.
 2. **Given** the load, **When** it runs, **Then** every record is created through the application's own database functions, in dependency order, so each one has its audit entries, notifications, document numbers and minutes as if users had done the steps; no table is filled by a direct insert that skips the rules.
 3. **Given** any date in the data, **When** it is created, **Then** it is relative to the load time; every open deadline and every voting deadline is at least 2 days ahead so nothing closes during a demo session, and closed or decided records carry past dates in a sensible order.
 4. **Given** the data, **When** it is read, **Then** it holds only synthetic people, companies, tax numbers, IBANs and files; sample files are small generated PDFs.
@@ -1195,8 +1193,8 @@ Also one SUBMITTED change request (Bank accounts) by Zeta Irrigation LLC. Plan l
 | ID | Method and type | Category, value (AZN) | State to show |
 | --- | --- | --- | --- |
 | S1 | Competitive RFQ | Irrigation systems, 6,000 | DRAFT: invitees listed, not published |
-| S2 | Competitive RFQ | Seeds, 12,000 | OPEN, deadline in 2 days, 4 invited: 2 submitted, 2 declined with a reason (Close now is allowed) |
-| S3 | Competitive Tender | Spare parts, 85,000 | OPEN, deadline in 9 days, 1 proposal so far, 1 declined and 2 invited vendors that have not answered (Close now is refused); Q&A with 1 published and 1 UNANSWERED question |
+| S2 | Competitive RFQ | Seeds, 12,000 | OPEN, deadline in 2 days, 4 invited: 2 submitted and 2 declined with a reason, so everyone has answered and Close now is available |
+| S3 | Competitive Tender | Spare parts, 85,000 | OPEN, deadline in 9 days, 1 proposal so far and 2 invited vendors that have not answered (Close now is disabled); Q&A with 1 published and 1 UNANSWERED question |
 | S4 | Competitive RFQ | Fertilisers, 20,000 | CLOSED below minimum (2 of 3): Extend, Continue and Cancel available |
 | S5 | Competitive Tender | Irrigation systems, 150,000 | AWAITING\_OPENING, 4 proposals, OPENING vote in progress with 1 of 3 votes cast |
 | S6 | Competitive Tender | Plant protection, 64,000 | TECHNICAL\_EVALUATION after the opening approved 3 to 0; 3 proposals, 1 marked PASSED |
@@ -1207,7 +1205,7 @@ Also one SUBMITTED change request (Bank accounts) by Zeta Irrigation LLC. Plan l
 | S11 | Competitive RFQ | Fertilisers, 14,000 | COMPLETED; its PO ACCEPTED; result notices sent |
 | S12 | Competitive Tender | Spare parts, 55,000 | CANCELLED with a reason; its OPENING vote closed as NO\_DECISION (SOURCING\_CANCELLED) |
 
-*Decisions and minutes.* Six closed decisions with numbered minutes MIN-2026-001 to MIN-2026-006 (S6 opening, S7 rejected winner, S10 winner, S11 winner, S11 PO, S12 cancelled opening) and three open votes (S5 opening, S9 winner, S10 PO).
+*Decisions and minutes.* Eight closed decisions with numbered minutes MIN-2026-001 to MIN-2026-008 (S6 opening, S7 rejected winner, S10 opening, S10 winner, S10 PO of the released order, S11 winner, S11 PO, S12 cancelled opening) and three open votes (S5 opening, S9 winner, S10 PO).
 
 *Notifications.* Every user has at least 3 unread notifications and some read ones, matching the records above.
 
@@ -1231,7 +1229,6 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Create, edit and submit own PR | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Approve, return or reject a PR (not own) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Start, publish, extend, continue or cancel a sourcing | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
-| Close an OPEN sourcing early (all invited vendors answered) | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Answer questions, publish clarifications | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Accept or decline an invitation, ask a question, submit a proposal | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | See proposal prices before the deadline | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
@@ -1239,24 +1236,25 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Disqualify, compare, propose the winner | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Vote on winner and PO decisions | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
 | Approve or reject a PO (not for own PR or own sourcing) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Download the receipt of own submitted proposal | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | Accept or decline a PO | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 | Approve the opening of tender bids | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
-| See the estimate and the saving against it (comparison, package, purchase order, sourcing list, dashboard) | ✅ (purchase order) | ✅ (purchase order and dashboard) | ✅ | ✅ | ✅ | ❌ |
 | Add extra costs; request a final offer | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Submit a final offer | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (if chosen) |
 | Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | View a vendor card, including owners | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ (own only) |
 | View a sourcing record, read-only (sealed data stays sealed until its opening rule) | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ (own invitation only) |
-| See the dashboard | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Change own password | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Reset a forgotten password (temporary password) | ❌ | ❌ | ✅ (vendor accounts) | ❌ | ✅ (internal users) | ❌ |
 | Request a change to company data, owners, bank accounts or documents | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Decide a change request; reopen a rejected registration | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Close a sourcing early (every invited vendor has answered) | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
+| See estimated values and the saving | ❌ | ✅ (on purchase orders and the dashboard) | ✅ | ✅ (in the decision package) | ✅ | ❌ (never) |
+| Download the receipt of a proposal | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own proposals) |
+| See the dashboard | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 
-Owner means the Procurement Specialist who started the sourcing; other specialists can read it.
+Owner means the Procurement Specialist who started the sourcing; other specialists can read it. Demo tools (DEMO-01) are open to everyone, and only while demo mode is on.
 
 ## Status Transition Model
 
@@ -1272,7 +1270,7 @@ A rejected winner, a rejected PO or a declined PO sends only the affected lines 
 | --- | --- | --- | --- | --- |
 | (none) | DRAFT | Start sourcing on an APPROVED PR | Procurement Specialist | Method Competitive (type by value) or Single Source (SSP) |
 | DRAFT | OPEN | Publish | Owner | At least one invitee; an SSP above the limit needs a justification and a file |
-| OPEN | CLOSED | Deadline passes, or Close now | System, or Owner | Within 1 minute; vendors reminded 24 hours before. Close now needs a reason and every invited vendor answered (RFQ-09) |
+| OPEN | CLOSED | Deadline passes | System | Within 1 minute; vendors reminded 24 hours before; the owner can also close early when every invited vendor has answered (RFQ-09) |
 | CLOSED | OPEN | Extend | Owner | Reason; at most 2 times |
 | CLOSED | AWAITING\_OPENING | Minimum reached, or Continue | System or Owner | Tender only; an OPENING decision opens |
 | CLOSED | COMPARISON | Minimum reached, or Continue | System or Owner | RFQ and SSP; prices open; Continue needs a reason |
@@ -1423,7 +1421,6 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | Answer or clarification published | Invited vendors not declined | In-app | Sourcing number, question and answer, no asker name | No |
 | Deadline extended | Invited vendors not declined | In-app | New deadline | No |
 | Sourcing closed | Sourcing owner | In-app | Proposals received versus minimum | No |
-| Sourcing closed early | Every vendor with a submitted proposal | In-app | Sourcing number (the reason stays internal) | No |
 | Sourcing cancelled | Invited vendors not declined | In-app | Sourcing number, reason | No |
 | Committee decision opened | Eligible committee members | In-app | Decision type (opening, winner or PO), sourcing, voting deadline | No |
 | Committee decision closed | Sourcing owner, committee members | In-app | Result, minutes number | No |
@@ -1441,6 +1438,7 @@ Rejections at steps 11, 13 and 14 and a vendor decline at step 15 all return onl
 | Change request submitted | All Procurement Specialists | In-app | Vendor, section, link | No |
 | Change request decided | Vendor | In-app | Section, decision, comment or reason | No |
 | Registration reopened | Vendor | In-app | The specialist's comment | No |
+| Sourcing closed early | Vendors with a submitted proposal | In-app | Sourcing number; closed before its deadline because all invited vendors had answered | No |
 
 ## Non-Functional Requirements
 
@@ -1472,7 +1470,7 @@ The release has no ERP, e-mail or SMS integration; every interface below runs in
 | Supabase Auth | API | Sign-in with e-mail and password; user creation by the Admin; vendor self-registration | Session for the user's roles | Wrong credentials: message, no session; service down: "Sign-in is unavailable, try again" |
 | Supabase database with row-level security | API | Every read and write | Rows filtered by company, role and vendor | Refused write: error message, nothing saved |
 | Supabase Storage (private bucket) | API | File upload and download | Stored file; time-limited download link | Wrong type or size: message, file not stored |
-| Deadline and voting job | Job, every minute | OPEN sourcing past its deadline; VOTING decision past its period | Status change, notifications, minutes | A failed run is caught by the next run |
+| Deadline and voting job | Job, every minute | OPEN sourcing past its deadline; VOTING decision past its period | Status change, notifications, minutes | A failed run is caught by the next run; demo mode also has End deadline now |
 | Qualification expiry | Job, daily, plus a check on read | QUALIFIED application past its valid-until date | EXPIRED status, vendor out of the AVL | The read-time check keeps the AVL correct even if the job fails |
 | PDF generation | API (server function) | Download of minutes or a PO | PDF in English | "The PDF could not be generated, try again"; data unchanged |
 | In-app notifications | Event | Any event in the Notification table | Bell item for each recipient, pushed live | If live push fails, the bell refreshes on the next page load |
@@ -1509,10 +1507,10 @@ Every number the system computes follows one of these rules; the examples are th
 | Default deadlines | Publish time + 3 days (RFQ, SSP) or + 14 days (Tender); final offer + 2 days; all Admin settings, the specialist may change them; a prefilled deadline the specialist did not change is recalculated from the publish time | Tender published Mon 16 Nov 2026 10:00 → deadline Mon 30 Nov 2026 10:00 |
 | Deadline reminder | Sent once, 24 hours before the deadline, to invited vendors that have neither declined nor submitted | Deadline Mon 30 Nov 2026 10:00 → reminder Sun 29 Nov 2026 10:00 |
 | Certificate status | VALID when there is no expiry date or it is more than 30 days away; EXPIRING within 30 days; EXPIRED from the day after the expiry date | Today 10 Nov 2026: expiry 30 Nov 2026 → EXPIRING; 15 Jan 2027 → VALID; 09 Nov 2026 → EXPIRED |
-| Saving against the estimate | Per line with a winner: estimated = quantity × estimated unit price of the PR line; awarded = quantity × the winner's own latest unit price excluding VAT; amounts rounded half-up to 2 decimals. Saving = sum of estimated − sum of awarded; percent = saving ÷ sum of estimated × 100, rounded half-up to 1 decimal on the absolute value, then the sign (a 3.25 % over-estimate shows +3.3 %, a 3.25 % saving 3.3 %). Cancelled lines and lines without a winner are excluded; internal users only (RFQ-10) | Estimated 80,000.00, awarded 74,500.00 → saving 5,500.00 AZN = 6.9 %; awarded above the estimate → "Over estimate", amount with a plus sign |
-| Time left on a deadline | Deadline − server time. 24 hours or more: days and hours; under 24 hours: hours and minutes (amber); under 1 hour: minutes (at least 1); 0 or less: "Deadline passed". The device clock is never used (RFQ-11) | 52 h 10 min → "2 days 4 hours"; 5 h 12 min → "5 h 12 min"; 42 min → "42 min"; 0 → "Deadline passed" |
-| Receipt fingerprint | First 16 characters of the SHA-256 of the submitted data (sourcing, vendor, round, lines, terms, file names) as canonical JSON with a fixed key order and prices with two decimals; capitals, groups of four (RFQ-12) | Same data → same fingerprint; unit price 33.04 → 33.05 → a different fingerprint |
 | Years in business | Full years between the founding date and today | Founded 15 Mar 2012, today 10 Nov 2026 → 14 years |
+| Saving against the estimate | Estimated value (PR line quantity times estimated unit price) minus awarded value (award quantity times the vendor's own unit price), both excluding VAT, over the lines that have a winner; percent is the saving divided by the estimated value, one decimal; a negative result reads Over estimate | 2,000 × 30.00 + 500 × 40.00 = 80,000.00; 2,000 × 27.50 + 500 × 39.00 = 74,500.00; saving 5,500.00 = 6.9% |
+| Time left | From the server time: days and hours when 24 hours or more remain, hours and minutes under 24 hours, minutes under 1 hour, Deadline passed after the deadline | Closes in 2 days 4 hours; Closes in 5 h 12 min; Closes in 42 min |
+| Receipt fingerprint | The first 16 characters of the SHA-256 of the submitted proposal data (sourcing, vendor, round, lines, terms, file names), in capital letters, in groups of four | 9F3A 1C7E 5B2D 4086 |
 
 ## Demo Scenario Data
 
@@ -1547,7 +1545,7 @@ The seed and the Fill sample values tell one story: a fertiliser Tender in which
 3. Leyla creates a PR on the plan line with two lines: 2,000 bags of "Ammonium nitrate 34.4%, 50 kg bag" × 30.00 AZN = 60,000.00 and 500 L of "Foliar fertiliser, 1 L" × 40.00 AZN = 20,000.00, delivery in 30 days to "Central warehouse"; value 80,000.00 AZN. Rashad approves.
 4. Nigar starts sourcing: Tender (80,000.00 ≥ 50,000.00), minimum 3 proposals, required Incoterm DDP, named place Central warehouse, delivery mode "Single delivery", payment term "30 days after delivery", technical document required.
 5. Beta Trade asks "Can delivery be split into two shipments?"; Nigar answers "Yes, two shipments before the delivery date."
-6. First proposals, per bag and per litre: Alpha Agro 33.04 and 48.38 including 18% VAT (28.00 and 41.00 excluding VAT), DDP Central warehouse, 20 days; Beta Trade 29.50 and 40.00 without VAT, CIP Baku port, 15 days, flagged "Different terms: Incoterm, named place"; Gamma Supply 27.00 and 38.00 without VAT, DDP Central warehouse, 25 days, technical document without the product certificate. The Specialist clicks Close now once every invited vendor has answered or declined (RFQ-09).
+6. First proposals, per bag and per litre: Alpha Agro 33.04 and 48.38 including 18% VAT (28.00 and 41.00 excluding VAT), DDP Central warehouse, 20 days; Beta Trade 29.50 and 40.00 without VAT, CIP Baku port, 15 days, flagged "Different terms: Incoterm, named place"; Gamma Supply 27.00 and 38.00 without VAT, DDP Central warehouse, 25 days, technical document without the product certificate. The presenter clicks End deadline now.
 7. The committee approves the opening 3 to 0 (minutes MIN-2026-001). Nigar sees the technical documents without prices and disqualifies Gamma Supply ("Missing product certificate"); the prices of Alpha Agro and Beta Trade open. Nigar adds a delivery cost of 1.00 AZN per unit to Beta Trade on both lines (port to warehouse), and requests a final offer from both: Alpha Agro lowers the bags to 27.50 excluding VAT (32.45 with VAT) and keeps 41.00 for the litres; Beta Trade lowers the litres to 39.00 and keeps 29.50 for the bags. The evaluated prices are 27.50 against 30.50 for the bags and 41.00 against 40.00 for the litres, so Alpha Agro is proposed for the bags and Beta Trade for the litres. Only 2 of 3 proposals are eligible, so Nigar writes the low-competition reason and sends both winners to the committee.
 8. Winner vote: Elchin For, Sevinj For, Tural Against ("Beta Trade delivers 5 days faster") → APPROVED 2 to 1, minutes MIN-2026-002.
 9. Two POs are created: PO-2026-0001 to Alpha Agro, 55,000.00 AZN excluding VAT (2,000 × 27.50), 64,900.00 AZN with 18% VAT; PO-2026-0002 to Beta Trade, 19,500.00 AZN (500 × 39.00). Rashad approves both; each PO vote is 3 to 0, "Same as the approved winner decision", minutes MIN-2026-003 and MIN-2026-004.
@@ -1588,11 +1586,11 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-019 | After approval the Registration page leaves the vendor's menu and the registration history moves to the Profile | REG-07, REG-06 |
 | D-020 | After approval, core company data (legal name, tax number, address, director, founding date, VAT status, owners, bank accounts, documents) changes only through a change request that a Procurement Specialist approves; other profile data changes freely and is logged | REG-08 |
 | D-021 | Users change their own password; an Admin resets internal users and a Procurement Specialist resets vendors with a temporary password, because the release sends no e-mail | PLT-03 |
-| D-022 | (Withdrawn, D-024) Demo tools in the app were unlocked with a demo code | DEMO-01 |
+| D-022 | Withdrawn, replaced by D-024. Demo tools (Switch user, End deadline now) would have worked only when demo mode is on and the presenter has unlocked them with a demo code; a public link alone can never be used to enter an account or wipe data | DEMO-01 |
 | D-023 | Resetting and loading demo data are commands run by a developer (npm run demo:reset and npm run demo:load) against a database whose demo flag is on, with a typed confirmation; they are not buttons in the app. Fill sample is a later addition | DEMO-02, DEMO-03 |
-| D-024 | The app has no demo tools: no demo access page, demo bar, Switch user, Lock or End deadline now, and no endpoint or action that signs in as another user without a password. Demo data is reset and loaded only by the developer commands of D-023 | DEMO-01 (withdrawn), DEMO-02, DEMO-03 |
-| D-025 | The Procurement Specialist who owns an OPEN sourcing may close it before its deadline when every invited vendor has answered (a submitted proposal or a declined invitation); a reason is required and the audit trail keeps it with the original deadline. This replaces the demo tool "End deadline now", which is removed | RFQ-09, DEMO-01 |
-| D-026 | Saving against the estimate (RFQ-10), the time left on every deadline (RFQ-11) and the vendor's proposal receipt (RFQ-12) are added. The estimate and the saving are internal: no vendor function, page, PDF, notification or export may return them. The receipt belongs to the owning vendor only and holds no estimate and no other vendor's data | RFQ-10, RFQ-11, RFQ-12 |
+| D-024 | No demo tools inside the app (no Switch user, Fill sample, End deadline now, unlock code or demo bar). The presenter signs in as each user, and a demo guide lists the accounts and what each one shows. Demo data is loaded and reset by the commands npm run demo:load and npm run demo:reset only | DEMO-01, DEMO-02, DEMO-03 |
+| D-025 | A sourcing can be closed before its deadline only by its owner, only when every invited vendor has answered, and always with a recorded reason, so no vendor is cut off and the early close is auditable | RFQ-09 |
+| D-026 | The saving is the estimated value minus the value at the vendors' own winning prices, both excluding VAT, and it is internal only: no vendor screen, file, notification or export may carry an estimate or a saving | RFQ-10 |
 
 **Assumptions in force**
 

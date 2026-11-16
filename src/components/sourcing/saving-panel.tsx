@@ -58,12 +58,12 @@ export function SavingTable({ saving, names }: { saving: Saving; names: Map<stri
           {saving.lines.map((l) => (
             <tr key={l.lineId} data-testid="saving-line">
               <th scope="row" className="border-t px-(--density-cell-x) py-(--density-cell-y) text-left font-normal">{names.get(l.lineId) ?? ""}</th>
-              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">{formatAmount(l.estimated)}</td>
-              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">{formatAmount(l.awarded)}</td>
+              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">{l.estimateUnit !== undefined ? formatAmount(l.estimateUnit) : "–"}</td>
+              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">{l.winnerUnit !== undefined ? formatAmount(l.winnerUnit) : "–"}</td>
               <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">
                 <span className="inline-flex items-center justify-end gap-2">
-                  {l.saving < 0 && <ToneChip tone="amber">{t("over")}</ToneChip>}
-                  {signed(l.saving)}
+                  {(l.percent ?? 0) < 0 && <ToneChip tone="amber">{t("over")}</ToneChip>}
+                  {l.percent === null || l.percent === undefined ? "–" : formatPercent(l.percent)}
                 </span>
               </td>
             </tr>

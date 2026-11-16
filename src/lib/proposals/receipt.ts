@@ -28,6 +28,9 @@ export type ReceiptData = {
   files: string[];
 };
 
+/** RFQ-12: the proposal statuses that have a receipt (submitted at some point); DRAFT and WITHDRAWN have none. */
+export const RECEIPT_STATUSES = ["SUBMITTED", "PASSED", "DISQUALIFIED", "AWARDED", "NOT_AWARDED"];
+
 /**
  * The submitted data as canonical JSON: a fixed key order (the order of this literal), prices with two decimals,
  * file names sorted. The submission time is not part of it, so the same data always gives the same fingerprint.

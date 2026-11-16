@@ -3,7 +3,17 @@
  * holds the JSON shape and a mirror of the same arithmetic so the rule is tested with the backlog values.
  * Internal users only: nothing here may reach a vendor page, RPC, PDF, notification or export.
  */
-export type SavingLine = { lineId: string; estimated: number; awarded: number; saving: number };
+export type SavingLine = {
+  lineId: string;
+  estimated: number;
+  awarded: number;
+  saving: number;
+  /** Per unit, excluding VAT: the PR line estimate and the winner's own latest price. */
+  estimateUnit?: number;
+  winnerUnit?: number;
+  /** Difference in percent with one decimal: positive below the estimate, negative above it (shown with a plus sign). */
+  percent?: number | null;
+};
 
 export type Saving = {
   lines: SavingLine[];
@@ -32,7 +42,15 @@ export function computeSaving(inputs: SavingInput[]): Saving {
   const lines = inputs.map((i) => {
     const estimated = roundHalfUp(i.estimateUnit * i.quantity, 2);
     const awarded = roundHalfUp(i.winnerUnit * i.quantity, 2);
-    return { lineId: i.lineId, estimated, awarded, saving: roundHalfUp(estimated - awarded, 2) };
+    return {
+      lineId: i.lineId,
+      estimated,
+      awarded,
+      saving: roundHalfUp(estimated - awarded, 2),
+      estimateUnit: i.estimateUnit,
+      winnerUnit: i.winnerUnit,
+      percent: i.estimateUnit > 0 ? roundHalfUp(((i.estimateUnit - i.winnerUnit) * 100) / i.estimateUnit, 1) : null,
+    };
   });
   const estimated = roundHalfUp(lines.reduce((a, l) => a + l.estimated, 0), 2);
   const awarded = roundHalfUp(lines.reduce((a, l) => a + l.awarded, 0), 2);

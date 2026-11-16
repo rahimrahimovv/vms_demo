@@ -60,6 +60,15 @@ export default async function VendorPurchaseOrderPage({ params }: PageProps<"/ve
           <div className="flex items-start gap-3">
             {options.length > 0 && <DecisionPanel action={respondToPo.bind(null, po.id)} options={options} />}
             <DownloadPdf href={`/api/purchase-orders/${po.id}/pdf`} fileName={`${po.number}.pdf`} />
+            {po.proposalId && (
+              <DownloadPdf
+                href={`/api/proposals/${po.proposalId}/receipt`}
+                fileName={`${po.sourcing.number}-receipt.pdf`}
+                label={t("receipt.title")}
+                busyLabel={t("receipt.downloading")}
+                testId="download-receipt"
+              />
+            )}
           </div>
         }
       />

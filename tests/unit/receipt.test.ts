@@ -1,6 +1,6 @@
 import { inflateSync } from "node:zlib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { buildReceiptPdf, canonicalReceiptJson, receiptFingerprint, type ReceiptData } from "@/lib/proposals/receipt";
+import { RECEIPT_STATUSES, buildReceiptPdf, canonicalReceiptJson, receiptFingerprint, type ReceiptData } from "@/lib/proposals/receipt";
 
 vi.mock("server-only", () => ({}));
 const session = vi.hoisted(() => ({ user: null as unknown }));
@@ -64,6 +64,14 @@ describe("RFQ-12 receipt PDF", () => {
     const text = pdfText(await buildReceiptPdf(receipt)).toLowerCase();
     for (const word of ["estimat", "saving", "committee", "vote", "winner"]) expect(text).not.toContain(word);
     expect(JSON.stringify(Object.keys(receipt))).not.toMatch(/estimat|saving/i);
+  });
+});
+
+describe("RFQ-12 statuses", () => {
+  it("a submitted proposal has a receipt, a DRAFT or WITHDRAWN one does not", () => {
+    expect(RECEIPT_STATUSES).toEqual(["SUBMITTED", "PASSED", "DISQUALIFIED", "AWARDED", "NOT_AWARDED"]);
+    expect(RECEIPT_STATUSES).not.toContain("DRAFT");
+    expect(RECEIPT_STATUSES).not.toContain("WITHDRAWN");
   });
 });
 
