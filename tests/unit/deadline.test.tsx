@@ -1,4 +1,3 @@
-import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
@@ -54,14 +53,9 @@ describe("RFQ-11 uses the server time", () => {
     const { DeadlineCountdown } = await import("@/components/deadline-countdown");
     const html = (deadline: string, kind?: "closes" | "finalOffer" | "voting") =>
       renderToStaticMarkup(
-        createElement(
-          NextIntlClientProvider,
-          {
-            locale: "en",
-            messages,
-            children: createElement(DeadlineCountdown, { deadline, serverNow: new Date(NOW).toISOString(), kind }),
-          },
-        ),
+        <NextIntlClientProvider locale="en" messages={messages}>
+          <DeadlineCountdown deadline={deadline} serverNow={new Date(NOW).toISOString()} kind={kind} />
+        </NextIntlClientProvider>,
       );
     const days = html(at(52 * HOUR + 10 * MIN));
     expect(days).toContain("Closes in 2 days 4 hours");

@@ -45,6 +45,7 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 38 stories
 │   ├── RFQ-09  Specialist closes a sourcing early
 │   ├── RFQ-10  Internal users see the saving against the estimate
 │   ├── RFQ-11  Everyone sees the time left on a deadline
+│   ├── RFQ-12  Vendor downloads a receipt of the submitted proposal
 ├── CMT  Committee
 │   ├── CMT-01  Admin configures the committee
 │   ├── CMT-02  Committee votes on a winner or a PO decision
@@ -846,6 +847,30 @@ TBD
 
 ---
 
+### RFQ-12 - Vendor Downloads A Receipt Of The Submitted Proposal
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-12 |
+| **Story title** | The vendor gets a PDF receipt with a fingerprint of exactly what it submitted. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Vendor |
+| **I want to...** | download a receipt of my submitted proposal |
+| **So that...** | I can prove what I submitted and when |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a SUBMITTED proposal, **When** the owning vendor clicks "Download receipt (PDF)" (shown after Submit and on the invitation page while the proposal is SUBMITTED), **Then** an English PDF opens with the e-Procurement header, "Proposal receipt", the sourcing number and category, the vendor's legal name and tax number, the submission date and time (Asia/Baku), the round (First offer or Final offer), each priced line with quantity, unit, unit price as entered, VAT basis and rate and line total, the Incoterm, named place, delivery mode, payment term, delivery days and validity, the names of the attached files and the fingerprint.
+2. **Given** a DRAFT or WITHDRAWN proposal, another vendor's proposal, or any internal user, **When** the receipt is requested, **Then** it is refused and nothing is returned.
+3. **Given** the receipt, **When** it is read, **Then** it holds no estimate, no other vendor's data and no committee data.
+4. **Given** the same submitted data, **When** the receipt is generated twice, **Then** the fingerprint is the same; **When** a price (or any term or file name) differs, **Then** the fingerprint differs. The fingerprint is the first 16 characters of the SHA-256 of the submitted data (sourcing, vendor, round, lines, terms, file names) as canonical JSON with a fixed key order, in capitals in groups of four.
+
+---
+
 ### CMT-01 - Admin Configures The Committee
 
 | Field | Value |
@@ -1185,6 +1210,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | Disqualify, compare, propose the winner | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Vote on winner and PO decisions | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
 | Approve or reject a PO (not for own PR or own sourcing) | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Download the receipt of own submitted proposal | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | Accept or decline a PO | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (own only) |
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
@@ -1455,6 +1481,7 @@ Every number the system computes follows one of these rules; the examples are th
 | Certificate status | VALID when there is no expiry date or it is more than 30 days away; EXPIRING within 30 days; EXPIRED from the day after the expiry date | Today 10 Nov 2026: expiry 30 Nov 2026 → EXPIRING; 15 Jan 2027 → VALID; 09 Nov 2026 → EXPIRED |
 | Saving against the estimate | Per line with a winner: estimated = quantity × estimated unit price of the PR line; awarded = quantity × the winner's own latest unit price excluding VAT; amounts rounded half-up to 2 decimals. Saving = sum of estimated − sum of awarded; percent = saving ÷ sum of estimated × 100, rounded half-up to 1 decimal. Cancelled lines and lines without a winner are excluded; internal users only (RFQ-10) | Estimated 80,000.00, awarded 74,500.00 → saving 5,500.00 AZN = 6.9 %; awarded above the estimate → "Over estimate", amount with a plus sign |
 | Time left on a deadline | Deadline − server time. 24 hours or more: days and hours; under 24 hours: hours and minutes (amber); under 1 hour: minutes (at least 1); 0 or less: "Deadline passed". The device clock is never used (RFQ-11) | 52 h 10 min → "2 days 4 hours"; 5 h 12 min → "5 h 12 min"; 42 min → "42 min"; 0 → "Deadline passed" |
+| Receipt fingerprint | First 16 characters of the SHA-256 of the submitted data (sourcing, vendor, round, lines, terms, file names) as canonical JSON with a fixed key order and prices with two decimals; capitals, groups of four (RFQ-12) | Same data → same fingerprint; unit price 33.04 → 33.05 → a different fingerprint |
 | Years in business | Full years between the founding date and today | Founded 15 Mar 2012, today 10 Nov 2026 → 14 years |
 
 ## Demo Scenario Data

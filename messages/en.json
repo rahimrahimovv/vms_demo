@@ -1100,6 +1100,41 @@
       "committed": "Committed = PRs pending approval, approved, in sourcing or completed."
     }
   },
+  "receipt": {
+    "title": "Proposal receipt",
+    "pdfGenerated": "e-Procurement proposal receipt",
+    "sourcing": "Sourcing",
+    "category": "Category",
+    "vendor": "Vendor",
+    "taxNumber": "Tax number",
+    "submitted": "Submitted",
+    "round": "Round",
+    "rounds": {
+      "1": "First offer",
+      "2": "Final offer"
+    },
+    "linesTitle": "Priced lines",
+    "item": "Item",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price (as entered)",
+    "vat": "VAT basis",
+    "vatIncluded": "Incl. {rate}%",
+    "vatExcluded": "Excl. {rate}%",
+    "lineTotal": "Line total",
+    "termsTitle": "Terms",
+    "incoterm": "Incoterm",
+    "namedPlace": "Named place",
+    "deliveryMode": "Delivery mode",
+    "paymentTerm": "Payment term",
+    "deliveryDays": "Delivery days",
+    "validityDays": "Validity (days)",
+    "filesTitle": "Attached files",
+    "noFiles": "No files attached",
+    "fingerprint": "Fingerprint",
+    "fingerprintNote": "Identifies the data you submitted. If any price, term or file changes, the fingerprint changes.",
+    "download": "Download receipt (PDF)",
+    "downloading": "Preparing the receipt..."
+  },
   "deadline": {
     "closes": "Closes in {value}",
     "finalOffer": "Final offer closes in {value}",

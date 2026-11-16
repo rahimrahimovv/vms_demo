@@ -4,6 +4,7 @@ import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { formatAmount, formatDate, formatDateTime } from "@/lib/format";
 import { DeadlineCountdown } from "@/components/deadline-countdown";
+import { DownloadPdf } from "@/components/download-pdf";
 import { NoAccess } from "@/components/no-access";
 import { RecordHeader } from "@/components/record-header";
 import { DecisionPanel } from "@/components/decision-panel";
@@ -102,7 +103,18 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
     (rows ?? []).filter((r) => r.is_active || value(r) === current).map((r) => ({ value: value(r), label: label(r) }));
   const name = (rows: { id: string; name: string }[] | null, key: string) => rows?.find((r) => r.id === key)?.name ?? "";
 
-  const actions =
+  // RFQ-12: the receipt while the proposal is SUBMITTED (also right after Submit, when the page reloads)
+  const receiptButton =
+    proposal?.status === "SUBMITTED" ? (
+      <DownloadPdf
+        href={`/api/proposals/${proposal.id}/receipt`}
+        fileName={`${view.number}-receipt.pdf`}
+        label={t("receipt.download")}
+        busyLabel={t("receipt.downloading")}
+        testId="download-receipt"
+      />
+    ) : null;
+  const answerPanel =
     view.invitationStatus === "INVITED" && open ? (
       <DecisionPanel
         action={answerInvitation.bind(null, id)}
@@ -111,6 +123,13 @@ export default async function VendorInvitationPage({ params }: PageProps<"/vendo
           { value: "DECLINE", label: t("invitations.decline"), variant: "outline", comment: "required", commentLabel: t("decision.reason") },
         ]}
       />
+    ) : null;
+  const actions =
+    answerPanel || receiptButton ? (
+      <div className="flex items-start gap-3">
+        {answerPanel}
+        {receiptButton}
+      </div>
     ) : undefined;
 
   return (

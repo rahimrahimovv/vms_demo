@@ -9,7 +9,20 @@ import { Button } from "@/components/ui/button";
  * Download button for the minutes PDF. It fetches the file so a failure shows "The PDF could not be generated,
  * try again" next to the button instead of leaving the page (CMT-03 AC3; Flow "PDF generation").
  */
-export function DownloadPdf({ href, fileName }: { href: string; fileName: string }) {
+export function DownloadPdf({
+  href,
+  fileName,
+  label,
+  busyLabel,
+  testId = "download-pdf",
+}: {
+  href: string;
+  fileName: string;
+  /** Button texts; the minutes texts when omitted. */
+  label?: string;
+  busyLabel?: string;
+  testId?: string;
+}) {
   const t = useTranslations();
   const [state, setState] = useState<"idle" | "busy" | "failed">("idle");
 
@@ -34,9 +47,9 @@ export function DownloadPdf({ href, fileName }: { href: string; fileName: string
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <Button onClick={download} disabled={state === "busy"} data-testid="download-pdf">
+      <Button onClick={download} disabled={state === "busy"} data-testid={testId}>
         <Download className="size-4" aria-hidden />
-        {state === "busy" ? t("minutes.downloading") : t("minutes.download")}
+        {state === "busy" ? (busyLabel ?? t("minutes.downloading")) : (label ?? t("minutes.download"))}
       </Button>
       {state === "failed" && (
         <p role="alert" className="text-xs font-medium text-destructive" data-testid="pdf-error">
