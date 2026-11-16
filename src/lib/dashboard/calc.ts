@@ -1,4 +1,6 @@
 import { roundHalfUp } from "@/lib/sourcing/saving";
+import { canAccess, type SectionKey } from "@/lib/auth/sections";
+import type { Role } from "@/lib/auth/roles";
 
 /**
  * PLT-04 dashboard: the shape of public.dashboard_summary and the small calculations behind it. The database is the
@@ -14,6 +16,22 @@ export function parsePeriod(value: string | string[] | undefined): Period {
   return (PERIODS as readonly string[]).includes(v ?? "") ? (v as Period) : DEFAULT_PERIOD;
 }
 
+/** Needs action (PLT-04 AC6): company-wide counts, the same for the four roles; a link only where the role may open the list. */
+export type NeedsKey = "registrations" | "requisitionsToApprove" | "posToApprove" | "sourcingsBelowMinimum" | "votesOpen";
+export const NEEDS_ACTION: Record<NeedsKey, { href: string; section: SectionKey }> = {
+  registrations: { href: "/vendors", section: "vendors" },
+  requisitionsToApprove: { href: "/requisitions?tab=toApprove", section: "requisitions" },
+  posToApprove: { href: "/purchase-orders", section: "purchaseOrders" },
+  sourcingsBelowMinimum: { href: "/sourcing", section: "sourcing" },
+  votesOpen: { href: "/decisions", section: "decisions" },
+};
+
+/** The link of a Needs action row for these roles, or null when none of them may open the list. */
+export function needsActionHref(key: NeedsKey, roles: readonly Role[]): string | null {
+  const target = NEEDS_ACTION[key];
+  return canAccess(roles, target.section) ? target.href : null;
+}
+
 export type StageKey = "draft" | "open" | "evaluation" | "committee" | "awarded" | "completed" | "cancelled";
 
 export type DashboardSummary = {
@@ -26,7 +44,7 @@ export type DashboardSummary = {
   categories: { name: string; awarded: number; inProgress: number }[];
   grades: { a: number; b: number; c: number; d: number; notGraded: number; total: number; expiringCertificates: number };
   topVendors: { name: string; awards: number; awarded: number }[];
-  needsAction: { key: string; count: number }[];
+  needsAction: { key: NeedsKey; count: number }[];
   committee: { approved: number; rejected: number; noDecision: number; eligible: number; cast: number };
 };
 

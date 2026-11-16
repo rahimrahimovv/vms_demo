@@ -142,26 +142,72 @@ describe("PLT-04 figures", () => {
   });
 });
 
-describe("PLT-04 Needs action equals My tasks", () => {
-  it("the Specialist's counts equal the My tasks cards, key by key, in the same order", async () => {
-    const user = { id: ids.specialist, roles: ["PROCUREMENT_SPECIALIST"] };
-    const tasks = await loadTasks(clients.specialist, user);
+describe("PLT-04 AC6 Needs action is company-wide and the same for all four roles", () => {
+  const KEYS = ["registrations", "requisitionsToApprove", "posToApprove", "sourcingsBelowMinimum", "votesOpen"];
+  const count = async (sql: string) => Number((await db.query(sql)).rows[0].n);
+
+  it("the five counts equal independent queries over the whole company, in the same order", async () => {
+    const expected = [
+      await count("select count(*)::int n from public.vendor where status = 'SUBMITTED'"),
+      await count("select count(*)::int n from public.requisition where status = 'PENDING_APPROVAL'"),
+      await count("select count(*)::int n from public.purchase_order where status = 'PENDING_APPROVAL'"),
+      await count("select count(*)::int n from public.sourcing where status = 'CLOSED'"),
+      await count("select count(*)::int n from public.decision where status = 'VOTING'"),
+    ];
     const { data } = await summary("specialist", "90d");
-    expect(data!.needsAction.map((n) => n.key)).toEqual(taskKeysFor(user.roles));
-    expect(data!.needsAction).toEqual(tasks.map((t) => ({ key: t.key, count: t.count })));
+    expect(data!.needsAction.map((n) => n.key)).toEqual(KEYS);
+    expect(data!.needsAction.map((n) => n.count)).toEqual(expected);
   });
 
-  it("the same holds for the Approver and the Committee Member", async () => {
-    for (const [who, roles] of [["approver", ["APPROVER"]], ["committee", ["COMMITTEE_MEMBER"]]] as const) {
-      const user = { id: ids[who], roles: [...roles] };
-      const tasks = await loadTasks(clients[who], user);
-      const { data } = await summary(who, "all");
-      expect(data!.needsAction, who).toEqual(tasks.map((t) => ({ key: t.key, count: t.count })));
+  it("is identical for the Approver, the Specialist, the Committee Member and the Admin", async () => {
+    const [a, s, c, d] = await Promise.all((["approver", "specialist", "committee", "admin"] as const).map(async (who) => (await summary(who, "30d")).data!.needsAction));
+    expect(s).toEqual(a);
+    expect(s).toEqual(c);
+    expect(s).toEqual(d);
+  });
+
+  it("the Specialist's counts equal My tasks where it is the same thing (registrations); the others are at least the personal count", async () => {
+    const user = { id: ids.specialist, roles: ["PROCUREMENT_SPECIALIST"] };
+    const mine = Object.fromEntries((await loadTasks(clients.specialist, user)).map((t) => [t.key, t.count]));
+    const dash = Object.fromEntries((await summary("specialist")).data!.needsAction.map((n) => [n.key, n.count]));
+    expect(dash.registrations).toBe(mine.registrations);
+    expect(dash.sourcingsBelowMinimum).toBeGreaterThanOrEqual(mine.sourcingsBelowMinimum); // My tasks: the user's own sourcings
+  });
+
+  it("the Approver and the Committee Member see at least their personal My tasks counts (those exclude own items)", async () => {
+    const approver = Object.fromEntries((await loadTasks(clients.approver, { id: ids.approver, roles: ["APPROVER"] })).map((t) => [t.key, t.count]));
+    const committee = Object.fromEntries((await loadTasks(clients.committee, { id: ids.committee, roles: ["COMMITTEE_MEMBER"] })).map((t) => [t.key, t.count]));
+    const dash = Object.fromEntries((await summary("approver")).data!.needsAction.map((n) => [n.key, n.count]));
+    expect(dash.posToApprove).toBeGreaterThanOrEqual(approver.posToApprove);
+    expect(dash.requisitionsToApprove).toBeGreaterThanOrEqual(approver.prsToApprove);
+    expect(dash.votesOpen).toBeGreaterThanOrEqual(committee.votesWaiting);
+  });
+});
+
+describe("PLT-04 cycle time", () => {
+  it("is computed from the business timestamps (requisition approved_at, order released_at), not from audit rows", async () => {
+    const sql = await db.query(`
+      select round(avg(extract(epoch from (po.released_at - rq.approved_at)) / 86400)::numeric, 1)::float8 as days, count(*)::int as n
+        from public.purchase_order po
+        join public.requisition rq on rq.id = app.sourcing_requisition(po.sourcing_id)
+       where po.released_at is not null and rq.approved_at is not null`);
+    const { data } = await summary("admin", "all");
+    expect(data!.cycle.orders).toBe(sql.rows[0].n);
+    expect(data!.cycle.days).toBe(sql.rows[0].days);
+  });
+
+  it("the timestamps are stamped when the status changes (a transaction that is rolled back)", async () => {
+    await db.query("begin");
+    try {
+      const r = (await db.query("select id from public.requisition where status = 'APPROVED' limit 1")).rows[0];
+      if (!r) return;
+      await db.query("update public.requisition set approved_at = null where id = $1", [r.id]);
+      await db.query("update public.requisition set status = 'IN_SOURCING' where id = $1", [r.id]);
+      await db.query("update public.requisition set status = 'APPROVED' where id = $1", [r.id]);
+      expect((await db.query("select approved_at is not null as ok from public.requisition where id = $1", [r.id])).rows[0].ok).toBe(true);
+    } finally {
+      await db.query("rollback");
     }
-  });
-
-  it("the Admin has no task cards", async () => {
-    expect((await summary("admin")).data!.needsAction).toEqual([]);
   });
 });
 

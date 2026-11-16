@@ -8,7 +8,10 @@ const LEYLA = EMAIL.requester;
 const RASHAD = EMAIL.approver;
 
 export type Line = { item: number; qty: number; price: number };
-export type Ctx = { w: World; plan: Record<string, string>; prs: Record<string, string>; sourcings: Record<string, string> };
+export type Ctx = { w: World; plan: Record<string, string>; prs: Record<string, string>; sourcings: Record<string, string>; released?: number };
+
+/** Days from the approval of a requisition to the release of its order, one per story that has a released order (6 to 14, average 9). */
+const APPROVAL_TO_RELEASE_DAYS = [8, 10, 7, 11, 9, 12, 6, 13, 14];
 
 const vendorMail = (w: World, key: string) => {
   const v = w.vendors.get(key);
@@ -153,7 +156,14 @@ async function expect(w: World, table: "sourcing" | "requisition" | "purchase_or
 
 /** The PR and the sourcing of a story are moved into the past together (the sourcing a day later than its PR). */
 async function age(ctx: Ctx, key: string, pr: string, sourcing: string | null, days: number) {
-  await backdate(ctx.w, "requisition", pr, days);
+  // a story with a released order gets a realistic gap between the requisition approval and the release: the requisition
+  // side is moved further back (second offset of app.demo_backdate); the sourcing, its order and the audit trail keep their times
+  let extra = 0;
+  if (sourcing && (await ctx.w.db.query("select 1 from public.purchase_order where sourcing_id = $1 and released_at is not null limit 1", [sourcing])).rowCount) {
+    extra = APPROVAL_TO_RELEASE_DAYS[(ctx.released ?? 0) % APPROVAL_TO_RELEASE_DAYS.length] - 1; // the sourcing is moved days - 1, the PR days + extra
+    ctx.released = (ctx.released ?? 0) + 1;
+  }
+  await backdate(ctx.w, "requisition", pr, days, 0, extra);
   if (sourcing) await backdate(ctx.w, "sourcing", sourcing, days - 1);
   ctx.prs[key] = pr;
   if (sourcing) ctx.sourcings[key] = sourcing;

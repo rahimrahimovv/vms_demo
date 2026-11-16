@@ -11,7 +11,7 @@ import { DashboardView, PeriodControl } from "@/components/dashboard/dashboard-v
  * The period travels in the query string, so it survives a reload.
  */
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
-  const { allowed } = await checkSection("dashboard");
+  const { user, allowed } = await checkSection("dashboard");
   if (!allowed) return <NoAccess />;
 
   const period = parsePeriod((await searchParams).period);
@@ -29,7 +29,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </div>
         <PeriodControl period={period} />
       </div>
-      <DashboardView data={summary} />
+      <DashboardView data={summary} roles={user.roles} />
     </div>
   );
 }

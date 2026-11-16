@@ -139,8 +139,19 @@ export async function attach(
 }
 
 /** Moves a closed story into the past (app.demo_backdate: guarded by demo_flag, owner connection only). */
-export async function backdate(w: World, rootType: "requisition" | "sourcing" | "vendor", id: string, days: number, hours = 0): Promise<void> {
-  await w.db.query("select app.demo_backdate($1, $2, ($3::int * interval '1 day') + ($4::int * interval '1 hour'))", [rootType, id, days, hours]);
+export async function backdate(
+  w: World,
+  rootType: "requisition" | "sourcing" | "vendor",
+  id: string,
+  days: number,
+  hours = 0,
+  /** Only for a requisition: a second offset that moves the requisition side further back (approval to release gap). */
+  requisitionExtraDays = 0,
+): Promise<void> {
+  await w.db.query(
+    "select app.demo_backdate($1, $2, ($3::int * interval '1 day') + ($4::int * interval '1 hour'), $5::int * interval '1 day')",
+    [rootType, id, days, hours, requisitionExtraDays],
+  );
 }
 
 /** The jobs pg_cron runs every minute (the app's own functions), run at once. */

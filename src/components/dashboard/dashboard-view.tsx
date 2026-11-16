@@ -2,13 +2,14 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { price } from "@/lib/sourcing/comparison";
-import { TASK_HREF, type TaskKey } from "@/lib/home/tasks";
+import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 import {
   PERIODS,
   barPercent,
   compactAmount,
   donutArcs,
+  needsActionHref,
   participation,
   type DashboardSummary,
   type Period,
@@ -85,9 +86,8 @@ export function PeriodControl({ period }: { period: Period }) {
 }
 
 /** Four tiles and six cards. Bars are CSS, the donut is SVG; every chart prints its numbers and carries an aria-label. */
-export function DashboardView({ data }: { data: DashboardSummary }) {
+export function DashboardView({ data, roles }: { data: DashboardSummary; roles: readonly Role[] }) {
   const t = useTranslations("dashboard");
-  const tHome = useTranslations("home");
   const noData = t("noData");
   const dash = "–";
 
@@ -266,7 +266,7 @@ export function DashboardView({ data }: { data: DashboardSummary }) {
       </Panel>
 
       <Panel testId="card-needs-action" className="col-span-4" title={t("needsAction.title")}>
-        {needsAction.length === 0 ? (
+        {needsAction.every((n) => n.count === 0) ? (
           <p className="py-6 text-center text-sm text-muted-foreground" data-testid="needs-action-none">{t("needsAction.none")}</p>
         ) : (
           <ul className="flex flex-col">
@@ -275,8 +275,12 @@ export function DashboardView({ data }: { data: DashboardSummary }) {
                 <span className="flex h-7 min-w-[34px] items-center justify-center rounded-[14px] bg-[rgba(62,120,194,0.16)] font-bold text-[#143A68] tabular-nums" data-testid="needs-action-count">
                   {n.count}
                 </span>
-                <span className="flex-1 font-medium">{tHome(`cardLabels.${n.key as TaskKey}`)}</span>
-                <Link href={TASK_HREF[n.key as TaskKey]} className="text-xs font-semibold text-primary hover:underline">{t("needsAction.open")}</Link>
+                <span className="flex-1 font-medium">{t(`needsAction.labels.${n.key}`)}</span>
+                {needsActionHref(n.key, roles) && (
+                  <Link href={needsActionHref(n.key, roles)!} className="text-xs font-semibold text-primary hover:underline" aria-label={`${t("needsAction.open")}: ${t(`needsAction.labels.${n.key}`)}`}>
+                    {t("needsAction.open")}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

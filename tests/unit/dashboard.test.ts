@@ -8,6 +8,7 @@ import {
   donutArcs,
   gradeCounts,
   inPeriod,
+  needsActionHref,
   parsePeriod,
   participation,
   periodStart,
@@ -102,5 +103,15 @@ describe("PLT-04 dashboard calculations", () => {
     expect(arcs.reduce((s, a) => s + a.dash, 0)).toBeCloseTo(2 * Math.PI * 42, 6);
     expect(arcs[1].offset).toBeCloseTo(-arcs[0].dash, 6);
     expect(donutArcs([0, 0], 42).every((a) => a.dash === 0)).toBe(true);
+  });
+
+  it("Needs action links only to lists the role may open", () => {
+    // Approver: no vendor cards, no sourcing list; Admin and Specialist: all five; Committee Member: no requisitions
+    expect(("registrations requisitionsToApprove posToApprove sourcingsBelowMinimum votesOpen".split(" ") as never[]).map((k) => needsActionHref(k, ["APPROVER"]))).toEqual([null, "/requisitions?tab=toApprove", "/purchase-orders", null, "/decisions"]);
+    for (const role of ["ADMIN", "PROCUREMENT_SPECIALIST"] as const) {
+      expect(("registrations requisitionsToApprove posToApprove sourcingsBelowMinimum votesOpen".split(" ") as never[]).map((k) => needsActionHref(k, [role])).every(Boolean), role).toBe(true);
+    }
+    expect(needsActionHref("requisitionsToApprove", ["COMMITTEE_MEMBER"])).toBeNull();
+    expect(needsActionHref("registrations", ["COMMITTEE_MEMBER"])).toBe("/vendors");
   });
 });

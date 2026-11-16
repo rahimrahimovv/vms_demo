@@ -1202,6 +1202,13 @@
     },
     "needsAction": {
       "title": "Needs action",
+      "labels": {
+        "registrations": "Registrations to review",
+        "requisitionsToApprove": "Requisitions to approve",
+        "posToApprove": "Purchase orders to approve",
+        "sourcingsBelowMinimum": "Sourcings below the minimum",
+        "votesOpen": "Committee votes still open"
+      },
       "open": "Open",
       "none": "Nothing needs your action."
     },
