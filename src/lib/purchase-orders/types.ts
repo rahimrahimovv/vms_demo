@@ -2,6 +2,8 @@
  * What the database functions public.po_view, public.po_list and the PO decision package return (PO-01..PO-03).
  * Amounts are AZN as JSON numbers; unit prices exclude VAT and never include the extra costs of RFQ-07.
  */
+import type { Saving } from "@/lib/sourcing/saving";
+
 export type PoStatus =
   | "PENDING_APPROVAL"
   | "PENDING_COMMITTEE"
@@ -46,6 +48,8 @@ export type PoView = PoBody & {
   requesterId: string | null;
   winnerMinutes: { id: string; number: string } | null;
   decision: { id: string; status: string } | null;
+  /** RFQ-10: set for internal readers only, never for a vendor. */
+  saving?: Saving | null;
 };
 
 export type PoListRow = {

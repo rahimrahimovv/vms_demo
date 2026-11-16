@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { SavingTable } from "@/components/sourcing/saving-panel";
 
 type Action = (prev: DecisionState, formData: FormData) => Promise<DecisionState>;
 
@@ -155,6 +156,10 @@ export function ComparisonView({
         </div>
         <p className="border-t bg-muted/50 px-5 py-3 text-xs text-muted-foreground">{t("footer")}</p>
       </section>
+
+      {data.saving && data.saving.lines.length > 0 && (
+        <SavingTable saving={data.saving} names={new Map(data.lines.map((l) => [l.id, l.item]))} />
+      )}
 
       <div className="flex flex-wrap gap-4">
         <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-glass px-[18px] py-4" data-testid="po-preview">

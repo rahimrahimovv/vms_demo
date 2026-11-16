@@ -11,7 +11,7 @@ e-Procurement is a generic, 1C-free procurement platform; this backlog covers th
 ### Backlog Hierarchy
 
 ```
-E-PROCUREMENT (Epic) - E2E procurement MVP, 34 stories
+E-PROCUREMENT (Epic) - E2E procurement MVP, 38 stories
 ├── PLT  Platform
 │   ├── PLT-01  Sign in and see only your role's screens
 │   ├── PLT-02  Get in-app notifications; keep an audit trail
@@ -42,7 +42,8 @@ E-PROCUREMENT (Epic) - E2E procurement MVP, 34 stories
 │   ├── RFQ-06  Specialist runs a Single Source Purchase (SSP)
 │   ├── RFQ-07  Specialist adds extra costs (landed price)
 │   ├── RFQ-08  Specialist requests a final (discounted) offer
-│   └── RFQ-09  Specialist closes a sourcing early
+│   ├── RFQ-09  Specialist closes a sourcing early
+│   ├── RFQ-10  Internal users see the saving against the estimate
 ├── CMT  Committee
 │   ├── CMT-01  Admin configures the committee
 │   ├── CMT-02  Committee votes on a winner or a PO decision
@@ -792,6 +793,33 @@ TBD
 
 ---
 
+### RFQ-10 - Internal Users See The Saving Against The Estimate
+
+| Field | Value |
+| --- | --- |
+| **Story ID** | RFQ-10 |
+| **Story title** | The system shows, to internal users only, how far the awarded value is below the PR estimate. |
+
+**Story Description**
+
+|  |  |
+| --- | --- |
+| **As a...** | Procurement Specialist, Committee Member, Admin (and the Approver on the purchase order) |
+| **I want to...** | see the estimate, the winning price and the saving for every awarded line and for the whole sourcing |
+| **So that...** | the value of the buying is visible at the decision and afterwards |
+
+**Acceptance Criteria** (Given / When / Then)
+
+1. **Given** a sourcing in COMPARISON, **When** the owner (or a committee member or the Admin) opens the comparison, **Then** below the price table each line with a winner shows the estimate (quantity × estimated unit price of the PR line), the winner's price (quantity × the vendor's own latest unit price excluding VAT) and the difference, and a footer shows the estimated value, the awarded value, the saving amount and the saving percent; cancelled lines and lines without a winner are not counted.
+2. **Given** a winner whose price is above the estimate, **When** the saving is shown, **Then** the line (and the total) shows an amber "Over estimate" chip and the amount with a plus sign.
+3. **Given** the owner sends the winner proposal to the committee, **When** the package is frozen, **Then** the saving is stored inside the package and shown unchanged to the committee.
+4. **Given** a purchase order, **When** an internal user opens it (the Approver sees the saving on the order only), **Then** the order shows the saving of its own lines.
+5. **Given** the sourcing list, **When** a sourcing is WINNER\_APPROVED or COMPLETED, **Then** the Saving column shows the amount and percent, and a dash for every other status.
+6. **Given** any vendor (invitation view, proposal, final offer, purchase order view, purchase order PDF, notification or export), **When** it reads its data, **Then** the estimate and the saving are never returned; a function that a vendor can call does not contain them.
+7. **Given** the backlog example (estimated 80,000.00 AZN, awarded 74,500.00 AZN), **When** the saving is computed, **Then** it is 5,500.00 AZN = 6.9 %.
+
+---
+
 ### CMT-01 - Admin Configures The Committee
 
 | Field | Value |
@@ -1135,6 +1163,7 @@ Six roles act in the scenario; separation of duties blocks self-approval at ever
 | View minutes | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Manage users, catalogue, categories, dictionaries, settings, committee | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 | Approve the opening of tender bids | ❌ | ❌ | ❌ | ✅ (not the sourcing owner) | ❌ | ❌ |
+| See the estimate and the saving against it (comparison, package, purchase order, sourcing list) | ✅ (purchase order) | ✅ (purchase order only) | ✅ | ✅ | ✅ | ❌ |
 | Add extra costs; request a final offer | ❌ | ❌ | ✅ (owner) | ❌ | ❌ | ❌ |
 | Submit a final offer | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (if chosen) |
 | Keep own company profile, owners, brands and certificates | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -1398,6 +1427,7 @@ Every number the system computes follows one of these rules; the examples are th
 | Default deadlines | Publish time + 3 days (RFQ, SSP) or + 14 days (Tender); final offer + 2 days; all Admin settings, the specialist may change them; a prefilled deadline the specialist did not change is recalculated from the publish time | Tender published Mon 16 Nov 2026 10:00 → deadline Mon 30 Nov 2026 10:00 |
 | Deadline reminder | Sent once, 24 hours before the deadline, to invited vendors that have neither declined nor submitted | Deadline Mon 30 Nov 2026 10:00 → reminder Sun 29 Nov 2026 10:00 |
 | Certificate status | VALID when there is no expiry date or it is more than 30 days away; EXPIRING within 30 days; EXPIRED from the day after the expiry date | Today 10 Nov 2026: expiry 30 Nov 2026 → EXPIRING; 15 Jan 2027 → VALID; 09 Nov 2026 → EXPIRED |
+| Saving against the estimate | Per line with a winner: estimated = quantity × estimated unit price of the PR line; awarded = quantity × the winner's own latest unit price excluding VAT; amounts rounded half-up to 2 decimals. Saving = sum of estimated − sum of awarded; percent = saving ÷ sum of estimated × 100, rounded half-up to 1 decimal. Cancelled lines and lines without a winner are excluded; internal users only (RFQ-10) | Estimated 80,000.00, awarded 74,500.00 → saving 5,500.00 AZN = 6.9 %; awarded above the estimate → "Over estimate", amount with a plus sign |
 | Years in business | Full years between the founding date and today | Founded 15 Mar 2012, today 10 Nov 2026 → 14 years |
 
 ## Demo Scenario Data
@@ -1478,6 +1508,7 @@ This section records the decisions confirmed by the Business Analyst, the assump
 | D-023 | Resetting and loading demo data are commands run by a developer (npm run demo:reset and npm run demo:load) against a database whose demo flag is on, with a typed confirmation; they are not buttons in the app. Fill sample is a later addition | DEMO-02, DEMO-03 |
 | D-024 | The app has no demo tools: no demo access page, demo bar, Switch user, Lock or End deadline now, and no endpoint or action that signs in as another user without a password. Demo data is reset and loaded only by the developer commands of D-023 | DEMO-01 (withdrawn), DEMO-02, DEMO-03 |
 | D-025 | The Procurement Specialist who owns an OPEN sourcing may close it before its deadline when every invited vendor has answered (a submitted proposal or a declined invitation); a reason is required and the audit trail keeps it with the original deadline. This replaces the demo tool "End deadline now", which is removed | RFQ-09, DEMO-01 |
+| D-026 | Saving against the estimate (RFQ-10), the time left on every deadline (RFQ-11) and the vendor's proposal receipt (RFQ-12) are added. The estimate and the saving are internal: no vendor function, page, PDF, notification or export may return them. The receipt belongs to the owning vendor only and holds no estimate and no other vendor's data | RFQ-10, RFQ-11, RFQ-12 |
 
 **Assumptions in force**
 

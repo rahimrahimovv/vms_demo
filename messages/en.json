@@ -1100,6 +1100,20 @@
       "committed": "Committed = PRs pending approval, approved, in sourcing or completed."
     }
   },
+  "saving": {
+    "title": "Saving against the estimate",
+    "hint": "AZN, excluding VAT · only lines that have a winner · the estimate and the saving are never shown to vendors",
+    "line": "Line",
+    "estimateCol": "Estimate",
+    "winnerCol": "Winner's price",
+    "differenceCol": "Difference",
+    "estimated": "Estimated value",
+    "awarded": "Awarded value",
+    "amount": "Saving",
+    "overAmount": "Above the estimate",
+    "percent": "Saving, %",
+    "over": "Over estimate"
+  },
   "sourcing": {
     "title": "Sourcing",
     "empty": "No sourcing yet. Start one from an approved PR.",
@@ -1123,6 +1137,7 @@
       "deadline": "Deadline",
       "owner": "Owner",
       "proposals": "Proposals",
+      "saving": "Saving",
       "status": "Status"
     },
     "types": {

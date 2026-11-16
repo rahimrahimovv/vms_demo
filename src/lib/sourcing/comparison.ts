@@ -2,6 +2,8 @@
  * The comparison document returned by public.sourcing_comparison and frozen in decision.package (RFQ-05 AC3,
  * RFQ-07, RFQ-08 AC5, CMT-02 AC2). Numbers arrive as JSON numbers; amounts are AZN excluding VAT.
  */
+import type { Saving } from "./saving";
+
 export type ComparisonCost = { id: string; type: "CUSTOMS" | "DELIVERY" | "INSURANCE" | "OTHER"; amount: number; note: string | null };
 
 export type ComparisonCell = {
@@ -93,6 +95,8 @@ export type Comparison = {
   committeeComments: { name: string; vote: string; comment: string }[];
   /** Set only in a frozen committee package. */
   frozenAt?: string;
+  /** RFQ-10: absent in packages frozen before the saving existed. Internal users only. */
+  saving?: Saving;
 };
 
 /** Amount without the currency, as in the table cells ("27.50"). */

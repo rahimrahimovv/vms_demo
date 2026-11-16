@@ -11,6 +11,8 @@ import { HistoryTab } from "@/components/history-tab";
 import { DownloadPdf } from "@/components/download-pdf";
 import { DecisionPanel, type DecisionOption } from "@/components/decision-panel";
 import { PoBodyView } from "@/components/po/po-body";
+import { SavingSummary } from "@/components/sourcing/saving-panel";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { decidePo } from "../actions";
@@ -135,6 +137,14 @@ export default async function PurchaseOrderPage({ params }: PageProps<"/purchase
               </>
             }
           />
+          {po.saving && po.saving.lines.length > 0 && (
+            <Card className="mt-5" data-testid="po-saving">
+              <CardContent className="flex flex-col gap-2">
+                <h3 className="text-base font-semibold">{t("saving.title")}</h3>
+                <SavingSummary saving={po.saving} />
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
         <TabsContent value="history" className="pt-4">
           <HistoryTab recordType="purchase_order" recordId={po.id} />

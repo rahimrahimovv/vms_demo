@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { formatAmount, formatDateTime } from "@/lib/format";
+import { formatPercent } from "@/lib/sourcing/saving";
+import { ToneChip } from "@/components/status-badge";
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
 import { StatusBadge } from "@/components/status-badge";
@@ -42,6 +44,15 @@ export default async function SourcingListPage() {
     ),
   );
 
+  // RFQ-10: the saving of WINNER_APPROVED and COMPLETED sourcings, for those who may read bids (empty otherwise)
+  const savingRows = ((await supabase.rpc("sourcing_savings")).data ?? []) as {
+    sourcing_id: string;
+    saving: number | string;
+    percent: number | string;
+    over: boolean;
+  }[];
+  const savings = new Map(savingRows.map((r) => [r.sourcing_id, r]));
+
   const rows: Row[] = sourcings.map((s, i) => ({
     id: s.id,
     cells: {
@@ -60,6 +71,18 @@ export default async function SourcingListPage() {
       proposals: {
         sort: counts[i] ?? -1,
         node: counts[i] === null ? t("common.none") : t("sourcing.proposalsOf", { count: counts[i] ?? 0, minimum: s.min_proposals }),
+      },
+      saving: {
+        sort: savings.has(s.id) ? Number(savings.get(s.id)?.saving) : Number.NEGATIVE_INFINITY,
+        node: savings.has(s.id) ? (
+          <span className="inline-flex items-center justify-end gap-2 tabular-nums" data-testid="sourcing-saving">
+            {savings.get(s.id)?.over && <ToneChip tone="amber">{t("saving.over")}</ToneChip>}
+            {savings.get(s.id)?.over ? "+" : ""}
+            {formatAmount(Math.abs(Number(savings.get(s.id)?.saving)))} ({formatPercent(Number(savings.get(s.id)?.percent))})
+          </span>
+        ) : (
+          t("common.none")
+        ),
       },
       status: { sort: s.status, node: <StatusBadge status={s.status} /> },
     },
@@ -85,6 +108,7 @@ export default async function SourcingListPage() {
             { key: "deadline", label: t("sourcing.columns.deadline") },
             { key: "owner", label: t("sourcing.columns.owner") },
             { key: "proposals", label: t("sourcing.columns.proposals") },
+            { key: "saving", label: t("sourcing.columns.saving"), align: "right" },
             { key: "status", label: t("sourcing.columns.status") },
           ]}
           rows={rows}
