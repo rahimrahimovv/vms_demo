@@ -237,7 +237,7 @@
   }
   html {
     @apply font-sans;
-    min-width: 1280px; /* desktop only */
+    min-width: 1240px; /* desktop only; 40 px under 1280 so a vertical scrollbar never causes a horizontal one */
   }
   body {
     @apply bg-background text-foreground;
