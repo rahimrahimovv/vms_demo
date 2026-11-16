@@ -757,7 +757,11 @@
     "reviewComment": "Review comment",
     "standingHistory": "Standing",
     "contacts": "Contact persons",
-    "summary": "Vendor summary",
+    "foundedLine": "Founded {date} ({years, plural, one {# year} other {# years}} in business)",
+    "alsoOwns": "Also owns {count, plural, one {# other vendor} other {# other vendors}}",
+    "showAllCount": "Show all ({count})",
+    "activityButton": "Activity ({count})",
+    "validityLeft": "{percent}% of the validity period left",
     "inBusiness": "In business",
     "years": "{years, plural, one {# year} other {# years}}",
     "qualification": "Qualification",
@@ -779,8 +783,6 @@
     },
     "reviewChangeRequest": "{count, plural, one {Review change request} other {Review change requests (#)}}",
     "banner": {
-      "title": "A change request for {section} is waiting",
-      "body": "Submitted on {date}. The current data stays in force until you decide.",
       "review": "Review"
     },
     "draft": "Registration not submitted yet",
@@ -791,7 +793,7 @@
       "certificates": "Certificates",
       "categories": "Categories",
       "documents": "Registration documents",
-      "details": "More details",
+      "company": "Company",
       "activity": "Activity"
     },
     "empty": {
@@ -801,7 +803,6 @@
       "certificates": "No certificates yet",
       "categories": "No categories yet",
       "documents": "No documents yet",
-      "details": "No more details yet",
       "activity": "No activity yet"
     },
     "sharedOwnerChip": "{owner} also owns {vendor}",

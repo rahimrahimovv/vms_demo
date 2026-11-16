@@ -14,17 +14,17 @@ import { FormField } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  ActivityCard,
+  ActivityButton,
+  AttentionStrip,
   BankAccountsCard,
   CategoriesCard,
   CertificatesCard,
-  ChangeRequestBanner,
+  CompanyCard,
   ContactsCard,
   DocumentsCard,
-  DraftNotice,
-  MoreDetailsCard,
   OwnersCard,
-  VendorRail,
+  QualificationCard,
+  VendorHeader,
   type OpenRequest,
   type OwnerShare,
 } from "@/components/vendor/vendor-card";
@@ -33,16 +33,15 @@ import { decideRegistration, reopenRegistration } from "./actions";
 const norm = (s: string) => s.trim().toUpperCase();
 
 /**
- * REG-06 AC7-AC8: the vendor card for PS, CM and Admin, one page: a summary rail on the left, the working cards on the right.
- * REG-02: the specialist decides on a SUBMITTED registration from the rail. Data, permissions and RLS are those of the
- * earlier tabbed page; only the layout changed.
+ * REG-06 AC7-AC8: the vendor card for PS, CM and Admin, one no-scroll page: a header strip with the actions, a "Needs attention"
+ * strip and three columns of compact cards; the history opens in a side panel. REG-02: the specialist decides on a SUBMITTED
+ * registration from the header. Data, permissions and RLS are those of the earlier tabbed page; only the layout changed.
  */
-export default async function VendorCardPage({ params, searchParams }: PageProps<"/vendors/[id]">) {
+export default async function VendorCardPage({ params }: PageProps<"/vendors/[id]">) {
   const { user, allowed } = await checkSection("vendors");
   if (!allowed) return <NoAccess />;
 
   const { id } = await params;
-  const { activity } = await searchParams;
   const t = await getTranslations();
   const supabase = await createClient();
   const today = bakuToday();
@@ -106,13 +105,12 @@ export default async function VendorCardPage({ params, searchParams }: PageProps
   const canReopen = isSpecialist && vendor.status === "REJECTED";
   const canReviewChange = isSpecialist && vendor.status === "APPROVED" && openRequests.length > 0;
 
-  // The same dialogs, messages and permissions as before; the buttons only sit in the rail now.
+  // The same dialogs, messages and permissions as before; the buttons sit in the header strip.
   const actions =
     canDecide || canReopen || canReviewChange || isSpecialist ? (
       <>
         {canDecide && (
           <DecisionPanel
-            stacked
             action={decideRegistration.bind(null, vendor.id)}
             options={[
               { value: "APPROVE", label: t("decision.approve"), comment: "none" },
@@ -126,7 +124,6 @@ export default async function VendorCardPage({ params, searchParams }: PageProps
             action={reopenRegistration.bind(null, vendor.id)}
             trigger={t("rejected.reopen")}
             triggerVariant="default"
-            triggerClassName="w-full"
             title={t("rejected.reopenTitle")}
             testId="reopen"
           >
@@ -136,7 +133,7 @@ export default async function VendorCardPage({ params, searchParams }: PageProps
           </ActionDialog>
         )}
         {canReviewChange && (
-          <Button asChild className="w-full">
+          <Button asChild>
             <Link
               href={openRequests.length === 1 ? `/change-requests/${openRequests[0].id}` : "/change-requests"}
               data-testid="review-change-request"
@@ -146,36 +143,32 @@ export default async function VendorCardPage({ params, searchParams }: PageProps
           </Button>
         )}
         {/* PLT-03 AC5: a Procurement Specialist resets the sign-in account of the vendor; an Admin cannot */}
-        {isSpecialist && <ResetPasswordButton vendorId={vendor.id} name={vendor.legal_name} className="w-full" />}
+        {isSpecialist && <ResetPasswordButton vendorId={vendor.id} name={vendor.legal_name} />}
       </>
     ) : null;
 
+  const reviewable = isSpecialist ? (openRequests[0] ?? null) : null;
+
+  // Three columns at 1400 px and wider; below that two, and the third column's cards flow under the others (the page may scroll).
   return (
-    <div className="flex items-start gap-4" data-testid="vendor-card">
-      <VendorRail
-        vendor={vendor}
-        attention={attention}
-        grade={grade}
-        brands={brands ?? []}
-        today={today}
-        categoryName={categoryName}
-        actions={actions}
-      />
-      <div className="flex min-w-0 flex-1 flex-col gap-(--density-gap)">
-        {vendor.status === "DRAFT" && <DraftNotice />}
-        {openRequests.map((r) => (
-          <ChangeRequestBanner key={r.id} request={r} canReview={isSpecialist} />
-        ))}
-        <div className="grid grid-cols-1 items-start gap-(--density-gap) min-[1400px]:grid-cols-2">
+    <div className="flex flex-col" data-testid="vendor-card">
+      <VendorHeader vendor={vendor} grade={grade} today={today} actions={actions} activity={<ActivityButton vendorId={vendor.id} />} />
+      <AttentionStrip attention={attention} categoryName={categoryName} isDraft={vendor.status === "DRAFT"} review={reviewable} />
+      <div className="grid grid-cols-2 items-start gap-3 min-[1400px]:grid-cols-3" data-testid="vendor-columns">
+        <div className="flex flex-col gap-3">
+          <QualificationCard vendor={vendor} grade={grade} />
+          <CompanyCard vendor={vendor} brands={brands ?? []} />
+        </div>
+        <div className="flex flex-col gap-3">
           <OwnersCard owners={owners} shares={shares} />
           <ContactsCard contacts={contacts} />
           <BankAccountsCard accounts={bankAccounts} />
+        </div>
+        <div className="col-span-2 grid grid-cols-2 items-start gap-3 min-[1400px]:col-span-1 min-[1400px]:grid-cols-1">
           <CertificatesCard certificates={certificates ?? []} today={today} />
           <CategoriesCard applications={applications ?? []} categoryName={categoryName} today={today} canOpen={isSpecialist} />
           <DocumentsCard files={files} />
-          <MoreDetailsCard vendor={vendor} />
         </div>
-        <ActivityCard vendorId={vendor.id} showAll={activity === "all"} />
       </div>
     </div>
   );
