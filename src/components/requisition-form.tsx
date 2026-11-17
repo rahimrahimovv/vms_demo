@@ -114,7 +114,7 @@ export function RequisitionForm({
         </div>
         {!plan && <p className="text-sm text-muted-foreground">{t("requisitions.pickPlanLineFirst")}</p>}
         {lines.length === 0 && (
-          <p className="surface-glass border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+          <p className="surface-card border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
             {t("requisitions.noLines")}
           </p>
         )}

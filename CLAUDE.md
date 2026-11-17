@@ -1,7 +1,7 @@
 # e-Procurement: rules for Claude Code
 
-e-Procurement is a generic, 1C-free procurement platform. The product is called e-Procurement; the look is the Midnight Navy palette in the
-light glass style (see Design). This repo holds the MVP for the management demo (date to confirm, Q-003).
+e-Procurement is a generic, 1C-free procurement platform. The product is called e-Procurement; the look is the Midnight Navy palette in
+solid surfaces, no glass effect (see Design). This repo holds the MVP for the management demo (date to confirm, Q-003).
 The single source of truth for scope and acceptance criteria is `docs/backlog.md` (39 stories, Given/When/Then).
 If this file and the backlog disagree, the backlog wins; ask the BA.
 Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are in the backlog section "Decisions, Assumptions And Open Questions".
@@ -33,7 +33,7 @@ Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are 
 
 ## Design
 - UI kit: shadcn/ui on Tailwind, lucide icons, Inter font. Clean enterprise look.
-- Colors: light glass surfaces on a pale blue page, one brand colour (Midnight Navy #1D4E89), neutral greys.
+- Colors: solid white surfaces on a flat pale blue page (#E8EEF6), one brand colour (Midnight Navy #1D4E89), neutral greys.
 - Layout: floating left sidebar (logo "e-Procurement", menu by role), top bar (page title,
   bell with unread count, user name and role). Demo bar slot above the top bar.
 - Home page for every role = "My tasks": cards with counts of items waiting for
@@ -48,25 +48,22 @@ Confirmed decisions (D-), assumptions in force (A-) and open questions (Q-) are 
 - Vendor portal: same app, simpler menu, with a progress checklist
   (Registration, Qualification, Categories) and a Profile page.
 - Every empty list shows one sentence and the main action button.
-- Style (14 Nov 2026): "light glass", Midnight Navy palette, applied through shared tokens and components in `globals.css`, never
-  screen by screen. The boards "Midnight navy: ..." on the design canvas are the reference for look and layout.
+- Style (D-015, solid, no glass): Midnight Navy palette, applied through shared tokens and components in `globals.css`, never
+  screen by screen. The board "Without glass: solid fallback (My tasks)" on the design canvas is the reference for look and layout.
   - Palette tokens: primary #1D4E89; button gradient #2A62A8 to #1D4E89 with glow rgba(29,78,137,0.35); links #1D4E89; dark text on tint
-    #143A68; tint #E4EEFB; focus ring #3E78C2 (2 px, offset 2 px); muted text #4A5961. Page background is a fixed layer
-    (`body::before`): gradient 135deg #DCE7F6 to #E6EEFB to #EDE9F8 plus three soft blobs. No teal anywhere (favicon, logo, PDFs use #1D4E89).
-  - Glass (translucent, blurred, thin light border, soft shadow, faint inner highlight) is for: the floating sidebar (16 px from the edges,
-    224 px wide, radius 26, rgba(15,32,56,0.84), labels #A9BBD8, text #E1E9F5, active item rgba(255,255,255,0.18)), the top bar pill (radius
-    22, white 0.72), cards (radius 22, white 0.58, class `surface-glass` or the `Card` component), notice banners (`surface-warning`),
-    tabs (segmented control), dialogs (radius 28, white 0.78), popovers (white 0.88) and the demo bar slot. Content starts 256 px from the left
-    and keeps 16 px from the other edges.
-  - Solid (about 88 % white, no blur) is for data tables and lists (`surface-solid`), and form inputs (86 % white, border rgba(23,38,43,0.45)).
-    Never put `backdrop-filter` on table rows, cells or long scrolling lists; blur radii stay 20 to 30 px.
-  - Buttons: primary = gradient with glow (`brand-button`), secondary = glass pill (`surface-pill`); radius 20 px, height 36 px (40 px large).
-    Sizes `xs` and `sm` stay small for inline row actions.
+    #143A68; tint #E4EEFB; focus ring #3E78C2 (2 px, offset 2 px); muted text #4A5961. Page background is flat #E8EEF6: no gradient, no blobs.
+  - No `backdrop-filter`, no blur, no translucent surface anywhere. Sidebar: solid #0F2038 (floating, 16 px from the edges, 224 px wide,
+    radius 26, labels #A9BBD8, text #E1E9F5, active item rgba(255,255,255,0.18) with a light border). Top bar pill (radius 22), cards (radius 22,
+    class `surface-card` or the `Card` component), data tables and lists (`surface-solid`), tabs (segmented control), dialogs (radius 28),
+    popovers and form fields are solid white #FFFFFF with a 1 px border #D5DEEB and the shadow 0 6px 20px rgba(15,32,56,0.08); no inner
+    highlight. Content starts 256 px from the left and keeps 16 px from the other edges.
+  - Inputs: border #8093AE (3.1:1 against white), background white, focus ring as above. Banners: solid tints (amber #FFF4D9, sky #E0F2F7) with their text colours.
+  - Buttons: primary = gradient with glow (`brand-button`), secondary = white pill with a #C3CEDD border (`surface-pill`); radius 20 px, height
+    36 px (40 px large). Sizes `xs` and `sm` stay small for inline row actions.
   - Status badges: pending / in progress (PENDING_APPROVAL, SUBMITTED, COMPARISON, TECHNICAL_EVALUATION, VOTING and the like) are sky
     (#E0F2F7 on #0B5566), never the brand blue; draft grey, returned and waiting amber, approved green, rejected red; grade badges brand blue.
-  - Contrast: every text keeps 4.5:1 over the worst case of its surface (the lightest and the darkest page colour, and a dark button for
-    surfaces that sit over content). The alphas above are measured values; do not lower them. Fallbacks are in `globals.css`:
-    `prefers-reduced-transparency`, `prefers-contrast: more` and no `backdrop-filter` turn every glass token into a solid colour.
+  - Contrast: every text keeps 4.5:1 over its solid surface; colour is never the only signal. `prefers-contrast: more` and forced colours
+    darken the borders; `prefers-reduced-motion` stops dialog animation.
   - Compact density stays, tokens `--density-*`: table rows about 36 px, table text 13 px, cell padding 8 x 12 px, gap between cards, tables and
     panels 14 px, big prices in the comparison table 18 px. A page stack `main > .flex-col` and tab panels get the 14 px gap from one rule, so do
     not set another gap on them. Form fields and buttons stay at least 36 px high (`--control-h`).
@@ -88,7 +85,7 @@ Each slice ends deployed and clickable on the Vercel link. Never break an earlie
 | 8a | DEMO-01, DEMO-02 | `npm run demo:reset` (seed and reset to scenario start, a developer command); full scenario rehearsed |
 | 8b | DEMO-03 | `npm run demo:load`: populated demo data, created through the application's own functions, with a self-check |
 
-Status (18 Nov 2026): Slices 0 to 7 done and live on Vercel; the light glass redesign done; Slice 7b (PLT-03, REG-08) done on vms-dev and deployed after the production step in `docs/PROGRESS.md`; Slice 8a (DEMO-01, DEMO-02) built on vms-dev,
+Status (18 Nov 2026): Slices 0 to 7 done and live on Vercel; the solid redesign (no glass, D-015) done; Slice 7b (PLT-03, REG-08) done on vms-dev and deployed after the production step in `docs/PROGRESS.md`; Slice 8a (DEMO-01, DEMO-02) built on vms-dev,
 not yet on vms-prod or `main` on Vercel (see `docs/PROGRESS.md`); 8b (DEMO-03, `npm run demo:load`) built on vms-dev, first real run pending. Open items are in `docs/PROGRESS.md`.
 
 The data model for every slice is in place from Slice 2 (all ERD tables, RLS and status audit); each slice adds its screens and the functions that change status.

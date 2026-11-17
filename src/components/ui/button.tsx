@@ -10,7 +10,7 @@ const buttonVariants = cva(
       variant: {
         default: "brand-button font-semibold",
         outline:
-          "surface-pill text-foreground backdrop-blur-md hover:bg-white/85 aria-expanded:bg-white/85",
+          "surface-pill text-foreground hover:bg-white/85 aria-expanded:bg-white/85",
         secondary:
           "surface-pill text-secondary-foreground hover:bg-white/85 aria-expanded:bg-white/85",
         ghost:

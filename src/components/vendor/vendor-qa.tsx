@@ -44,7 +44,7 @@ export function VendorQa({
   const err =(k: string) => (state.errors[k] ? t(state.errors[k]) : undefined);
 
   return (
-    <section className="flex flex-col gap-4 surface-glass p-5" data-testid="vendor-qa">
+    <section className="flex flex-col gap-4 surface-card p-5" data-testid="vendor-qa">
       <div className="flex flex-col gap-1">
         <h3 className="text-base font-semibold">{t("sourcing.qa.title")}</h3>
         <p className="text-xs text-muted-foreground">{t("sourcing.qa.channelNote")}</p>

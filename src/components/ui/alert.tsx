@@ -7,9 +7,9 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "surface-glass text-card-foreground",
+        default: "surface-card text-card-foreground",
         destructive:
-          "surface-glass border-red-300 bg-(--tone-red-bg) text-(--tone-red-fg) *:data-[slot=alert-description]:text-(--tone-red-fg) *:[svg]:text-current",
+          "surface-card border-red-300 bg-(--tone-red-bg) text-(--tone-red-fg) *:data-[slot=alert-description]:text-(--tone-red-fg) *:[svg]:text-current",
       },
     },
     defaultVariants: {

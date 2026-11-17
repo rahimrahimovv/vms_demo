@@ -102,7 +102,7 @@ export default async function AvlPage({ searchParams }: PageProps<"/avl">) {
 
   return (
     <div className="flex flex-col gap-5">
-      <form className="grid grid-cols-[2fr_1.5fr_1.5fr_1.5fr_auto_auto] items-end gap-4 surface-glass p-4" data-testid="avl-filters">
+      <form className="grid grid-cols-[2fr_1.5fr_1.5fr_1.5fr_auto_auto] items-end gap-4 surface-card p-4" data-testid="avl-filters">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="category">{t("avl.filters.category")}</Label>
           <select id="category" name="category" defaultValue={category} className={SELECT_CLASS}>

@@ -78,17 +78,17 @@ export function ComparisonView({
 
   return (
     <div className="flex flex-col gap-5" data-testid="comparison">
-      <section aria-label={t("requiredTerms")} className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 surface-glass px-[18px] py-2.5">
+      <section aria-label={t("requiredTerms")} className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 surface-card px-[18px] py-2.5">
         <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("requiredTerms")}</span>
         {[s.requiredIncoterm && `Incoterm ${s.requiredIncoterm}`, s.requiredPlace, s.requiredMode, s.requiredPaymentTerm]
           .filter(Boolean)
           .map((x) => (
-            <span key={x as string} className="rounded-full bg-(--glass-inner) px-2.5 py-0.5 text-sm">
+            <span key={x as string} className="rounded-full bg-(--surface-inner) px-2.5 py-0.5 text-sm">
               {x}
             </span>
           ))}
-        <span className="rounded-full bg-(--glass-inner) px-2.5 py-0.5 text-sm">{t("minimumChip", { minimum: s.minimum })}</span>
-        {roundUsed && <span className="rounded-full bg-(--glass-inner) px-2.5 py-0.5 text-sm">{t("finalOfferUsedChip")}</span>}
+        <span className="rounded-full bg-(--surface-inner) px-2.5 py-0.5 text-sm">{t("minimumChip", { minimum: s.minimum })}</span>
+        {roundUsed && <span className="rounded-full bg-(--surface-inner) px-2.5 py-0.5 text-sm">{t("finalOfferUsedChip")}</span>}
       </section>
 
       {s.status === "COMPARISON" && data.committeeComments.length > 0 && (
@@ -103,7 +103,7 @@ export function ComparisonView({
       )}
 
       {roundOpen && s.finalOfferDeadline && (
-        <section className="surface-glass border-sky-300 px-5 py-4 text-sm text-(--tone-sky-fg)" data-testid="round-open">
+        <section className="surface-card border-sky-300 px-5 py-4 text-sm text-(--tone-sky-fg)" data-testid="round-open">
           {serverNow ? (
             <DeadlineCountdown deadline={s.finalOfferDeadline} serverNow={serverNow} kind="finalOffer" className="font-medium" />
           ) : (
@@ -171,7 +171,7 @@ export function ComparisonView({
       )}
 
       <div className="flex flex-wrap gap-4">
-        <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-glass px-[18px] py-4" data-testid="po-preview">
+        <section aria-label={t("poTitle", { count: data.purchaseOrders.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-card px-[18px] py-4" data-testid="po-preview">
           <h3 className="text-base font-semibold">{t("poTitle", { count: data.purchaseOrders.length })}</h3>
           {data.purchaseOrders.length === 0 && <p className="text-sm text-muted-foreground">{t("poNone")}</p>}
           {data.purchaseOrders.map((po) => (
@@ -186,7 +186,7 @@ export function ComparisonView({
           <p className="text-xs text-muted-foreground">{t("poNote")}</p>
         </section>
 
-        <section aria-label={t("disqualifiedTitle", { count: data.disqualified.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-glass px-[18px] py-4" data-testid="disqualified">
+        <section aria-label={t("disqualifiedTitle", { count: data.disqualified.length })} className="flex min-w-[420px] flex-1 flex-col gap-2 surface-card px-[18px] py-4" data-testid="disqualified">
           <h3 className="text-base font-semibold">{t("disqualifiedTitle", { count: data.disqualified.length })}</h3>
           {data.disqualified.length === 0 && <p className="text-sm text-muted-foreground">{t("disqualifiedNone")}</p>}
           {data.disqualified.map((d) => (

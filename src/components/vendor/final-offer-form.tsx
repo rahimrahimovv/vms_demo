@@ -40,7 +40,7 @@ export function FinalOfferForm({
     start(async () => setState(await action(state, fd)));
   };
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4 surface-glass border-sky-300 p-5" data-testid="final-offer-form">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4 surface-card border-sky-300 p-5" data-testid="final-offer-form">
       <div className="flex flex-col gap-1">
         <h3 className="text-base font-semibold">{t("proposal.finalOffer.title")}</h3>
         <p className="text-sm">{t("proposal.finalOffer.intro")}</p>

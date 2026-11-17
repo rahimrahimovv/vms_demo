@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/layout/logo-mark";
 
-/** Sign-in and Register: the centred glass card on the page layer, logo and product name at its top. */
+/** Sign-in and Register: the centred card on the page layer, logo and product name at its top. */
 export function AuthShell({ name, children, wide = false }: { name: string; children: ReactNode; wide?: boolean }) {
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-10">

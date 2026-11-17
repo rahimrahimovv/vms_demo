@@ -4,7 +4,7 @@ import { LogoMark } from "./logo-mark";
 import { SidebarNav } from "./sidebar-nav";
 
 /**
- * Floating dark-glass sidebar, 16 px from the edges: logo "e-Procurement" and the menu for the user's roles
+ * Floating dark solid sidebar, 16 px from the edges: logo "e-Procurement" and the menu for the user's roles
  * (PLT-01 AC4). Content starts 256 px from the left.
  */
 export async function AppSidebar({ sections }: { sections: Section[] }) {

@@ -52,7 +52,7 @@ export function RegistrationChecklist({
   const percent = Math.round((progress.done / progress.total) * 100);
   return (
     <div className="flex flex-col gap-4" data-testid="registration-checklist">
-      <section className="surface-glass flex flex-col gap-2.5 px-[18px] py-4">
+      <section className="surface-card flex flex-col gap-2.5 px-[18px] py-4">
         <div className="flex items-center justify-between gap-4">
           <span className="font-semibold">{tHome("steps.registration")}</span>
           <span className="text-[13px] text-[#3d4a50]" data-testid="progress-text">
@@ -79,8 +79,8 @@ export function RegistrationChecklist({
               data-step={key}
               data-status={status}
               className={cn(
-                "surface-glass flex items-start gap-3 px-[18px] py-4",
-                current === key && "border-primary! shadow-[0_0_0_1px_var(--primary),var(--glass-card-shadow)]",
+                "surface-card flex items-start gap-3 px-[18px] py-4",
+                current === key && "border-primary! shadow-[0_0_0_1px_var(--primary),var(--surface-shadow)]",
               )}
             >
               <StepMark status={status} />
@@ -110,7 +110,7 @@ export function RegistrationChecklist({
           <p className="px-2 pt-1 font-semibold text-[#3d4a50]">{tHome("afterApproval")}</p>
           <ul className="grid grid-cols-4 gap-4" data-testid="locked-steps">
             {(["questionnaire", "categories"] as const).map((key) => (
-              <li key={key} className="surface-glass flex items-center gap-2.5 px-[18px] py-4 opacity-80" data-locked={key}>
+              <li key={key} className="surface-card flex items-center gap-2.5 px-[18px] py-4 opacity-80" data-locked={key}>
                 <Lock className="size-5 shrink-0 text-[#3d4a50]" aria-hidden />
                 <span className="flex flex-col gap-0.5">
                   <span className="font-semibold">{t(`lockedSteps.${key}`)}</span>

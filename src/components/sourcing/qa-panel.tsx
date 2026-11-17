@@ -60,7 +60,7 @@ export async function QaPanel({
         const shown = q.status === "PUBLISHED" ? q.publishedText : q.questionText;
         const edited = q.status === "PUBLISHED" && q.questionText && q.publishedText !== q.questionText;
         return (
-          <article key={q.id} className="flex flex-col gap-2 surface-glass p-4" data-testid="qa-item" data-status={q.status}>
+          <article key={q.id} className="flex flex-col gap-2 surface-card p-4" data-testid="qa-item" data-status={q.status}>
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
               <span>
                 {q.vendorName ? t("askedBy", { vendor: q.vendorName, date: formatDateTime(q.askedAt) }) : t("publishedOn", { date: formatDateTime(q.publishedAt ?? q.askedAt) })}

@@ -18,10 +18,10 @@ import {
 import { formatPercent } from "@/lib/sourcing/saving";
 import { ToneChip } from "@/components/status-badge";
 
-/** A card of the dashboard: the light glass surface, a title row, then the content. */
+/** A card of the dashboard: the white card surface, a title row, then the content. */
 function Panel({ title, aside, className, testId, children }: { title: string; aside?: ReactNode; className?: string; testId: string; children: ReactNode }) {
   return (
-    <section className={cn("flex min-h-0 flex-col surface-glass px-4 py-3.5", className)} data-testid={testId} aria-label={title}>
+    <section className={cn("flex min-h-0 flex-col surface-card px-4 py-3.5", className)} data-testid={testId} aria-label={title}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <h2 className="text-[15px] font-bold">{title}</h2>
         {aside}
@@ -41,7 +41,7 @@ function NoData({ text }: { text: string }) {
 
 function Tile({ label, value, sub, tone, testId }: { label: string; value: ReactNode; sub: ReactNode; tone?: "good"; testId: string }) {
   return (
-    <section className="col-span-3 surface-glass px-4 py-3.5" data-testid={testId} aria-label={label}>
+    <section className="col-span-3 surface-card px-4 py-3.5" data-testid={testId} aria-label={label}>
       <div className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">{label}</div>
       <div className={cn("py-1 text-[30px] leading-[1.15] font-bold tabular-nums", tone === "good" ? "text-(--tone-green-fg)" : "text-[#143A68]")} data-testid={`${testId}-value`}>
         {value}
@@ -66,7 +66,7 @@ const GRADE_COLOURS = ["#1D4E89", "#3E78C2", "#8FB8E8", "#C9D2D5", "rgba(23,38,4
 export function PeriodControl({ period }: { period: Period }) {
   const t = useTranslations("dashboard");
   return (
-    <nav aria-label={t("periodLabel")} className="inline-flex gap-1 rounded-[18px] border border-(--glass-tabs-border) bg-(--glass-tabs-bg) p-1 backdrop-blur-md" data-testid="period-control">
+    <nav aria-label={t("periodLabel")} className="inline-flex gap-1 rounded-[18px] border border-(--surface-tabs-border) bg-(--surface-tabs-bg) p-1" data-testid="period-control">
       {PERIODS.map((p) => (
         <Link
           key={p}

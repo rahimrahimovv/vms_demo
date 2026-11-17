@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 /**
- * A right side panel (glass, 440 px) that opens from a trigger. Built on the shared dialog: Esc and the close button close it,
+ * A right side panel (solid, 440 px) that opens from a trigger. Built on the shared dialog: Esc and the close button close it,
  * focus stays inside while it is open and returns to the trigger.
  */
 export function SidePanel({

@@ -51,26 +51,26 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* e-Procurement: "light glass" style, Midnight Navy palette. Light only (desktop).
-   Everything below is a token; components never hard-code a colour or a blur. */
+/* e-Procurement: solid surfaces, no glass effect (D-015), Midnight Navy palette. Light only (desktop).
+   Everything below is a token; components never hard-code a colour or a shadow. */
 :root {
-  --background: #e6eefb; /* only seen where the fixed page layer cannot paint */
+  --background: #e8eef6; /* the flat page colour */
   --foreground: #17262b;
-  --card: rgba(255, 255, 255, 0.88); /* "bg-card" panels are the solid ones: data tables and lists */
+  --card: #ffffff;
   --card-foreground: #17262b;
-  --popover: rgba(255, 255, 255, 0.88);
+  --popover: #ffffff;
   --popover-foreground: #17262b;
   --primary: #1d4e89;
   --primary-foreground: #ffffff;
   --secondary: #eaf0f7;
   --secondary-foreground: #17262b;
   --muted: #eaf0f7;
-  --muted-foreground: #4a5961; /* 5.65:1 on a card over the darkest page colour */
+  --muted-foreground: #4a5961; /* 6.9:1 on white, 6.0:1 on the page */
   --accent: #e4eefb; /* tint: hover, selected */
   --accent-foreground: #143a68;
   --destructive: #b42318;
-  --border: rgba(23, 38, 43, 0.1);
-  --input: rgba(23, 38, 43, 0.45);
+  --border: #d5deeb;
+  --input: #8093ae; /* 3.13:1 against white (the brief's #8FA0B8 measures 2.66:1) */
   --ring: #3e78c2;
   --chart-1: #3e78c2;
   --chart-2: #1d4e89;
@@ -88,43 +88,22 @@
   --brand-grade-bg: #e4eefb;
   --brand-grade-fg: #1b4a8a;
 
-  /* Page layer: gradient plus three large soft blobs (painted by body::before) */
-  --page-gradient: linear-gradient(135deg, #dce7f6 0%, #e6eefb 52%, #ede9f8 100%);
-  --blob-1: rgba(62, 120, 194, 0.36);
-  --blob-2: rgba(111, 168, 220, 0.3);
-  --blob-3: rgba(169, 183, 238, 0.34);
+  /* Surfaces: solid white, a clear 1 px border, a soft shadow. No blur, no transparency. */
+  --surface-bg: #ffffff;
+  --surface-border: #d5deeb;
+  --surface-shadow: 0 6px 20px rgba(15, 32, 56, 0.08);
+  --surface-dialog-shadow: 0 24px 60px rgba(15, 32, 56, 0.22);
+  --surface-popover-shadow: 0 16px 40px rgba(15, 32, 56, 0.18);
+  --surface-pill-border: #c3cedd;
+  --surface-tabs-bg: #ffffff;
+  --surface-tabs-border: #d5deeb;
+  --surface-tab-active-bg: #e4eefb;
+  --surface-inner: #eef3fa; /* rows and chips inside a card */
+  --surface-overlay: rgba(15, 32, 56, 0.45);
+  --field-bg: #ffffff;
 
-  /* Glass surfaces. Alphas were measured, not guessed: see docs/PROGRESS.md "Contrast". */
-  --glass-blur: blur(22px) saturate(170%);
-  --glass-blur-bar: blur(24px) saturate(180%);
-  --glass-blur-heavy: blur(30px) saturate(190%);
-  --glass-blur-sidebar: blur(28px) saturate(170%);
-  --glass-card-bg: rgba(255, 255, 255, 0.58);
-  --glass-card-border: rgba(255, 255, 255, 0.85);
-  --glass-card-shadow: 0 10px 32px rgba(23, 38, 43, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --glass-bar-bg: rgba(255, 255, 255, 0.72); /* mockup 0.52 fails 4.5:1 for the role text over content */
-  --glass-bar-border: rgba(255, 255, 255, 0.75);
-  --glass-bar-shadow: 0 8px 28px rgba(23, 38, 43, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --glass-solid-bg: rgba(255, 255, 255, 0.88);
-  --glass-solid-border: rgba(255, 255, 255, 0.9);
-  --glass-solid-shadow: 0 12px 36px rgba(23, 38, 43, 0.1);
-  --glass-dialog-bg: rgba(255, 255, 255, 0.78); /* mockup 0.5 fails over a dark button */
-  --glass-dialog-border: rgba(255, 255, 255, 0.9);
-  --glass-dialog-shadow: 0 24px 60px rgba(23, 38, 43, 0.22), inset 0 1px 0 #ffffff;
-  --glass-popover-bg: rgba(255, 255, 255, 0.88);
-  --glass-popover-shadow: 0 16px 40px rgba(23, 38, 43, 0.18), inset 0 1px 0 #ffffff;
-  --glass-pill-bg: rgba(255, 255, 255, 0.6);
-  --glass-pill-border: rgba(255, 255, 255, 0.85);
-  --glass-tabs-bg: rgba(255, 255, 255, 0.45);
-  --glass-tabs-border: rgba(255, 255, 255, 0.7);
-  --glass-tab-active-bg: rgba(255, 255, 255, 0.92);
-  --glass-inner: rgba(255, 255, 255, 0.7); /* rows inside a glass card */
-  --glass-overlay: rgba(15, 32, 56, 0.25);
-  --glass-overlay-blur: blur(2px);
-  --field-bg: rgba(255, 255, 255, 0.86);
-
-  /* Floating sidebar (dark glass). Text 8.5:1, labels 5.4:1, active item 6.1:1 over the lightest page colour. */
-  --sidebar: rgba(15, 32, 56, 0.84);
+  /* Floating sidebar (solid navy). Text 13:1, labels 8.3:1, active item 9.7:1. */
+  --sidebar: #0f2038;
   --sidebar-foreground: #e1e9f5;
   --sidebar-label: #a9bbd8;
   --sidebar-logo: linear-gradient(180deg, #5b94d6, #3e78c2);
@@ -135,7 +114,7 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.22);
   --sidebar-ring: #3e78c2;
-  --sidebar-shadow: 0 12px 40px rgba(15, 32, 56, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --sidebar-shadow: 0 12px 40px rgba(15, 32, 56, 0.3);
   --sidebar-w: 224px;
   --shell-gap: 16px;
 
@@ -165,69 +144,14 @@
   --control-h: 36px; /* form fields and buttons never go below this */
 }
 
-/* Fallbacks: all glass surfaces become solid, with the same text colours.
-   (The same list is repeated for @supports below: CSS cannot share one block between a media and a supports query.) */
-@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+/* Forced colours and more contrast: borders stay visible whatever the palette. */
+@media (prefers-contrast: more), (forced-colors: active) {
   :root {
-    --glass-blur: none;
-    --glass-blur-bar: none;
-    --glass-blur-heavy: none;
-    --glass-blur-sidebar: none;
-    --glass-overlay-blur: none;
-    --glass-card-bg: #f7f9fd;
-    --glass-card-border: #c9d4e3;
-    --glass-bar-bg: #ffffff;
-    --glass-bar-border: #c9d4e3;
-    --glass-solid-bg: #ffffff;
-    --glass-solid-border: #c9d4e3;
-    --glass-dialog-bg: #ffffff;
-    --glass-dialog-border: #9fb0c6;
-    --glass-popover-bg: #ffffff;
-    --glass-pill-bg: #ffffff;
-    --glass-pill-border: #9fb0c6;
-    --glass-tabs-bg: #eef3fa;
-    --glass-tabs-border: #c9d4e3;
-    --glass-tab-active-bg: #ffffff;
-    --glass-inner: #eef3fa;
-    --glass-overlay: rgba(15, 32, 56, 0.45);
-    --field-bg: #ffffff;
-    --card: #ffffff;
-    --popover: #ffffff;
-    --sidebar: #0f2038;
-    --blob-1: transparent;
-    --blob-2: transparent;
-    --blob-3: transparent;
-    --page-gradient: linear-gradient(135deg, #e6eefb, #e6eefb);
-    --input: rgba(23, 38, 43, 0.6);
-  }
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root {
-    --glass-blur: none;
-    --glass-blur-bar: none;
-    --glass-blur-heavy: none;
-    --glass-blur-sidebar: none;
-    --glass-overlay-blur: none;
-    --glass-card-bg: #f7f9fd;
-    --glass-card-border: #c9d4e3;
-    --glass-bar-bg: #ffffff;
-    --glass-bar-border: #c9d4e3;
-    --glass-solid-bg: #ffffff;
-    --glass-solid-border: #c9d4e3;
-    --glass-dialog-bg: #ffffff;
-    --glass-dialog-border: #9fb0c6;
-    --glass-popover-bg: #ffffff;
-    --glass-pill-bg: #ffffff;
-    --glass-pill-border: #9fb0c6;
-    --glass-tabs-bg: #eef3fa;
-    --glass-tabs-border: #c9d4e3;
-    --glass-tab-active-bg: #ffffff;
-    --glass-inner: #eef3fa;
-    --glass-overlay: rgba(15, 32, 56, 0.45);
-    --field-bg: #ffffff;
-    --card: #ffffff;
-    --popover: #ffffff;
-    --sidebar: #0f2038;
+    --surface-border: #5f7390;
+    --surface-pill-border: #5f7390;
+    --surface-tabs-border: #5f7390;
+    --border: #5f7390;
+    --input: #3d4a50;
   }
 }
 
@@ -253,19 +177,6 @@
     font-size: 14px; /* the boards use 14 px / 1.45 as the base */
     line-height: 1.45;
   }
-  /* Fixed page layer: gradient plus three soft blobs. Radial gradients instead of blur filters: same look, no GPU cost. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(circle 340px at 140px 160px, var(--blob-1) 0%, var(--blob-1) 35%, transparent 100%),
-      radial-gradient(circle 330px at calc(100% - 320px) 100px, var(--blob-2) 0%, var(--blob-2) 35%, transparent 100%),
-      radial-gradient(circle 360px at 680px calc(100% - 140px), var(--blob-3) 0%, var(--blob-3) 35%, transparent 100%),
-      var(--page-gradient);
-  }
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
@@ -283,97 +194,66 @@ main [data-slot="tabs-content"].flex-col {
   gap: var(--density-gap);
 }
 
-/* Surfaces. Glass = translucent, blurred, thin light border, soft shadow, faint inner highlight.
-   Solid = about 88 % white and no blur (data tables, lists, form inputs): blur on big panels that move with the
-   page costs frames, and at 88 % it is invisible anyway. */
-.surface-glass {
-  background: var(--glass-card-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-card-border);
-  box-shadow: var(--glass-card-shadow);
-  border-radius: 22px;
-}
+/* Surfaces: solid white with a clear border and a soft shadow (cards, bar, tabs, banners, dialogs, popovers, tables). */
+.surface-card,
 .surface-solid {
-  background: var(--glass-solid-bg);
-  border: 1px solid var(--glass-solid-border);
-  box-shadow: var(--glass-solid-shadow);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-shadow);
   border-radius: 22px;
 }
-/* A row or tile inside a glass card */
+/* A row or tile inside a card */
 .surface-inner {
-  background: var(--glass-inner);
+  background: var(--surface-inner);
   border-radius: 14px;
 }
-/* Warning banner: amber glass */
+/* Warning banner: solid amber tint */
 .surface-warning {
-  background: rgba(255, 244, 217, 0.72);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(233, 196, 106, 0.8);
+  background: var(--tone-amber-bg);
+  border: 1px solid #e9c46a;
   border-radius: 22px;
   color: var(--tone-amber-fg);
-  box-shadow: var(--glass-card-shadow);
+  box-shadow: var(--surface-shadow);
 }
 .surface-warning [data-slot="alert-description"],
 .surface-warning [data-slot="alert-title"] {
   color: var(--tone-amber-fg);
 }
-@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  .surface-warning {
-    background: #fff4d9;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .surface-warning {
-    background: #fff4d9;
-  }
-}
 
-/* Shell: floating sidebar, top bar pill, popovers, dialogs, small glass pills (secondary buttons, bell). */
+/* Shell: floating sidebar, top bar pill, popovers, dialogs, secondary buttons. */
 .shell-sidebar {
   background: var(--sidebar);
   border: 1px solid var(--sidebar-border);
   box-shadow: var(--sidebar-shadow);
-  -webkit-backdrop-filter: var(--glass-blur-sidebar);
-  backdrop-filter: var(--glass-blur-sidebar);
   border-radius: 26px;
 }
 .shell-bar {
-  background: var(--glass-bar-bg);
-  border: 1px solid var(--glass-bar-border);
-  box-shadow: var(--glass-bar-shadow);
-  -webkit-backdrop-filter: var(--glass-blur-bar);
-  backdrop-filter: var(--glass-blur-bar);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-shadow);
   border-radius: 22px;
 }
 .surface-dialog {
-  background: var(--glass-dialog-bg);
-  border: 1px solid var(--glass-dialog-border);
-  box-shadow: var(--glass-dialog-shadow);
-  -webkit-backdrop-filter: var(--glass-blur-heavy);
-  backdrop-filter: var(--glass-blur-heavy);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-dialog-shadow);
   border-radius: 28px;
 }
 .surface-popover {
-  background: var(--glass-popover-bg);
-  border: 1px solid var(--glass-dialog-border);
-  box-shadow: var(--glass-popover-shadow);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-popover-shadow);
   border-radius: 18px;
 }
 .surface-pill {
-  background: var(--glass-pill-bg);
-  border: 1px solid var(--glass-pill-border);
-  box-shadow: 0 1px 3px rgba(23, 38, 43, 0.14); /* keeps the pill visible on a solid table row */
+  background: #ffffff;
+  border: 1px solid var(--surface-pill-border);
+  box-shadow: 0 1px 3px rgba(15, 32, 56, 0.1);
 }
 .brand-button {
   background: var(--brand-gradient);
   color: #fff;
-  box-shadow: 0 6px 16px var(--brand-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 16px var(--brand-glow);
 }
 .brand-button:hover {
   filter: brightness(1.08);

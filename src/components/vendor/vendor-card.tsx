@@ -160,7 +160,7 @@ export async function VendorHeader({ vendor, grade, today, actions, activity }: 
 
 export type OpenRequest = { id: string; section: string; submitted_at: string | null; created_at: string };
 
-/** One amber glass strip with the chips of "Needs attention"; calm and slim when there is nothing. A DRAFT shows its own line. */
+/** One amber strip with the chips of "Needs attention"; calm and slim when there is nothing. A DRAFT shows its own line. */
 export async function AttentionStrip({
   attention,
   categoryName,
@@ -176,14 +176,14 @@ export async function AttentionStrip({
   const t = await getTranslations();
   if (isDraft) {
     return (
-      <section role="status" className="surface-glass px-4 py-2.5 text-[13px] font-medium" data-testid="draft-notice">
+      <section role="status" className="surface-card px-4 py-2.5 text-[13px] font-medium" data-testid="draft-notice">
         {t("vendorCard.draft")}
       </section>
     );
   }
   if (attention.length === 0) {
     return (
-      <section className="surface-glass px-4 py-2.5 text-[13px] text-muted-foreground" data-testid="needs-attention">
+      <section className="surface-card px-4 py-2.5 text-[13px] text-muted-foreground" data-testid="needs-attention">
         {t("vendorCard.attention.none")}
       </section>
     );
