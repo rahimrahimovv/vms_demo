@@ -84,15 +84,15 @@ export function NotificationBell({
         <Button
           variant="outline"
           size="icon"
-          className="relative size-10 rounded-full"
+          className="relative"
           aria-label={t("bell.label", { count: unread })}
           data-testid="bell"
         >
-          <Bell className="size-5" aria-hidden />
+          <Bell className="size-4" strokeWidth={1.5} aria-hidden />
           {unread > 0 && (
             <span
               data-testid="bell-count"
-              className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground"
+              className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground"
             >
               {bellBadge(unread)}
             </span>

@@ -26,10 +26,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   ]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AppSidebar sections={sectionsFor(user.roles, vendorStatus)} />
-      {/* Content starts 256 px from the left (16 + 224 + 16) and keeps 16 px from the other edges */}
-      <div className="flex min-w-0 flex-col gap-(--shell-gap) py-(--shell-gap) pr-(--shell-gap) pl-[calc(var(--shell-gap)*2+var(--sidebar-w))]">
+      {/* Content starts 256 px from the left, 32 px padding; the top bar spans the content area */}
+      <div className="flex min-w-0 flex-col gap-5 pr-(--page-pad) pb-(--page-pad) pl-[calc(var(--sidebar-w)+var(--page-pad))]">
         <TopBar
           userId={user.id}
           fullName={user.fullName}
@@ -37,7 +37,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           initialItems={(latest ?? []).map(toBellItem)}
           initialUnread={unread ?? 0}
         />
-        <main className="flex-1 px-(--density-page-x)">{children}</main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

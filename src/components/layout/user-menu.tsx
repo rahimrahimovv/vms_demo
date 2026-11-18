@@ -27,29 +27,29 @@ export function UserMenu({ fullName, roleLabels }: { fullName: string; roleLabel
   const router = useRouter();
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-[14px] px-2 py-1 text-left hover:bg-white/60">
-        <Avatar className="size-[34px]">
-          <AvatarFallback className="bg-(--avatar-bg) text-[13px] font-semibold text-brand-ink">
+      <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-md px-2 py-1 text-left hover:bg-accent">
+        <Avatar className="size-8">
+          <AvatarFallback className="bg-secondary text-xs font-medium text-secondary-foreground">
             {initials(fullName)}
           </AvatarFallback>
         </Avatar>
         <span className="flex flex-col leading-tight">
-          <span className="text-sm font-semibold" data-testid="user-name">
+          <span className="text-sm font-medium" data-testid="user-name">
             {fullName}
           </span>
-          <span className="text-xs text-[#3d4a50]" data-testid="user-roles">
+          <span className="text-xs text-muted-foreground" data-testid="user-roles">
             {roleLabels.join(", ")}
           </span>
         </span>
-        <ChevronDown className="size-4 text-muted-foreground" aria-hidden />
+        <ChevronDown className="size-4 text-muted-foreground" strokeWidth={1.5} aria-hidden />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onSelect={() => router.push("/change-password")} data-testid="change-password-link">
-          <KeyRound className="size-4" aria-hidden />
+          <KeyRound className="size-4" strokeWidth={1.5} aria-hidden />
           {t("changePassword")}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => signOut()}>
-          <LogOut className="size-4" aria-hidden />
+          <LogOut className="size-4" strokeWidth={1.5} aria-hidden />
           {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>

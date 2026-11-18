@@ -4,6 +4,7 @@
     "tagline": "Procurement platform"
   },
   "nav": {
+    "breadcrumb": "Breadcrumb",
     "home": "My tasks",
     "dashboard": "Dashboard",
     "vendorRegistration": "Registration",

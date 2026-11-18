@@ -4,8 +4,8 @@ import { LogoMark } from "./logo-mark";
 import { SidebarNav } from "./sidebar-nav";
 
 /**
- * Floating dark solid sidebar, 16 px from the edges: logo "e-Procurement" and the menu for the user's roles
- * (PLT-01 AC4). Content starts 256 px from the left.
+ * Light sidebar fixed to the left edge, 256 px wide, with a right border: logo "e-Procurement" and the menu for the
+ * user's roles (PLT-01 AC4). Content starts 256 px from the left.
  */
 export async function AppSidebar({ sections }: { sections: Section[] }) {
   const t = await getTranslations();
@@ -20,10 +20,10 @@ export async function AppSidebar({ sections }: { sections: Section[] }) {
     .filter((g) => g.items.length > 0);
 
   return (
-    <aside className="shell-sidebar fixed top-(--shell-gap) bottom-(--shell-gap) left-(--shell-gap) z-30 flex w-(--sidebar-w) flex-col overflow-hidden text-sidebar-foreground">
-      <div className="flex items-center gap-2.5 px-5 pt-5 pb-3">
-        <LogoMark tone="sidebar" className="size-[30px]" iconClassName="size-4" />
-        <span className="text-[15px] font-bold text-white">{t("app.name")}</span>
+    <aside className="shell-sidebar fixed inset-y-0 left-0 z-30 flex w-(--sidebar-w) flex-col text-sidebar-foreground">
+      <div className="flex items-center gap-2.5 px-5 pt-5 pb-2">
+        <LogoMark />
+        <span className="text-[15px] font-semibold">{t("app.name")}</span>
       </div>
       <SidebarNav groups={groups} />
     </aside>

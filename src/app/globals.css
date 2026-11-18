@@ -5,12 +5,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-heading: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-label: var(--sidebar-label);
-  --color-sidebar-divider: var(--sidebar-divider);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -21,6 +19,7 @@
   --color-brand: var(--brand);
   --color-brand-ink: var(--brand-ink);
   --color-brand-tint: var(--brand-tint);
+  --color-muted-on-muted: var(--muted-on-muted);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -51,107 +50,91 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* e-Procurement: solid surfaces, no glass effect (D-015), Midnight Navy palette. Light only (desktop).
+/* e-Procurement: shadcn/ui "new-york" style (docs/DESIGN.md, D-015). Monochrome, flat, light only (desktop).
    Everything below is a token; components never hard-code a colour or a shadow. */
 :root {
-  --background: #e8eef6; /* the flat page colour */
-  --foreground: #17262b;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
   --card: #ffffff;
-  --card-foreground: #17262b;
+  --card-foreground: #0a0a0a;
   --popover: #ffffff;
-  --popover-foreground: #17262b;
-  --primary: #1d4e89;
-  --primary-foreground: #ffffff;
-  --secondary: #eaf0f7;
-  --secondary-foreground: #17262b;
-  --muted: #eaf0f7;
-  --muted-foreground: #4a5961; /* 6.9:1 on white, 6.0:1 on the page */
-  --accent: #e4eefb; /* tint: hover, selected */
-  --accent-foreground: #143a68;
-  --destructive: #b42318;
-  --border: #d5deeb;
-  --input: #8093ae; /* 3.13:1 against white (the brief's #8FA0B8 measures 2.66:1) */
-  --ring: #3e78c2;
-  --chart-1: #3e78c2;
-  --chart-2: #1d4e89;
-  --chart-3: #6fa8dc;
-  --chart-4: #a9b7ee;
-  --chart-5: #4a5961;
-  --radius: 0.5rem;
+  --popover-foreground: #0a0a0a;
+  --primary: #000000;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373; /* 4.74:1 on white, 4.54:1 on #fafafa */
+  --muted-on-muted: #666666; /* muted text on a muted fill (table header, tab track): 5.27:1; #737373 gives 4.35:1 */
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #e7000b;
+  --border: #e5e5e5;
+  --input: #8f8f8f; /* field border: 3.23:1 against white (the spec #e5e5e5 is 1.26:1, below the 3:1 for controls) */
+  --ring: #525252; /* focus ring: 7.8:1 against white (the spec #a3a3a3 is 2.5:1) */
+  --chart-1: #8ec5ff;
+  --chart-2: #3080ff;
+  --chart-3: #155dfc;
+  --chart-4: #1447e6;
+  --chart-5: #193cb8;
+  --radius: 0.625rem;
 
-  /* Brand */
-  --brand: #1d4e89;
-  --brand-gradient: linear-gradient(180deg, #2a62a8, #1d4e89);
-  --brand-glow: rgba(29, 78, 137, 0.35);
-  --brand-tint: #e4eefb;
-  --brand-ink: #143a68;
-  --brand-grade-bg: #e4eefb;
-  --brand-grade-fg: #1b4a8a;
+  /* Status dots (a dot always comes with a word) */
+  --dot-green: #16a34a;
+  --dot-blue: #155dfc;
+  --dot-amber: #d97706;
+  --dot-grey: #a3a3a3;
+  --dot-red: #e7000b;
 
-  /* Surfaces: solid white, a clear 1 px border, a soft shadow. No blur, no transparency. */
-  --surface-bg: #ffffff;
-  --surface-border: #d5deeb;
-  --surface-shadow: 0 6px 20px rgba(15, 32, 56, 0.08);
-  --surface-dialog-shadow: 0 24px 60px rgba(15, 32, 56, 0.22);
-  --surface-popover-shadow: 0 16px 40px rgba(15, 32, 56, 0.18);
-  --surface-pill-border: #c3cedd;
-  --surface-tabs-bg: #ffffff;
-  --surface-tabs-border: #d5deeb;
-  --surface-tab-active-bg: #e4eefb;
-  --surface-inner: #eef3fa; /* rows and chips inside a card */
-  --surface-overlay: rgba(15, 32, 56, 0.45);
-  --field-bg: #ffffff;
+  /* Sidebar: light, fixed to the left edge, 256 px */
+  --sidebar: #fafafa;
+  --sidebar-foreground: #171717;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #525252;
+  --sidebar-w: 256px;
+  --topbar-h: 56px;
+  --page-pad: 32px;
 
-  /* Floating sidebar (solid navy). Text 13:1, labels 8.3:1, active item 9.7:1. */
-  --sidebar: #0f2038;
-  --sidebar-foreground: #e1e9f5;
-  --sidebar-label: #a9bbd8;
-  --sidebar-logo: linear-gradient(180deg, #5b94d6, #3e78c2);
-  --sidebar-divider: rgba(255, 255, 255, 0.14);
-  --sidebar-primary: #3e78c2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(255, 255, 255, 0.18);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.22);
-  --sidebar-ring: #3e78c2;
-  --sidebar-shadow: 0 12px 40px rgba(15, 32, 56, 0.3);
-  --sidebar-w: 224px;
-  --shell-gap: 16px;
-
-  --avatar-bg: rgba(62, 120, 194, 0.22);
-
-  /* Status badges: "pending / in progress" is sky so it never looks like the brand blue */
-  --tone-sky-bg: #e0f2f7;
-  --tone-sky-fg: #0b5566;
-  --tone-amber-bg: #fff4d9;
-  --tone-amber-fg: #6b4300;
-  --tone-green-bg: #e3f3e8;
-  --tone-green-fg: #17612f;
-  --tone-red-bg: #fde8e8;
-  --tone-red-fg: #8f1d1d;
-  --tone-grey-bg: #eef1f2;
-  --tone-grey-fg: #3d4a50;
-
-  /* Compact density: one place for table rows, gaps and page padding. */
-  --density-table-text: 13px;
+  /* Density: tables 40 px header and 44 px rows; the Dashboard and the vendor card may tighten padding only */
+  --density-table-text: 14px;
   --density-cell-x: 12px;
-  --density-cell-y: 8px;
-  --density-head-h: 36px;
-  --density-gap: 14px;
-  --density-page-y: 16px;
-  --density-page-x: 0px; /* the shell already keeps 16 px from the edges, like the top bar */
+  --density-cell-y: 0px;
+  --density-head-h: 40px;
+  --density-row-h: 44px;
+  --density-gap: 20px;
   --density-price: 18px;
   --control-h: 36px; /* form fields and buttons never go below this */
+
+  /* Transitional aliases, removed in the final sweep of this redesign */
+  --brand: #171717;
+  --brand-ink: #171717;
+  --brand-tint: #f5f5f5;
+  --brand-grade-bg: #f5f5f5;
+  --brand-grade-fg: #171717;
+  --surface-inner: #fafafa;
+  --field-bg: #ffffff;
+  --tone-sky-bg: #ffffff;
+  --tone-sky-fg: #171717;
+  --tone-amber-bg: #ffffff;
+  --tone-amber-fg: #171717;
+  --tone-green-bg: #ffffff;
+  --tone-green-fg: #171717;
+  --tone-red-bg: #ffffff;
+  --tone-red-fg: #b91c1c;
+  --tone-grey-bg: #f5f5f5;
+  --tone-grey-fg: #171717;
 }
 
 /* Forced colours and more contrast: borders stay visible whatever the palette. */
 @media (prefers-contrast: more), (forced-colors: active) {
   :root {
-    --surface-border: #5f7390;
-    --surface-pill-border: #5f7390;
-    --surface-tabs-border: #5f7390;
-    --border: #5f7390;
-    --input: #3d4a50;
+    --border: #737373;
+    --input: #404040;
+    --sidebar-border: #737373;
   }
 }
 
@@ -174,8 +157,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-size: 14px; /* the boards use 14 px / 1.45 as the base */
-    line-height: 1.45;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
@@ -185,76 +169,71 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  em,
+  i {
+    font-style: normal;
+  }
 }
 
-/* Compact density: stacks of cards, tables and tab panels on a page use the 14 px gap. Unlayered on purpose, so it
-   wins over the per-screen gap utilities and every new screen follows it without extra classes. */
+/* Stacks of cards, tables and tab panels on a page use one gap. Unlayered on purpose, so it wins over the per-screen gap
+   utilities and every new screen follows it without extra classes. */
 main > .flex.flex-col,
 main [data-slot="tabs-content"].flex-col {
   gap: var(--density-gap);
 }
 
-/* Surfaces: solid white with a clear border and a soft shadow (cards, bar, tabs, banners, dialogs, popovers, tables). */
+/* Surfaces: white, a 1 px border, shadow-sm (cards, tables, banners). */
 .surface-card,
 .surface-solid {
-  background: var(--surface-bg);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--surface-shadow);
-  border-radius: 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border-radius: 14px;
 }
 /* A row or tile inside a card */
 .surface-inner {
   background: var(--surface-inner);
-  border-radius: 14px;
+  border-radius: 10px;
 }
-/* Warning banner: solid amber tint */
+/* Warning banner (transitional; the Alert component replaces it) */
 .surface-warning {
-  background: var(--tone-amber-bg);
-  border: 1px solid #e9c46a;
-  border-radius: 22px;
-  color: var(--tone-amber-fg);
-  box-shadow: var(--surface-shadow);
-}
-.surface-warning [data-slot="alert-description"],
-.surface-warning [data-slot="alert-title"] {
-  color: var(--tone-amber-fg);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
-/* Shell: floating sidebar, top bar pill, popovers, dialogs, secondary buttons. */
+/* Shell */
 .shell-sidebar {
   background: var(--sidebar);
-  border: 1px solid var(--sidebar-border);
-  box-shadow: var(--sidebar-shadow);
-  border-radius: 26px;
+  border-right: 1px solid var(--sidebar-border);
 }
 .shell-bar {
-  background: var(--surface-bg);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--surface-shadow);
-  border-radius: 22px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
 }
 .surface-dialog {
-  background: var(--surface-bg);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--surface-dialog-shadow);
-  border-radius: 28px;
+  background: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-radius: 14px;
 }
 .surface-popover {
-  background: var(--surface-bg);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--surface-popover-shadow);
-  border-radius: 18px;
+  background: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border-radius: 10px;
 }
 .surface-pill {
-  background: #ffffff;
-  border: 1px solid var(--surface-pill-border);
-  box-shadow: 0 1px 3px rgba(15, 32, 56, 0.1);
+  background: var(--background);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 .brand-button {
-  background: var(--brand-gradient);
-  color: #fff;
-  box-shadow: 0 6px 16px var(--brand-glow);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 .brand-button:hover {
-  filter: brightness(1.08);
+  background: color-mix(in oklab, var(--primary) 90%, transparent);
 }

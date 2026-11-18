@@ -750,3 +750,16 @@ Kept differences from the mockup: the example numbers are the database's; cycle 
 - **Contrast re-measured** (all better than before): text on white 15.6:1, muted #4A5961 on white 7.3:1 and on the page 6.2:1, sidebar text 13.4:1, labels 8.4:1, active item 9.0:1, amber 7.9:1, sky 7.3:1, green 6.5:1, red 7.6:1, links 8.4:1. Colour is still never the only signal (chips carry text).
 - **Kept differences:** input border #8093AE instead of the brief's #8FA0B8 (that one measures 2.66:1 against white; #8093AE gives 3.13:1); the sign-in card, dashboard cards and vendor card use the same `surface-card`; the active tab is a tint (#E4EEFB) on a white track.
 - **Checks:** typecheck clean, 214 unit tests, build ok, dev server restarted on port 3000. Edge headless: no element with a backdrop-filter or blur on any page; at 1440 x 900 the Dashboard (Specialist and Admin) and the vendor cards of Ege, Baku Pack and Caspian have scrollHeight 900 = window height, no horizontal scroll; My tasks for the Specialist is longer than one screen (1222), as before, because it is a list.
+
+## Redesign: shadcn/ui new-york (18 Nov 2026, D-015 changed)
+
+Source: `docs/DESIGN.md` and the nine "shadcn style" boards on the design canvas. Look only; behaviour, permissions, data and texts unchanged.
+
+| Stage | Status | Notes |
+| --- | --- | --- |
+| 1 Tokens, fonts, shell, logo, favicon | done | DESIGN.md tokens in `globals.css` (light only), Geist and Geist Mono, light sidebar fixed left (256 px), 56 px top bar with breadcrumb, 32 px content padding, monochrome "e" mark. Transitional aliases (`--brand*`, `--tone-*`, `.surface-*`) stay until stage 4 |
+| 2 Shared components | not started | |
+| 3 Pages that have a mockup | not started | |
+| 4 Other pages and final sweep | not started | |
+
+Contrast decisions (numbers in the final report): muted text on a muted fill uses `--muted-on-muted` #666666 (5.27:1; #737373 gives 4.35:1); focus ring #525252 (7.8:1; the specified #a3a3a3 is 2.5:1); field border #8f8f8f (3.23:1; the specified #e5e5e5 is 1.26:1).
