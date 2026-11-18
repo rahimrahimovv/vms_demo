@@ -16,9 +16,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-brand: var(--brand);
-  --color-brand-ink: var(--brand-ink);
-  --color-brand-tint: var(--brand-tint);
   --color-muted-on-muted: var(--muted-on-muted);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
@@ -108,25 +105,7 @@
   --density-gap: 20px;
   --density-price: 18px;
   --control-h: 36px; /* form fields and buttons never go below this */
-
-  /* Transitional aliases, removed in the final sweep of this redesign */
-  --brand: #171717;
-  --brand-ink: #171717;
-  --brand-tint: #f5f5f5;
-  --brand-grade-bg: #f5f5f5;
-  --brand-grade-fg: #171717;
-  --surface-inner: #fafafa;
-  --field-bg: #ffffff;
-  --tone-sky-bg: #ffffff;
-  --tone-sky-fg: #171717;
-  --tone-amber-bg: #ffffff;
-  --tone-amber-fg: #171717;
-  --tone-green-bg: #ffffff;
-  --tone-green-fg: #171717;
-  --tone-red-bg: #ffffff;
-  --tone-red-fg: #b91c1c;
-  --tone-grey-bg: #f5f5f5;
-  --tone-grey-fg: #171717;
+  --surface-inner: #fafafa; /* rows and tiles inside a card */
 }
 
 /* Forced colours and more contrast: borders stay visible whatever the palette. */
@@ -195,13 +174,6 @@ main [data-slot="tabs-content"].flex-col {
   background: var(--surface-inner);
   border-radius: 10px;
 }
-/* Warning banner (transitional; the Alert component replaces it) */
-.surface-warning {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-}
 
 /* Shell */
 .shell-sidebar {
@@ -223,19 +195,6 @@ main [data-slot="tabs-content"].flex-col {
   border: 1px solid var(--border);
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   border-radius: 10px;
-}
-.surface-pill {
-  background: var(--background);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-.brand-button {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-.brand-button:hover {
-  background: color-mix(in oklab, var(--primary) 90%, transparent);
 }
 
 /* Lucide icons: 1.5 stroke (the library default is 2); icons that set their own width keep it. */

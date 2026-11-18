@@ -7,6 +7,7 @@ import { flattenTree, type CategoryRow } from "@/lib/categories";
 import { bakuToday, certificateStatus } from "@/lib/vendors/rules";
 import { StatusBadge, ToneChip } from "@/components/status-badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -18,12 +19,12 @@ type Stage = { key: "registration" | "questionnaire" | "categories"; href: strin
 
 const DAY_MS = 86_400_000;
 
-/** Grade badges stay brand blue (Midnight Navy). */
+/** Grade badges are secondary badges without a dot. */
 function GradeBadge({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex h-5 items-center rounded-full bg-(--brand-grade-bg) px-2.5 text-xs font-semibold whitespace-nowrap text-(--brand-grade-fg)", className)}>
+    <Badge variant="secondary" className={className}>
       {children}
-    </span>
+    </Badge>
   );
 }
 
@@ -139,7 +140,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
         <Alert
           key={c.id}
           variant={c.status === "EXPIRED" ? "destructive" : "default"}
-          className={cn("flex items-center gap-3.5", c.status === "EXPIRING" && "surface-warning")}
+          className={cn("flex items-center gap-3.5", c.status === "EXPIRING")}
           data-testid="certificate-warning"
         >
           <TriangleAlert className="size-5 shrink-0" aria-hidden />

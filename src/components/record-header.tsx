@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/status-badge";
 
 /** Record page header: number/title, status badge, main actions on the right (CLAUDE.md Design). */
@@ -22,7 +23,7 @@ export function RecordHeader({
         <div className="flex items-center gap-3">
           <h2 className="text-2xl leading-8 font-semibold">{title}</h2>
           {tag && (
-            <span className="inline-flex h-5 items-center rounded-full border border-white/90 bg-white/70 px-2.5 text-xs font-semibold text-muted-foreground">{tag}</span>
+            <Badge variant="secondary">{tag}</Badge>
           )}
           {status && <StatusBadge status={status} />}
         </div>

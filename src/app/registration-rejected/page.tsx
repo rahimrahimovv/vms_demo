@@ -29,7 +29,7 @@ export default async function RegistrationRejectedPage() {
         <StatusBadge status="REJECTED" />
       </div>
       {vendor?.legal_name && <p className="text-muted-foreground">{vendor.legal_name}</p>}
-      <div className="surface-warning flex flex-col gap-1 rounded-[14px] p-4" data-testid="rejected-reason">
+      <div className="flex flex-col gap-1 rounded-[10px] border p-4" data-testid="rejected-reason">
         <span className="text-xs font-semibold text-muted-foreground">{t("rejected.reason")}</span>
         <span className="text-sm whitespace-pre-wrap">{vendor?.review_comment ?? t("common.none")}</span>
       </div>

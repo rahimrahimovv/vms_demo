@@ -587,7 +587,7 @@ function AddCostForm({ id, line, cell, action }: { id: string; line: ComparisonL
       <input type="hidden" name="proposal" value={cell.proposalId} />
       <div className="flex flex-col gap-1.5">
         <Label htmlFor={`${id}-type`}>{t("sourcing.comparison.costs.type")}</Label>
-        <select id={`${id}-type`} name="type" defaultValue="DELIVERY" className="h-8 rounded-[10px] border border-input bg-(--field-bg) px-2.5 text-sm">
+        <select id={`${id}-type`} name="type" defaultValue="DELIVERY" className="h-8 rounded-md border border-input bg-background px-2.5 text-sm shadow-xs">
           {(["CUSTOMS", "DELIVERY", "INSURANCE", "OTHER"] as const).map((k) => (
             <option key={k} value={k}>
               {t(`sourcing.comparison.costs.types.${k}`)}

@@ -4,7 +4,7 @@ Updated after each slice (CLAUDE.md "How to work").
 
 ## Slice 0: Setup (done, 06 Nov 2026)
 
-- Next.js 16.4 (App Router, TypeScript), Tailwind 4, shadcn/ui (Radix, Nova), lucide, Inter, next-intl.
+- Next.js 16.4 (App Router, TypeScript), Tailwind 4, shadcn/ui (Radix, new-york look since 18 Nov 2026), lucide, Geist, next-intl.
 - Supabase: migrations in `supabase/migrations/`, `seed.sql`, `scripts/seed-users.ts`; applied to vms-dev and vms-prod.
 - Vitest: unit tests and RLS tests against vms-dev. Setup and deploy steps: `docs/SETUP.md`.
 - Vercel: not confirmed deployed yet (steps in `docs/SETUP.md`).
