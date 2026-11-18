@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
@@ -89,7 +89,7 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
 
   const planWarning =
     overPlan > 0 && pr.status !== "REJECTED" ? (
-      <Alert className="surface-warning" data-testid="plan-warning">
+      <Alert data-testid="plan-warning">
         <AlertTriangle className="size-4" aria-hidden />
         <AlertDescription>{t("requisitions.planWarning", { amount: formatAmount(overPlan) })}</AlertDescription>
       </Alert>
@@ -138,28 +138,33 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
 
       {query.submitted === "1" && (
         <Alert data-testid="submitted-note">
+          <Info aria-hidden />
           <AlertDescription>{t("requisitions.submittedNote")}</AlertDescription>
         </Alert>
       )}
       {query.saved === "1" && pr.status === "DRAFT" && (
         <Alert data-testid="form-saved">
+          <Info aria-hidden />
           <AlertDescription>{t("requisitions.saved")}</AlertDescription>
         </Alert>
       )}
       {pr.status === "RETURNED" && pr.decision_comment && (
-        <Alert className="surface-warning" data-testid="returned-comment">
+        <Alert data-testid="returned-comment">
+          <AlertTriangle aria-hidden />
           <AlertTitle>{t("requisitions.returnedTitle")}</AlertTitle>
           <AlertDescription>{pr.decision_comment}</AlertDescription>
         </Alert>
       )}
       {pr.status === "REJECTED" && pr.decision_comment && (
         <Alert variant="destructive" data-testid="rejected-reason">
+          <Info aria-hidden />
           <AlertTitle>{t("requisitions.rejectedTitle")}</AlertTitle>
           <AlertDescription>{pr.decision_comment}</AlertDescription>
         </Alert>
       )}
       {pr.status === "PENDING_APPROVAL" && !canDecide && (
         <Alert data-testid="pending-note">
+          <Info aria-hidden />
           <AlertDescription>
             {t(own && user.roles.includes("APPROVER") ? "requisitions.ownRequestNote" : "requisitions.pendingNote")}
           </AlertDescription>
@@ -210,7 +215,7 @@ export default async function RequisitionPage({ params, searchParams }: PageProp
               </Card>
               <div className="surface-solid overflow-x-auto">
                 <Table>
-                  <TableHeader className="bg-muted/60">
+                  <TableHeader className="bg-muted">
                     <TableRow>
                       <TableHead>#</TableHead>
                       <TableHead>{t("items.columns.code")}</TableHead>

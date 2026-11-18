@@ -61,7 +61,7 @@ export function VendorQa({
           {q.status === "PUBLISHED" ? (
             <p className="surface-inner px-3 py-2 text-sm whitespace-pre-wrap">{q.answer}</p>
           ) : (
-            <p className="text-xs font-semibold text-(--tone-amber-fg)">{t("sourcing.qa.awaiting")}</p>
+            <p className="text-xs font-semibold text-foreground">{t("sourcing.qa.awaiting")}</p>
           )}
         </article>
       ))}
@@ -73,7 +73,7 @@ export function VendorQa({
           </FormField>
           <FileField id="qa-file" name="file" label={t("sourcing.qa.attachment")} error={err("file")} />
           {state.errors.form && <p role="alert" className="text-xs font-medium text-destructive">{t(state.errors.form)}</p>}
-          {state.saved && <p className="text-xs text-(--tone-green-fg)" data-testid="question-sent">{t("sourcing.qa.sent")}</p>}
+          {state.saved && <p className="text-xs text-foreground" data-testid="question-sent">{t("sourcing.qa.sent")}</p>}
           <div>
             <Button type="submit" disabled={pending} data-testid="ask-question">
               {pending ? t("common.saving") : t("sourcing.qa.send")}

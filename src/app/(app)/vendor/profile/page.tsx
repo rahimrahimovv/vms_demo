@@ -180,7 +180,7 @@ export default async function VendorProfilePage() {
                   <span className="font-mono text-xs">{a.iban}</span>
                   <span>{a.swift}</span>
                   <span>{a.currency}</span>
-                  {a.is_main && <span className="text-xs font-semibold text-brand-ink">{t("bankAccounts.main")}</span>}
+                  {a.is_main && <span className="text-xs font-semibold text-foreground">{t("bankAccounts.main")}</span>}
                 </li>
               ))}
             </ul>
@@ -225,7 +225,7 @@ export default async function VendorProfilePage() {
           {(certificates ?? []).length > 0 && (
             <div className="surface-solid overflow-hidden">
               <Table data-testid="certificates">
-                <TableHeader className="bg-muted/60">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead>{t("profile.fields.certificateType")}</TableHead>
                     <TableHead>{t("profile.fields.number")}</TableHead>

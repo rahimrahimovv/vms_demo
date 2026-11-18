@@ -15,8 +15,8 @@ export default async function ChangePasswordPage() {
 
   return (
     <AuthShell name={t("app.name")}>
-      <h1 className="text-[22px] font-bold">{t("password.title")}</h1>
-      <p className="text-[#3d4a50]" data-testid="password-intro">
+      <h1 className="text-[22px] font-semibold">{t("password.title")}</h1>
+      <p className="text-muted-foreground" data-testid="password-intro">
         {forced ? t("password.forcedNotice") : t("password.intro")}
       </p>
       <ChangePasswordForm />

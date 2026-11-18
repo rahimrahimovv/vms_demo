@@ -39,7 +39,7 @@ export async function ChangeRequestHistory({ vendorId, audience }: { vendorId: s
   return (
     <div className="surface-solid overflow-hidden">
       <Table data-testid="change-request-history">
-        <TableHeader className="bg-muted/60">
+        <TableHeader className="bg-muted">
           <TableRow>
             <TableHead>{t("columns.section")}</TableHead>
             <TableHead>{t("columns.status")}</TableHead>

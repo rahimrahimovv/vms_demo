@@ -2,7 +2,7 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Plus, Trash2, Info } from "lucide-react";
 import { formatAmount } from "@/lib/format";
 import {
   EMPTY_LINE,
@@ -73,11 +73,13 @@ export function RequisitionForm({
 
       {state.errors.form && (
         <Alert variant="destructive" data-testid="form-error">
+          <Info aria-hidden />
           <AlertDescription>{t(state.errors.form)}</AlertDescription>
         </Alert>
       )}
       {state.saved && (
         <Alert data-testid="form-saved">
+          <Info aria-hidden />
           <AlertDescription>{t("requisitions.saved")}</AlertDescription>
         </Alert>
       )}
@@ -241,7 +243,7 @@ export function RequisitionForm({
           </span>
         </div>
         {excess > 0 && (
-          <Alert className="max-w-xl surface-warning" data-testid="plan-warning">
+          <Alert className="max-w-xl" data-testid="plan-warning">
             <AlertTriangle className="size-4" aria-hidden />
             <AlertDescription>{t("requisitions.planWarning", { amount: formatAmount(excess) })}</AlertDescription>
           </Alert>

@@ -48,10 +48,10 @@ export function FinalOfferForm({
           <DeadlineCountdown deadline={deadline} serverNow={serverNow} kind="finalOffer" />
         </p>
         {message && <p className="text-sm text-muted-foreground">{t("proposal.finalOffer.message", { message })}</p>}
-        {respondedAt && <p className="text-xs text-(--tone-green-fg)" data-testid="final-offer-responded">{t("proposal.finalOffer.responded", { date: formatDateTime(respondedAt) })}</p>}
+        {respondedAt && <p className="text-xs text-foreground" data-testid="final-offer-responded">{t("proposal.finalOffer.responded", { date: formatDateTime(respondedAt) })}</p>}
       </div>
       <table className="w-full text-sm">
-        <thead className="bg-muted/60 text-left">
+        <thead className="bg-muted text-left">
           <tr>
             <th className="px-3 py-2 font-medium">{t("items.columns.name")}</th>
             <th className="px-3 py-2 text-right font-medium">{t("requisitions.fields.quantity")}</th>
@@ -87,7 +87,7 @@ export function FinalOfferForm({
       </table>
       <p className="text-xs text-muted-foreground">{t("proposal.finalOffer.hint")}</p>
       {state.errors.form && <p role="alert" className="text-xs font-medium text-destructive">{t(state.errors.form)}</p>}
-      {state.saved && <p className="text-xs text-(--tone-green-fg)">{t("proposal.finalOffer.saved")}</p>}
+      {state.saved && <p className="text-xs text-foreground">{t("proposal.finalOffer.saved")}</p>}
       <div className="flex gap-2">
         <Button type="submit" name="intent" value="submit" disabled={pending} data-testid="submit-final-offer">
           {t("proposal.finalOffer.submit")}

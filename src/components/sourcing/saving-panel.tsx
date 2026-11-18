@@ -41,26 +41,26 @@ export function SavingTable({ saving, names }: { saving: Saving; names: Map<stri
   const t = useTranslations("saving");
   return (
     <section aria-label={t("title")} className="surface-solid overflow-hidden" data-testid="saving-section">
-      <div className="border-b border-[rgba(23,38,43,0.08)] px-[18px] py-2.5">
+      <div className="border-b border-border px-5 py-2.5">
         <h3 className="text-base font-semibold">{t("title")}</h3>
         <p className="text-xs text-muted-foreground">{t("hint")}</p>
       </div>
       <table className="w-full border-collapse text-(length:--density-table-text)" data-testid="saving-table">
         <thead>
           <tr className="bg-muted/50">
-            <th scope="col" className="px-(--density-cell-x) py-(--density-cell-y) text-left font-semibold">{t("line")}</th>
-            <th scope="col" className="px-(--density-cell-x) py-(--density-cell-y) text-right font-semibold">{t("estimateCol")}</th>
-            <th scope="col" className="px-(--density-cell-x) py-(--density-cell-y) text-right font-semibold">{t("winnerCol")}</th>
-            <th scope="col" className="px-(--density-cell-x) py-(--density-cell-y) text-right font-semibold">{t("differenceCol")}</th>
+            <th scope="col" className="px-(--density-cell-x) py-3 text-left font-semibold">{t("line")}</th>
+            <th scope="col" className="px-(--density-cell-x) py-3 text-right font-semibold">{t("estimateCol")}</th>
+            <th scope="col" className="px-(--density-cell-x) py-3 text-right font-semibold">{t("winnerCol")}</th>
+            <th scope="col" className="px-(--density-cell-x) py-3 text-right font-semibold">{t("differenceCol")}</th>
           </tr>
         </thead>
         <tbody>
           {saving.lines.map((l) => (
             <tr key={l.lineId} data-testid="saving-line">
-              <th scope="row" className="border-t px-(--density-cell-x) py-(--density-cell-y) text-left font-normal">{names.get(l.lineId) ?? ""}</th>
-              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">{l.estimateUnit !== undefined ? formatAmount(l.estimateUnit) : "–"}</td>
-              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">{l.winnerUnit !== undefined ? formatAmount(l.winnerUnit) : "–"}</td>
-              <td className="border-t px-(--density-cell-x) py-(--density-cell-y) text-right tabular-nums">
+              <th scope="row" className="border-t px-(--density-cell-x) py-3 text-left font-normal">{names.get(l.lineId) ?? ""}</th>
+              <td className="border-t px-(--density-cell-x) py-3 text-right tabular-nums">{l.estimateUnit !== undefined ? formatAmount(l.estimateUnit) : "–"}</td>
+              <td className="border-t px-(--density-cell-x) py-3 text-right tabular-nums">{l.winnerUnit !== undefined ? formatAmount(l.winnerUnit) : "–"}</td>
+              <td className="border-t px-(--density-cell-x) py-3 text-right tabular-nums">
                 <span className="inline-flex items-center justify-end gap-2">
                   {(l.percent ?? 0) < 0 && <ToneChip tone="amber">{t("over")}</ToneChip>}
                   {l.percent === null || l.percent === undefined ? "–" : formatPercent(l.percent)}

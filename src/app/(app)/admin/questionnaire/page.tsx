@@ -42,7 +42,7 @@ export default async function AdminQuestionnairePage() {
       ) : (
         <div className="surface-solid overflow-hidden">
           <Table data-testid="questions">
-            <TableHeader className="bg-muted/60">
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>{t("adminQuestionnaire.fields.text")}</TableHead>
                 <TableHead>{t("adminQuestionnaire.fields.options")}</TableHead>

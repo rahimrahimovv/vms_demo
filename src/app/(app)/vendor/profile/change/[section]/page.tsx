@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
@@ -45,7 +46,8 @@ export default async function NewChangeRequestPage({ params }: PageProps<"/vendo
     <div className="flex max-w-5xl flex-col gap-4">
       <RecordHeader title={t("changeRequest.formTitle", { section: t(`changeRequest.sections.${section}`) })} subtitle={t("changeRequest.formSubtitle")} />
       {open ? (
-        <Alert className="surface-warning" data-testid="request-open">
+        <Alert data-testid="request-open">
+          <AlertTriangle aria-hidden />
           <AlertDescription>
             {t("errors.changeRequestOpen")}{" "}
             <Link href={`/vendor/profile/requests/${open.id}`} className="font-medium underline">

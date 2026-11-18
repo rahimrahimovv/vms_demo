@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { AlertTriangle, Info } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
@@ -55,13 +56,15 @@ export default async function RegistrationStepPage({ params }: PageProps<"/vendo
     <div className="flex flex-col gap-6">
       <RecordHeader title={vendor.legal_name} subtitle={t(`vendorTypes.${vendor.vendor_type}`)} status={vendor.status} />
       {vendor.status === "RETURNED" && vendor.review_comment && (
-        <Alert className="surface-warning" data-testid="returned-comment">
+        <Alert data-testid="returned-comment">
+          <AlertTriangle aria-hidden />
           <AlertTitle>{t("registration.returnedTitle")}</AlertTitle>
           <AlertDescription>{vendor.review_comment}</AlertDescription>
         </Alert>
       )}
       {vendor.status === "SUBMITTED" && (
         <Alert data-testid="submitted-note">
+          <Info aria-hidden />
           <AlertDescription>{t("registration.readOnlyNote")}</AlertDescription>
         </Alert>
       )}

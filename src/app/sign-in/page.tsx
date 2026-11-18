@@ -11,13 +11,13 @@ export default async function SignInPage() {
 
   return (
     <AuthShell name={t("app.name")}>
-      <h1 className="text-[22px] font-bold">{t("signIn.title")}</h1>
-      <p className="text-[#3d4a50]">{t("signIn.subtitle")}</p>
+      <h1 className="text-[22px] font-semibold">{t("signIn.title")}</h1>
+      <p className="text-muted-foreground">{t("signIn.subtitle")}</p>
       <SignInForm />
-      <p className="text-[13px] text-[#3d4a50]" data-testid="forgot-password">
+      <p className="text-[13px] text-muted-foreground" data-testid="forgot-password">
         {t("signIn.forgot")}
       </p>
-      <p className="pt-1.5 text-[13px] text-[#3d4a50]">
+      <p className="pt-1.5 text-[13px] text-muted-foreground">
         {t("signIn.vendorPrompt")}{" "}
         <Link href="/register" className="font-semibold text-primary hover:underline" data-testid="register-link">
           {t("signIn.registerLink")}

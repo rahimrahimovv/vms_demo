@@ -23,14 +23,14 @@ export default async function RegistrationRejectedPage() {
   return (
     <AuthShell name={t("app.name")}>
       <div className="flex items-center gap-3">
-        <h1 className="text-[22px] font-bold" data-testid="rejected-title">
+        <h1 className="text-[22px] font-semibold" data-testid="rejected-title">
           {t("rejected.title")}
         </h1>
         <StatusBadge status="REJECTED" />
       </div>
-      {vendor?.legal_name && <p className="text-[#3d4a50]">{vendor.legal_name}</p>}
-      <div className="surface-warning flex flex-col gap-1 rounded-[18px] p-4" data-testid="rejected-reason">
-        <span className="text-xs font-semibold text-[#3d4a50]">{t("rejected.reason")}</span>
+      {vendor?.legal_name && <p className="text-muted-foreground">{vendor.legal_name}</p>}
+      <div className="surface-warning flex flex-col gap-1 rounded-[14px] p-4" data-testid="rejected-reason">
+        <span className="text-xs font-semibold text-muted-foreground">{t("rejected.reason")}</span>
         <span className="text-sm whitespace-pre-wrap">{vendor?.review_comment ?? t("common.none")}</span>
       </div>
       <p className="text-sm font-medium" data-testid="rejected-contact">

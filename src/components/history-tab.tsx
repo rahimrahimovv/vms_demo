@@ -37,7 +37,7 @@ export async function HistoryTab({ recordType, recordId }: { recordType: string;
   return (
     <div className="surface-solid overflow-hidden">
       <Table>
-        <TableHeader className="bg-muted/60">
+        <TableHeader className="bg-muted">
           <TableRow>
             <TableHead>{t("columns.when")}</TableHead>
             <TableHead>{t("columns.user")}</TableHead>

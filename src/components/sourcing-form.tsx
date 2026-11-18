@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, FileText, Trash2 } from "lucide-react";
+import { AlertTriangle, FileText, Trash2, Info } from "lucide-react";
 import { SELECT_CLASS } from "@/components/admin/entry-dialog";
 import { StagedFileInput } from "@/components/file-field";
 import { FormField } from "@/components/form-field";
@@ -86,11 +86,13 @@ export function SourcingForm({
     <form action={formAction} className="flex flex-col gap-6" data-testid="sourcing-form">
       {state.errors.form && (
         <Alert variant="destructive" data-testid="sourcing-form-error">
+          <Info aria-hidden />
           <AlertDescription>{t(state.errors.form, state.params)}</AlertDescription>
         </Alert>
       )}
       {state.saved && (
         <Alert data-testid="sourcing-saved">
+          <Info aria-hidden />
           <AlertDescription>{t("sourcing.saved")}</AlertDescription>
         </Alert>
       )}
@@ -151,7 +153,7 @@ export function SourcingForm({
       <section className="flex flex-col gap-3" data-testid="invitee-list">
         <h3 className="text-base font-semibold">{t("sourcing.invitees.title")}</h3>
         {type !== "SSP" && remaining < minimum && (
-          <Alert className="surface-warning" data-testid="below-minimum-warning">
+          <Alert data-testid="below-minimum-warning">
             <AlertTriangle className="size-4" aria-hidden />
             <AlertDescription>{t("sourcing.invitees.belowMinimum", { count: remaining, minimum })}</AlertDescription>
           </Alert>

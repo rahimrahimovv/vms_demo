@@ -25,7 +25,7 @@ type AvlRow = {
   bank_guarantee_available: boolean;
 };
 
-const SELECT_CLASS = "h-9 w-full rounded-[14px] border border-input bg-(--field-bg) px-3 text-sm";
+const SELECT_CLASS = "h-(--control-h) w-full rounded-md border border-input bg-background px-3 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive disabled:opacity-50";
 const param = (value: string | string[] | undefined) => (typeof value === "string" ? value : "");
 
 /**

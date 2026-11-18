@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { AlertTriangle, Info } from "lucide-react";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
@@ -107,6 +108,7 @@ export default async function VendorQualificationPage({ searchParams }: PageProp
 
       {startError && (
         <Alert variant="destructive">
+          <Info aria-hidden />
           <AlertDescription>{t(startError)}</AlertDescription>
         </Alert>
       )}
@@ -137,18 +139,21 @@ export default async function VendorQualificationPage({ searchParams }: PageProp
 
       {onHold && (
         <Alert variant="destructive" data-testid="hold-note">
+          <Info aria-hidden />
           <AlertDescription>{t("qualification.applyAgainOn", { date: formatDate(vendor.standing_until!) })}</AlertDescription>
         </Alert>
       )}
 
       {open?.status === "RETURNED" && open.review_comment && (
-        <Alert className="surface-warning" data-testid="returned-comment">
+        <Alert data-testid="returned-comment">
+          <AlertTriangle aria-hidden />
           <AlertTitle>{t("qualification.returnedTitle")}</AlertTitle>
           <AlertDescription>{open.review_comment}</AlertDescription>
         </Alert>
       )}
       {open?.status === "SUBMITTED" && (
         <Alert>
+          <Info aria-hidden />
           <AlertDescription>{t("qualification.submittedNote")}</AlertDescription>
         </Alert>
       )}

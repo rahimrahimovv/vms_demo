@@ -8,6 +8,8 @@ import { certificateStatus, daysBetween, yearsInBusiness } from "@/lib/vendors/r
 import { initials, ringShare, type AttentionItem } from "@/lib/vendors/attention";
 import type { BankAccountRow, ContactRow, FileRow, OwnerRow, VendorRow } from "@/lib/vendors/queries";
 import { StatusBadge, ToneChip } from "@/components/status-badge";
+import { AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +17,7 @@ import { ActivityList, SidePanel, type ActivityEntry } from "@/components/vendor
 
 type T = Awaited<ReturnType<typeof getTranslations>>;
 
-const ROW = "flex flex-col gap-0.5 border-t border-[rgba(23,38,43,0.08)] py-1.5 text-[13px]";
+const ROW = "flex flex-col gap-0.5 border-t border-border py-1.5 text-[13px]";
 const MUTED = "text-xs text-muted-foreground";
 
 /** A compact card: 15 px title, 13 px text, about 14 px padding (Card size "sm"). */
@@ -24,7 +26,7 @@ export function SectionCard({ title, action, children, testId }: { title: string
     <Card size="sm" data-testid={testId}>
       <CardHeader className="grid-cols-[1fr_auto] items-center">
         <CardTitle>
-          <h2 className="text-[15px] font-bold">{title}</h2>
+          <h2 className="text-[15px] font-semibold">{title}</h2>
         </CardTitle>
         {action}
       </CardHeader>
@@ -34,12 +36,12 @@ export function SectionCard({ title, action, children, testId }: { title: string
 }
 
 function Calm({ children }: { children: ReactNode }) {
-  return <p className="border-t border-[rgba(23,38,43,0.08)] pt-2 text-[13px] text-muted-foreground">{children}</p>;
+  return <p className="border-t border-border pt-2 text-[13px] text-muted-foreground">{children}</p>;
 }
 
 function Fact({ label, children, testId }: { label: string; children: ReactNode; testId?: string }) {
   return (
-    <div className="flex gap-3 border-t border-[rgba(23,38,43,0.08)] py-1 text-[13px]">
+    <div className="flex gap-3 border-t border-border py-1 text-[13px]">
       <dt className="w-28 shrink-0 text-muted-foreground">{label}</dt>
       <dd className="min-w-0 flex-1 font-medium break-words" data-testid={testId}>
         {children}
@@ -134,12 +136,12 @@ export async function VendorHeader({ vendor, grade, today, actions, activity }: 
   return (
     <Card size="sm" data-testid="vendor-header">
       <CardContent className="flex items-center gap-3.5">
-        <div aria-hidden className="brand-button flex size-[52px] shrink-0 items-center justify-center rounded-2xl text-lg font-bold">
+        <div aria-hidden className="flex size-[52px] shrink-0 items-center justify-center rounded-full bg-secondary text-lg font-medium text-secondary-foreground">
           {initials(vendor.legal_name)}
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-            <h1 className="text-lg leading-tight font-bold">{vendor.legal_name}</h1>
+            <h1 className="text-lg leading-tight font-semibold">{vendor.legal_name}</h1>
             <StatusBadge status={vendor.status} />
             {vendor.standing && <StatusBadge status={vendor.standing} />}
             {grade && <Badge data-testid="card-grade">{t("vendorCard.gradeBadge", { grade: grade.grade })}</Badge>}
@@ -189,36 +191,39 @@ export async function AttentionStrip({
     );
   }
   return (
-    <section aria-labelledby="attention-title" className="surface-warning flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2" data-testid="needs-attention">
-      <h2 id="attention-title" className="text-xs font-bold tracking-[0.06em] text-(--tone-amber-fg) uppercase">
+    <Alert aria-labelledby="attention-title" className="items-center gap-x-3 py-2 has-[>svg]:grid-cols-[auto_auto_1fr_auto]" data-testid="needs-attention">
+      <AlertTriangle aria-hidden />
+      <AlertTitle id="attention-title" className="whitespace-nowrap">
         {t("vendorCard.attention.title")}
-      </h2>
-      <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-        {attention.map((item, i) => {
-          const text = attentionText(t, item, categoryName);
-          return (
-            <li key={`${item.kind}-${i}`}>
-              <ToneChip tone={item.tone} className="h-auto min-h-5 py-0.5 text-left whitespace-normal">
-                {item.kind === "sharedOwner" ? (
-                  <Link href={`/vendors/${item.vendorId}`} className="underline" data-testid="shared-owner">
-                    {text}
-                  </Link>
-                ) : (
-                  text
-                )}
-              </ToneChip>
-            </li>
-          );
-        })}
-      </ul>
+      </AlertTitle>
+      <AlertDescription>
+        <ul className="flex min-w-0 flex-wrap items-center gap-1.5">
+          {attention.map((item, i) => {
+            const text = attentionText(t, item, categoryName);
+            return (
+              <li key={`${item.kind}-${i}`}>
+                <ToneChip tone={item.tone} className="h-auto min-h-5 py-0.5 text-left whitespace-normal">
+                  {item.kind === "sharedOwner" ? (
+                    <Link href={`/vendors/${item.vendorId}`} className="underline" data-testid="shared-owner">
+                      {text}
+                    </Link>
+                  ) : (
+                    text
+                  )}
+                </ToneChip>
+              </li>
+            );
+          })}
+        </ul>
+      </AlertDescription>
       {review && (
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" size="sm">
           <Link href={`/change-requests/${review.id}`} data-testid="strip-review">
             {t("vendorCard.banner.review")}
           </Link>
         </Button>
       )}
-    </section>
+    </Alert>
   );
 }
 
@@ -236,10 +241,10 @@ export async function QualificationCard({
   const C = 2 * Math.PI * R;
   return (
     <SectionCard title={t("vendorCard.qualification")} testId="qualification">
-      <div className="flex items-center gap-3.5 border-t border-[rgba(23,38,43,0.08)] pt-2">
+      <div className="flex items-center gap-3.5 border-t border-border pt-2">
         {grade ? (
           <svg width="84" height="84" viewBox="0 0 84 84" role="img" aria-label={t("vendorCard.gradeAria", { grade: grade.grade, score: scoreText })} className="shrink-0">
-            <circle cx="42" cy="42" r={R} fill="none" strokeWidth="9" className="stroke-foreground/15" />
+            <circle cx="42" cy="42" r={R} fill="none" strokeWidth="9" className="stroke-muted" />
             <circle
               cx="42"
               cy="42"
@@ -249,9 +254,9 @@ export async function QualificationCard({
               strokeLinecap="round"
               strokeDasharray={`${(C * ringShare(score)).toFixed(1)} ${C.toFixed(1)}`}
               transform="rotate(-90 42 42)"
-              className="stroke-primary"
+              className="stroke-chart-3"
             />
-            <text x="42" y="51" textAnchor="middle" fontSize="26" fontWeight="700" className="fill-(--brand-grade-fg)">
+            <text x="42" y="51" textAnchor="middle" fontSize="26" fontWeight="600" className="fill-foreground">
               {grade.grade}
             </text>
           </svg>
@@ -259,7 +264,7 @@ export async function QualificationCard({
         <div className="flex min-w-0 flex-col gap-1">
           {grade ? (
             <>
-              <div className="text-base font-bold">{t("vendorCard.points", { score: scoreText })}</div>
+              <div className="text-base font-semibold">{t("vendorCard.points", { score: scoreText })}</div>
               {grade.valid_until && (
                 <div className="text-[13px] text-muted-foreground">
                   {t("qualification.validUntil")} {formatDate(grade.valid_until)}
@@ -328,11 +333,11 @@ export async function OwnersCard({ owners, shares }: { owners: OwnerRow[]; share
           <span>
             <span className="font-medium">{o.full_name}</span> <span className="text-muted-foreground">· {t(`ownerRoles.${o.role}`)}</span>
           </span>
-          <span className="font-bold tabular-nums">{pct !== null ? `${pct}%` : t("common.none")}</span>
+          <span className="font-semibold tabular-nums">{pct !== null ? `${pct}%` : t("common.none")}</span>
         </div>
         {pct !== null && (
-          <div aria-hidden className="h-1 overflow-hidden rounded-full bg-foreground/10">
-            <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
+          <div aria-hidden className="h-1.5 overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-chart-3" style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
           </div>
         )}
         {detail && <div className={MUTED}>{t("vendorCard.idNumber", { number: o.id_number })}</div>}
@@ -467,7 +472,7 @@ export async function CertificatesCard({
               aria-label={t("vendorCard.validityLeft", { percent: left })}
               className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-foreground/10"
             >
-              <div className={status === "VALID" ? "h-full rounded-full bg-primary" : "h-full rounded-full bg-(--tone-amber-fg)"} style={{ width: `${left}%` }} />
+              <div className={status === "VALID" ? "h-full rounded-full bg-chart-3" : "h-full rounded-full bg-(--dot-amber)"} style={{ width: `${left}%` }} />
             </div>
           )}
           <span className={`${MUTED} shrink-0`}>{c.expires_on ? t("vendorCard.until", { date: formatDate(c.expires_on) }) : t("profile.noExpiry")}</span>
@@ -532,7 +537,7 @@ export async function CategoriesCard({
 export async function DocumentsCard({ files }: { files: FileRow[] }) {
   const t = await getTranslations();
   const rows = files.map((f) => (
-    <li key={f.id} className="flex items-center justify-between gap-3 border-t border-[rgba(23,38,43,0.08)] py-1.5 text-[13px]">
+    <li key={f.id} className="flex items-center justify-between gap-3 border-t border-border py-1.5 text-[13px]">
       <span className="min-w-0 break-words">
         <span className="font-medium">{f.file_name}</span>
         {f.kind && <span className="text-muted-foreground"> · {t(`files.kinds.${f.kind}`)}</span>}

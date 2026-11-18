@@ -758,8 +758,8 @@ Source: `docs/DESIGN.md` and the nine "shadcn style" boards on the design canvas
 | Stage | Status | Notes |
 | --- | --- | --- |
 | 1 Tokens, fonts, shell, logo, favicon | done | DESIGN.md tokens in `globals.css` (light only), Geist and Geist Mono, light sidebar fixed left (256 px), 56 px top bar with breadcrumb, 32 px content padding, monochrome "e" mark. Transitional aliases (`--brand*`, `--tone-*`, `.surface-*`) stay until stage 4 |
-| 2 Shared components | not started | |
-| 3 Pages that have a mockup | not started | |
+| 2 Shared components | done | Button (black primary, outline, secondary, ghost, link, destructive; 32/36/40 px), Input/Select/Textarea (36 px, 3 px focus ring), outline status badges with a 6 px dot (`ToneChip` keys green, blue, amber, grey, red), muted-track tabs, cards 14 px, tables (40 px header, 44 px rows), Alert, Dialog, popovers |
+| 3 Pages that have a mockup | in progress | My tasks, Dashboard, Sourcing list, vendor card, vendor home, comparison (price bars), sign-in restyled through the shared pieces; warning banners are `Alert` with a leading icon; PDF accent #171717. Layouts of the mockups that need data or features the app does not have (search, tabs, Deadlines panel, extra fields) are kept as in the app |
 | 4 Other pages and final sweep | not started | |
 
 Contrast decisions (numbers in the final report): muted text on a muted fill uses `--muted-on-muted` #666666 (5.27:1; #737373 gives 4.35:1); focus ring #525252 (7.8:1; the specified #a3a3a3 is 2.5:1); field border #8f8f8f (3.23:1; the specified #e5e5e5 is 1.26:1).

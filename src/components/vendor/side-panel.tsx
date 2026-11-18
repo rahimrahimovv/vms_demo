@@ -68,7 +68,7 @@ export function ActivityList({ entries }: { entries: ActivityEntry[] }) {
     <div className="flex flex-col gap-2">
       <ul data-testid="activity-list">
         {shown.map((e) => (
-          <li key={e.id} className="flex flex-col gap-0.5 border-t border-[rgba(23,38,43,0.08)] py-2 text-[13px]">
+          <li key={e.id} className="flex flex-col gap-0.5 border-t border-border py-2 text-[13px]">
             <span className="text-xs text-muted-foreground tabular-nums">{e.at}</span>
             {e.node}
           </li>

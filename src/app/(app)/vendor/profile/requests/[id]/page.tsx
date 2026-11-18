@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { AlertTriangle, Info } from "lucide-react";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
 import { currencyOptions } from "@/lib/currencies";
@@ -104,11 +105,13 @@ export default async function VendorChangeRequestPage({ params }: PageProps<"/ve
       />
       {request.status === "SUBMITTED" && (
         <Alert data-testid="pending-note">
+          <Info aria-hidden />
           <AlertDescription>{t("changeRequest.pending")}</AlertDescription>
         </Alert>
       )}
       {request.review_comment && (
-        <Alert className="surface-warning" data-testid="review-comment">
+        <Alert data-testid="review-comment">
+          <AlertTriangle aria-hidden />
           <AlertDescription>
             <span className="font-semibold">{t(request.status === "REJECTED" ? "decision.reason" : "decision.comment")}: </span>
             {request.review_comment}

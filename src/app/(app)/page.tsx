@@ -11,6 +11,7 @@ import { TASK_HREF, loadTasks, waitingRows, waitingTotal, type TaskRow } from "@
 import { NoAccess } from "@/components/no-access";
 import { EmptyState } from "@/components/empty-state";
 import { VendorHome } from "@/components/vendor/vendor-home";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -110,9 +111,9 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="px-2 py-1">
-        <h2 className="text-2xl font-bold">{t(`home.greeting.${greeting}`, { name: firstName })}</h2>
-        <p className="text-[#3d4a50]" data-testid="waiting-count">
+      <div>
+        <h2 className="text-2xl leading-8 font-semibold">{t(`home.greeting.${greeting}`, { name: firstName })}</h2>
+        <p className="text-muted-foreground" data-testid="waiting-count">
           {t("home.waitingCount", { count: waiting })}
         </p>
         <span className="sr-only" data-testid="task-card-unread">
@@ -127,12 +128,12 @@ export default async function HomePage() {
             <Card key={card.key} data-testid={`task-card-${card.key}`}>
               <CardContent className="flex flex-col gap-1">
                 <span className="flex items-start justify-between">
-                  <span className="text-[32px] leading-[1.1] font-bold text-brand-ink">{card.count}</span>
-                  {Icon && <Icon className="size-5 text-brand" aria-hidden />}
+                  <span className="text-3xl leading-9 font-semibold">{card.count}</span>
+                  {Icon && <Icon className="size-4 text-muted-foreground" aria-hidden />}
                 </span>
-                <span className="font-semibold">{t(`home.cardLabels.${card.key}`)}</span>
+                <span className="font-medium">{t(`home.cardLabels.${card.key}`)}</span>
                 <span className="sr-only">{t(`home.cards.${card.key}`, { count: card.count })}</span>
-                <Link href={card.href} className="text-[13px] font-semibold hover:underline">
+                <Link href={card.href} className="text-sm font-medium underline-offset-4 hover:underline">
                   {t(`home.cardLinks.${card.key}`)}
                 </Link>
               </CardContent>
@@ -142,9 +143,9 @@ export default async function HomePage() {
         {adminCards.map((card) => (
           <Card key={card.key} data-testid={`task-card-admin-${card.key}`}>
             <CardContent className="flex flex-col gap-1">
-              <span className="text-[32px] leading-[1.1] font-bold text-brand-ink">{card.count}</span>
-              <span className="font-semibold">{t(`home.adminCards.${card.key}.label`)}</span>
-              <Link href={card.href} className="text-[13px] font-semibold hover:underline">
+              <span className="text-3xl leading-9 font-semibold">{card.count}</span>
+              <span className="font-medium">{t(`home.adminCards.${card.key}.label`)}</span>
+              <Link href={card.href} className="text-sm font-medium underline-offset-4 hover:underline">
                 {t(`home.adminCards.${card.key}.link`)}
               </Link>
             </CardContent>
@@ -156,23 +157,21 @@ export default async function HomePage() {
         <section className="min-w-0 flex-1">
           {rows.length === 0 ? (
             <>
-              <h2 className="px-2 pb-3 text-base font-semibold">{t("home.listTitle")}</h2>
+              <h2 className="pb-3 text-base leading-6 font-semibold">{t("home.listTitle")}</h2>
               <EmptyState message={t("home.empty")} action={mainAction} />
             </>
           ) : (
             <div className="surface-solid overflow-hidden">
-              <h2 className="px-[18px] py-3 text-base font-semibold">{t("home.listTitle")}</h2>
+              <h2 className="px-6 pt-5 pb-3 text-base leading-6 font-semibold">{t("home.listTitle")}</h2>
               <ul>
                 {rows.map((row) => (
-                  <li key={`${row.key}-${row.recordId}`} className="flex items-center gap-3 border-t border-[rgba(23,38,43,0.08)] px-[18px] py-2.5" data-testid="waiting-row">
+                  <li key={`${row.key}-${row.recordId}`} className="flex items-center gap-3 border-t border-border px-6 py-3" data-testid="waiting-row">
                     <div className="min-w-0 flex-1">
-                      <div className="font-semibold">{taskText(row)}</div>
+                      <div className="font-medium">{taskText(row)}</div>
                       <div className="text-xs text-muted-foreground">{formatDateTime(row.since)}</div>
                     </div>
                     <div className="w-36 shrink-0">
-                      <span className="inline-flex h-5 items-center rounded-full bg-(--brand-grade-bg) px-2.5 text-xs font-semibold text-(--brand-grade-fg)">
-                        {recordType(row.recordType)}
-                      </span>
+                      <Badge variant="secondary">{recordType(row.recordType)}</Badge>
                     </div>
                     <div className="w-24 shrink-0 text-xs text-muted-foreground">{formatAge(row.since)}</div>
                     <Button asChild variant="outline">
@@ -195,7 +194,7 @@ export default async function HomePage() {
             ) : (
               recent.map((row) => (
                 <div key={row.id} className="surface-inner px-3 py-2">
-                  <div className="text-[13px] font-semibold">{text(row)}</div>
+                  <div className="text-sm font-medium">{text(row)}</div>
                   <div className="text-xs text-muted-foreground">
                     {row.record_number ? `${row.record_number} · ` : ""}
                     {formatAge(row.created_at)}

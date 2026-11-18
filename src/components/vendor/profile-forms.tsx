@@ -14,7 +14,7 @@ import { BankAccountsEditor } from "@/components/vendor/bank-accounts-editor";
 import type { BankAccount } from "@/lib/vendors/validate";
 
 export const SELECT_CLASS =
-  "h-9 w-full rounded-[14px] border border-input bg-(--field-bg) px-3 text-sm outline-none aria-invalid:border-destructive";
+  "h-(--control-h) w-full rounded-md border border-input bg-background px-3 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive disabled:opacity-50";
 
 type Action = (prev: FormState, formData: FormData) => Promise<FormState>;
 

@@ -30,8 +30,8 @@ export default async function RegisterPage() {
     <AuthShell name={t("app.name")} wide>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-bold">{t("registration.title")}</h1>
-          <p className="text-[#3d4a50]">{t("registration.subtitle")}</p>
+          <h1 className="text-[22px] font-semibold">{t("registration.title")}</h1>
+          <p className="text-muted-foreground">{t("registration.subtitle")}</p>
         </div>
         <Link href="/sign-in" className="shrink-0 text-sm font-semibold text-primary hover:underline">
           {t("registration.haveAccount")}

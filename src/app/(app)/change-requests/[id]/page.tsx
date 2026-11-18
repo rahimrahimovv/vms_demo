@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
@@ -64,14 +65,15 @@ export default async function ChangeRequestPage({ params }: PageProps<"/change-r
         status={request.status}
         actions={actions}
       />
-      <p className="px-2 text-sm">
+      <p className="text-sm">
         <Link href={`/vendors/${request.vendor_id}`} className="font-medium text-primary hover:underline" data-testid="vendor-link">
           {vendor?.legal_name}
         </Link>
         {request.submitted_at && <span className="text-muted-foreground"> · {t("changeRequest.submittedAt", { date: formatDateTime(request.submitted_at) })}</span>}
       </p>
       {request.review_comment && (
-        <Alert className="surface-warning" data-testid="review-comment">
+        <Alert data-testid="review-comment">
+          <AlertTriangle aria-hidden />
           <AlertDescription>
             <span className="font-semibold">{decider?.full_name ? `${decider.full_name}: ` : ""}</span>
             {request.review_comment}

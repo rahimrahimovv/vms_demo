@@ -74,7 +74,7 @@ export default async function MinutesPage({ params }: PageProps<"/minutes/[id]">
         <h3 className="text-base font-semibold">{t("minutes.voters")}</h3>
         <div className="surface-solid overflow-hidden">
           <Table>
-            <TableHeader className="bg-muted/60">
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>{t("minutes.voterColumns.member")}</TableHead>
                 <TableHead>{t("minutes.voterColumns.vote")}</TableHead>

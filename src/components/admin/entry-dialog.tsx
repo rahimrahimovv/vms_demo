@@ -34,7 +34,7 @@ export type EntryField = {
 };
 
 export const SELECT_CLASS =
-  "h-9 w-full rounded-[14px] border border-input bg-(--field-bg) px-3 text-sm outline-none disabled:opacity-50";
+  "h-(--control-h) w-full rounded-md border border-input bg-background px-3 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive disabled:opacity-50";
 
 /**
  * Add or edit one master-data entry (MDM-01, MDM-02, PLN-01) in a dialog: two-column form,

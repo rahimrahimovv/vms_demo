@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
 import { createClient } from "@/lib/supabase/server";
@@ -308,7 +308,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       />
 
       {belowMinimum && (
-        <Alert className="surface-warning" data-testid="below-minimum">
+        <Alert data-testid="below-minimum">
           <AlertTriangle className="size-4" aria-hidden />
           <AlertTitle>{t("sourcing.belowMinimum", { count: submitted, minimum: s.min_proposals })}</AlertTitle>
           <AlertDescription>{t(submitted > 0 ? "sourcing.belowMinimumHint" : "sourcing.belowMinimumNone")}</AlertDescription>
@@ -316,17 +316,20 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       )}
       {s.status === "CANCELLED" && s.cancel_reason && (
         <Alert variant="destructive" data-testid="cancel-reason">
+          <Info aria-hidden />
           <AlertTitle>{t("sourcing.cancelledTitle")}</AlertTitle>
           <AlertDescription>{s.cancel_reason}</AlertDescription>
         </Alert>
       )}
       {owner && hasLivePo && s.status === "COMPARISON" && (
         <Alert data-testid="cancel-blocked">
+          <Info aria-hidden />
           <AlertDescription>{t("sourcing.purchaseOrders.cancelBlocked")}</AlertDescription>
         </Alert>
       )}
       {opening && (
         <Alert data-testid="opening-decision">
+          <Info aria-hidden />
           <AlertTitle>{t("sourcing.proposals.committeeDecision")}</AlertTitle>
           <AlertDescription className="flex items-center gap-3">
             <StatusBadge status={opening.status} />
@@ -338,6 +341,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       )}
       {winnerDecision && (
         <Alert data-testid="winner-decision">
+          <Info aria-hidden />
           <AlertTitle>{t("sourcing.comparison.winnerDecision")}</AlertTitle>
           <AlertDescription className="flex items-center gap-3">
             <StatusBadge status={winnerDecision.status} />
@@ -349,6 +353,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
       )}
       {s.low_competition_reason && !comparison && (
         <Alert data-testid="continue-reason">
+          <Info aria-hidden />
           <AlertTitle>{t("sourcing.continuedTitle")}</AlertTitle>
           <AlertDescription>{s.low_competition_reason}</AlertDescription>
         </Alert>
@@ -455,7 +460,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
 
           <div className="surface-solid overflow-x-auto">
             <Table>
-              <TableHeader className="bg-muted/60">
+              <TableHeader className="bg-muted">
                 <TableRow>
                   <TableHead>#</TableHead>
                   <TableHead>{t("items.columns.name")}</TableHead>
@@ -494,7 +499,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           ) : (
             <div className="surface-solid overflow-hidden">
               <Table>
-                <TableHeader className="bg-muted/60">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead>{t("sourcing.invitees.vendor")}</TableHead>
                     <TableHead>{t("sourcing.columns.status")}</TableHead>
@@ -521,7 +526,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           <TabsContent value="proposals" className="flex flex-col gap-3 pt-4">
             <div className="surface-solid overflow-hidden">
               <Table>
-                <TableHeader className="bg-muted/60">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead>{t("sourcing.proposals.vendor")}</TableHead>
                     <TableHead>{t("sourcing.proposals.submitted")}</TableHead>
@@ -646,7 +651,7 @@ export default async function SourcingPage({ params }: PageProps<"/sourcing/[id]
           <TabsContent value="purchaseOrders" className="pt-4">
             <div className="surface-solid overflow-hidden">
               <Table>
-                <TableHeader className="bg-muted/60">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead>{t("purchaseOrders.columns.number")}</TableHead>
                     <TableHead>{t("purchaseOrders.columns.vendor")}</TableHead>

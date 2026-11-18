@@ -5,7 +5,7 @@ import { STEP_KEYS, type StepKey, type StepStatus } from "@/lib/vendors/steps";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-/** The round mark in front of a step: filled brand with a check = done, amber ring = in progress, grey ring = not started. */
+/** The round mark in front of a step: filled black with a check = done, blue ring = in progress, grey ring = not started. */
 export function StepMark({ status, size = 26 }: { status: StepStatus; size?: number }) {
   const done = status === "COMPLETE" || status === "NOT_NEEDED";
   return (
@@ -14,12 +14,12 @@ export function StepMark({ status, size = 26 }: { status: StepStatus; size?: num
       style={{ width: size, height: size }}
       className={cn(
         "flex shrink-0 items-center justify-center rounded-full",
-        done && "bg-primary shadow-[0_2px_8px_var(--brand-glow)]",
-        status === "IN_PROGRESS" && "box-border border-[3px] border-[#d99a00]",
-        status === "NOT_STARTED" && "box-border border-2 border-[rgba(23,38,43,0.35)]",
+        done && "bg-primary",
+        status === "IN_PROGRESS" && "box-border border-[3px] border-(--dot-blue)",
+        status === "NOT_STARTED" && "box-border border-2 border-(--dot-grey)",
       )}
     >
-      {done && <Check className="size-3.5 text-white" strokeWidth={3} />}
+      {done && <Check className="size-3.5 text-primary-foreground" strokeWidth={3} />}
     </span>
   );
 }
@@ -52,10 +52,10 @@ export function RegistrationChecklist({
   const percent = Math.round((progress.done / progress.total) * 100);
   return (
     <div className="flex flex-col gap-4" data-testid="registration-checklist">
-      <section className="surface-card flex flex-col gap-2.5 px-[18px] py-4">
+      <section className="surface-card flex flex-col gap-2.5 px-5 py-4">
         <div className="flex items-center justify-between gap-4">
           <span className="font-semibold">{tHome("steps.registration")}</span>
-          <span className="text-[13px] text-[#3d4a50]" data-testid="progress-text">
+          <span className="text-[13px] text-muted-foreground" data-testid="progress-text">
             {t("progress", { done: progress.done, total: progress.total })}
           </span>
         </div>
@@ -65,9 +65,9 @@ export function RegistrationChecklist({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percent}
-          className="h-2.5 overflow-hidden rounded-[5px] bg-[rgba(23,38,43,0.1)]"
+          className="h-2.5 overflow-hidden rounded-[5px] bg-muted"
         >
-          <div className="h-full rounded-[5px] bg-[linear-gradient(90deg,#2a62a8,#3e78c2)]" style={{ width: `${percent}%` }} />
+          <div className="h-full rounded-[5px] bg-chart-3" style={{ width: `${percent}%` }} />
         </div>
       </section>
       <ol className="grid grid-cols-4 gap-4">
@@ -79,7 +79,7 @@ export function RegistrationChecklist({
               data-step={key}
               data-status={status}
               className={cn(
-                "surface-card flex items-start gap-3 px-[18px] py-4",
+                "surface-card flex items-start gap-3 px-5 py-4",
                 current === key && "border-primary! shadow-[0_0_0_1px_var(--primary),var(--surface-shadow)]",
               )}
             >
@@ -107,14 +107,14 @@ export function RegistrationChecklist({
       </ol>
       {showLocked && (
         <>
-          <p className="px-2 pt-1 font-semibold text-[#3d4a50]">{tHome("afterApproval")}</p>
+          <p className="px-2 pt-1 font-semibold text-muted-foreground">{tHome("afterApproval")}</p>
           <ul className="grid grid-cols-4 gap-4" data-testid="locked-steps">
             {(["questionnaire", "categories"] as const).map((key) => (
-              <li key={key} className="surface-card flex items-center gap-2.5 px-[18px] py-4 opacity-80" data-locked={key}>
-                <Lock className="size-5 shrink-0 text-[#3d4a50]" aria-hidden />
+              <li key={key} className="surface-card flex items-center gap-2.5 px-5 py-4 opacity-80" data-locked={key}>
+                <Lock className="size-5 shrink-0 text-muted-foreground" aria-hidden />
                 <span className="flex flex-col gap-0.5">
                   <span className="font-semibold">{t(`lockedSteps.${key}`)}</span>
-                  <span className="text-xs text-[#3d4a50]">{t("locked")}</span>
+                  <span className="text-xs text-muted-foreground">{t("locked")}</span>
                 </span>
               </li>
             ))}

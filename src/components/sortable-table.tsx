@@ -51,7 +51,7 @@ export function SortableTable({
   return (
     <div className="surface-solid overflow-hidden">
       <Table>
-        <TableHeader className="bg-muted/60">
+        <TableHeader className="bg-muted">
           <TableRow>
             {columns.map((column) => {
               const active = sort?.key === column.key;
@@ -87,7 +87,7 @@ export function SortableTable({
           {sorted.map((row) => (
             <TableRow key={row.id}>
               {columns.map((column) => (
-                <TableCell key={column.key} className={cn(column.align === "right" && "text-right tabular-nums")}>
+                <TableCell key={column.key} className={cn(column.align === "right" && "text-right whitespace-nowrap tabular-nums")}>
                   {row.cells[column.key]?.node}
                 </TableCell>
               ))}

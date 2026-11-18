@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AlertTriangle, Info } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { checkSection } from "@/lib/auth/guard";
@@ -150,16 +151,19 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
 
       {d.reopen_reason && (
         <Alert data-testid="reopen-reason">
+          <Info aria-hidden />
           <AlertDescription>{t("decisions.reopenedBecause", { reason: d.reopen_reason })}</AlertDescription>
         </Alert>
       )}
       {d.result_rule === "SOURCING_CANCELLED" && d.close_reason && (
         <Alert variant="destructive" data-testid="cancel-reason">
+          <Info aria-hidden />
           <AlertDescription>{t("decisions.cancelledBecause", { reason: d.close_reason })}</AlertDescription>
         </Alert>
       )}
       {voting && mine && (
         <Alert data-testid="vote-note">
+          <Info aria-hidden />
           <AlertTitle>{t(`decisions.voters.${mine.state}`)}</AlertTitle>
           <AlertDescription>
             {mine.state === "VOTED" ? `${t("decisions.yourVoteIs", { vote: voteLabel(mine.vote) })} ` : ""}
@@ -169,11 +173,13 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
       )}
       {voting && !mine && owner && (
         <Alert data-testid="owner-note">
+          <Info aria-hidden />
           <AlertDescription>{t("decisions.ownerNote")}</AlertDescription>
         </Alert>
       )}
       {voting && !mine && !owner && user.roles.includes("COMMITTEE_MEMBER") && (
         <Alert data-testid="not-voter-note">
+          <Info aria-hidden />
           <AlertDescription>{t("decisions.notVoter")}</AlertDescription>
         </Alert>
       )}
@@ -261,10 +267,12 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
                 <>
                   {pkg.po.same ? (
                     <Alert data-testid="po-same">
+                      <Info aria-hidden />
                       <AlertDescription>{t("decisions.package.samePackage")}</AlertDescription>
                     </Alert>
                   ) : (
-                    <Alert className="surface-warning" data-testid="po-differences">
+                    <Alert data-testid="po-differences">
+                      <AlertTriangle aria-hidden />
                       <AlertTitle>{t("decisions.package.differencesTitle")}</AlertTitle>
                       <AlertDescription>
                         <ul className="list-disc pl-5">
@@ -325,7 +333,7 @@ export default async function DecisionPage({ params }: PageProps<"/decisions/[id
             <h3 className="text-base font-semibold">{t("decisions.voters.title")}</h3>
             <div className="surface-solid overflow-hidden">
               <Table>
-                <TableHeader className="bg-muted/60">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead>{t("decisions.voters.member")}</TableHead>
                     <TableHead>{t("decisions.voters.state")}</TableHead>

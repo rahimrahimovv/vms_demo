@@ -85,7 +85,7 @@ export default async function RequisitionsPage({ searchParams }: PageProps<"/req
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-4">
-        <nav className="flex w-fit gap-1 rounded-[18px] border border-(--surface-tabs-border) bg-(--surface-tabs-bg) p-1" aria-label={t("requisitions.tabsLabel")}>
+        <nav className="flex w-fit gap-1 rounded-[14px] border border-(--surface-tabs-border) bg-(--surface-tabs-bg) p-1" aria-label={t("requisitions.tabsLabel")}>
           {tabs.map((key) => (
             <Link
               key={key}
@@ -93,8 +93,8 @@ export default async function RequisitionsPage({ searchParams }: PageProps<"/req
               aria-current={tab === key ? "page" : undefined}
               data-testid={`tab-${key}`}
               className={cn(
-                "rounded-[14px] px-3.5 py-1.5 text-sm",
-                tab === key ? "bg-(--surface-tab-active-bg) font-semibold text-brand-ink shadow-[0_2px_8px_rgba(23,38,43,0.1)]" : "text-[#3d4a50] hover:text-foreground",
+                "rounded-[10px] px-3.5 py-1.5 text-sm",
+                tab === key ? "bg-background font-medium text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {t(`requisitions.tabs.${key}`)}

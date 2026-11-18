@@ -94,7 +94,7 @@ export function ProposalForm({
 
       <div className="surface-solid overflow-x-auto">
         <Table>
-          <TableHeader className="bg-muted/60">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>{t("items.columns.name")}</TableHead>
               <TableHead className="text-right">{t("requisitions.fields.quantity")}</TableHead>

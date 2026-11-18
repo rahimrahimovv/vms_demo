@@ -42,7 +42,7 @@ export async function PoBodyView({ body, fields }: { body: PoBody; fields?: Reac
         <h3 className="text-base font-semibold">{t("lines.title")}</h3>
         <div className="surface-solid overflow-hidden">
           <Table>
-            <TableHeader className="bg-muted/60">
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>{t("lines.item")}</TableHead>
                 <TableHead className="text-right">{t("lines.quantity")}</TableHead>

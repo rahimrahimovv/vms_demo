@@ -95,7 +95,7 @@ export function CommitteeForm({
         </p>
       )}
       {state.saved && !state.error && (
-        <p role="status" className="text-sm text-(--tone-green-fg)" data-testid="committee-saved">
+        <p role="status" className="text-sm text-foreground" data-testid="committee-saved">
           {t("committee.saved")}
         </p>
       )}

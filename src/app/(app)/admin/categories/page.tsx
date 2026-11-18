@@ -76,7 +76,7 @@ export default async function CategoriesPage() {
       <div className="flex justify-end">{addButton}</div>
       <div className="surface-solid overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/60">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>{t("categoryAdmin.columns.name")}</TableHead>
               <TableHead>{t("categoryAdmin.columns.licence")}</TableHead>

@@ -43,7 +43,7 @@ export function CategoryApplyForm({
         </Alert>
       )}
       <div key={state.attempt ?? 0} className="surface-solid overflow-hidden">
-        <div className="grid grid-cols-[1fr_16rem_14rem] gap-4 border-b bg-muted/60 px-4 py-2 text-xs font-medium text-muted-foreground">
+        <div className="grid grid-cols-[1fr_16rem_14rem] gap-4 border-b bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
           <span>{t("categories.columns.category")}</span>
           <span>{t("categories.columns.licence")}</span>
           <span>{t("categories.columns.status")}</span>

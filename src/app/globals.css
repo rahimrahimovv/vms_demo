@@ -237,3 +237,8 @@ main [data-slot="tabs-content"].flex-col {
 .brand-button:hover {
   background: color-mix(in oklab, var(--primary) 90%, transparent);
 }
+
+/* Lucide icons: 1.5 stroke (the library default is 2); icons that set their own width keep it. */
+svg.lucide[stroke-width="2"] {
+  stroke-width: 1.5;
+}

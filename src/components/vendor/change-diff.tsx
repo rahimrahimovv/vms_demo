@@ -45,7 +45,7 @@ export async function ChangeDiff({
     return (
       <div className="surface-solid overflow-hidden">
         <Table data-testid="change-diff">
-          <TableHeader className="bg-muted/60">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>{t("changeRequest.diff.field")}</TableHead>
               <TableHead>{t("changeRequest.diff.current")}</TableHead>
@@ -134,7 +134,7 @@ export async function ChangeDiff({
   return (
     <div className="surface-solid overflow-hidden">
       <Table data-testid="change-diff">
-        <TableHeader className="bg-muted/60">
+        <TableHeader className="bg-muted">
           <TableRow>
             <TableHead>{t("changeRequest.diff.document")}</TableHead>
             <TableHead>{t("changeRequest.diff.current")}</TableHead>

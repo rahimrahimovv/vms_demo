@@ -24,7 +24,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     <div className="flex flex-col">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <h2 className="text-2xl font-semibold">{t("title")}</h2>
           <p className="text-[13px] text-muted-foreground">{t("subtitle")}</p>
         </div>
         <PeriodControl period={period} />

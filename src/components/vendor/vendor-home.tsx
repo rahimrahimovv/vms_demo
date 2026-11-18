@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Check, Lock, TriangleAlert } from "lucide-react";
+import { Check, Lock, TriangleAlert, AlertTriangle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
 import { flattenTree, type CategoryRow } from "@/lib/categories";
 import { bakuToday, certificateStatus } from "@/lib/vendors/rules";
-import { StatusBadge } from "@/components/status-badge";
+import { StatusBadge, ToneChip } from "@/components/status-badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,13 +67,13 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
   ];
 
   const heading = (
-    <div className="flex flex-wrap items-center gap-3 px-2 py-1">
-      <h2 className="text-2xl font-bold" data-testid="vendor-name">
+    <div className="flex flex-wrap items-center gap-3">
+      <h2 className="text-2xl font-semibold" data-testid="vendor-name">
         {vendor?.legal_name}
       </h2>
       {vendor?.status && <StatusBadge status={vendor.status} />}
       {approved && grade && <GradeBadge>{t("vendorHome.gradeBadge", { grade: grade.grade ?? "" })}</GradeBadge>}
-      {vendor?.vendor_type && <span className="text-[#3d4a50]">{t(`vendorTypes.${vendor.vendor_type}`)}</span>}
+      {vendor?.vendor_type && <span className="text-muted-foreground">{t(`vendorTypes.${vendor.vendor_type}`)}</span>}
     </div>
   );
 
@@ -100,12 +100,13 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
         <div className="flex flex-col gap-4">
           {heading}
           {loaded.vendor.status === "RETURNED" && loaded.vendor.review_comment && (
-            <Alert className="surface-warning" data-testid="returned-comment">
+            <Alert data-testid="returned-comment">
+              <AlertTriangle aria-hidden />
               <AlertTitle>{t("registration.returnedTitle")}</AlertTitle>
               <AlertDescription>{loaded.vendor.review_comment}</AlertDescription>
             </Alert>
           )}
-          <Alert className="surface-warning flex items-center gap-3.5" data-testid="complete-profile-warning">
+          <Alert className="flex items-center gap-3.5" data-testid="complete-profile-warning">
             <TriangleAlert className="size-5 shrink-0" aria-hidden />
             <div className="min-w-0 flex-1">
               <AlertTitle className="text-sm font-semibold">{t("registration.warning")}</AlertTitle>
@@ -156,12 +157,12 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
 
       <div className="grid grid-cols-3 gap-4">
         {counts.map((card) => (
-          <Link key={card.key} href={card.href} data-testid={`task-card-${card.key}`} className="rounded-[22px]">
-            <Card className="h-full transition-colors hover:bg-white/70">
+          <Link key={card.key} href={card.href} data-testid={`task-card-${card.key}`} className="rounded-[14px]">
+            <Card className="h-full transition-colors hover:bg-muted/50">
               <CardContent className="flex flex-col gap-1">
                 <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl leading-[1.1] font-bold text-brand-ink">{card.count}</span>
-                  <span className="font-semibold">{t(`vendorHome.cardLabels.${card.key}`)}</span>
+                  <span className="text-3xl leading-9 font-semibold">{card.count}</span>
+                  <span className="font-medium">{t(`vendorHome.cardLabels.${card.key}`)}</span>
                 </div>
                 <span className="sr-only">{t(`home.cards.${card.key}`, { count: card.count })}</span>
                 <p className="text-[13px] text-muted-foreground">{t(`vendorHome.cardHints.${card.key}`, { count: card.count })}</p>
@@ -174,7 +175,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
       <Card>
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle>{t("vendorHome.checklist")}</CardTitle>
-          <span className="text-[13px] text-[#3d4a50]">
+          <span className="text-[13px] text-muted-foreground">
             {stagesDone === stages.length ? t("vendorHome.allComplete") : t("vendorHome.stagesComplete", { done: stagesDone, total: stages.length })}
           </span>
         </CardHeader>
@@ -187,24 +188,22 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
                 <li key={s.key} data-step={s.key} data-state={s.done ? "done" : locked ? "todo" : "current"}>
                   <Link
                     href={s.href}
-                    className="flex h-full items-start gap-3 rounded-[18px] border border-white/80 bg-white/55 px-3.5 py-3 transition-colors hover:bg-white/75"
+                    className="flex h-full items-start gap-3 rounded-[10px] border bg-card px-3.5 py-3 transition-colors hover:bg-muted/50"
                   >
                     <span
                       aria-hidden
                       className={cn(
                         "flex size-[30px] shrink-0 items-center justify-center rounded-full",
-                        s.done ? "bg-primary shadow-[0_2px_8px_var(--brand-glow)]" : locked ? "border-2 border-[rgba(23,38,43,0.35)]" : "box-border border-[3px] border-[#d99a00]",
+                        s.done ? "bg-primary" : locked ? "border-2 border-(--dot-grey)" : "box-border border-[3px] border-(--dot-blue)",
                       )}
                     >
-                      {s.done ? <Check className="size-4 text-white" strokeWidth={3} /> : locked ? <Lock className="size-3.5 text-[#3d4a50]" /> : null}
+                      {s.done ? <Check className="size-4 text-primary-foreground" strokeWidth={3} /> : locked ? <Lock className="size-3.5 text-muted-foreground" /> : null}
                     </span>
                     <span className="flex flex-col items-start gap-0.5">
-                      <span className="font-semibold">{t(`vendorHome.steps.${s.key}`)}</span>
+                      <span className="font-medium">{t(`vendorHome.steps.${s.key}`)}</span>
                       <span className="pb-1 text-xs text-muted-foreground">{t(`vendorHome.stepHints.${s.key}`)}</span>
                       {s.key === "categories" && qualified.length > 0 ? (
-                        <span className="inline-flex h-5 items-center rounded-full bg-(--tone-green-bg) px-2.5 text-xs font-semibold text-(--tone-green-fg)">
-                          {t("vendorHome.qualifiedCount", { count: qualified.length })}
-                        </span>
+                        <ToneChip tone="green">{t("vendorHome.qualifiedCount", { count: qualified.length })}</ToneChip>
                       ) : status ? (
                         <StatusBadge status={status} />
                       ) : null}
@@ -227,7 +226,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
               <>
                 <div className="flex items-center gap-4 py-1.5">
                   <span
-                    className="flex size-[72px] shrink-0 items-center justify-center rounded-full border border-white/90 bg-[linear-gradient(180deg,#e4eefb,#cfe0f8)] text-4xl font-bold text-(--brand-grade-fg) shadow-[0_6px_16px_rgba(29,78,137,0.18)]"
+                    className="flex size-[72px] shrink-0 items-center justify-center rounded-full border-[6px] border-chart-3 bg-card text-4xl font-semibold"
                     aria-label={t("qualification.grade")}
                   >
                     {grade.grade}
@@ -245,9 +244,9 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={barPercent}
-                  className="h-2 overflow-hidden rounded-[4px] bg-[rgba(23,38,43,0.1)]"
+                  className="h-2 overflow-hidden rounded-[4px] bg-muted"
                 >
-                  <div className="h-full rounded-[4px] bg-[linear-gradient(90deg,#2a62a8,#3e78c2)]" style={{ width: `${barPercent}%` }} />
+                  <div className="h-full rounded-[4px] bg-chart-3" style={{ width: `${barPercent}%` }} />
                 </div>
               </>
             ) : (

@@ -143,7 +143,7 @@ export default async function QuestionnaireReviewPage({ params }: PageProps<"/qu
         <TabsContent value="details" className="pt-4">
           <div className="surface-solid overflow-hidden">
             <Table data-testid="answers">
-              <TableHeader className="bg-muted/60">
+              <TableHeader className="bg-muted">
                 <TableRow>
                   <TableHead>{t("questionnaires.columns.question")}</TableHead>
                   <TableHead>{t("questionnaires.columns.answer")}</TableHead>

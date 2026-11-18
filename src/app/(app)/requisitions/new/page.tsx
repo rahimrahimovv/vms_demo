@@ -18,8 +18,8 @@ export default async function NewRequisitionPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1 px-2">
-        <h2 className="text-2xl font-bold">{t("requisitions.newTitle")}</h2>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl leading-8 font-semibold">{t("requisitions.newTitle")}</h2>
         <p className="text-sm text-muted-foreground">{t("requisitions.newSubtitle")}</p>
       </div>
       <RequisitionForm

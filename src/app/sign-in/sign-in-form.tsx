@@ -28,7 +28,7 @@ export function SignInForm() {
         <Input id="password" name="password" type="password" autoComplete="current-password" required />
       </FormField>
       {/* NFR-006: disabled while the request runs, so a second click sends nothing. */}
-      <Button type="submit" disabled={pending} size="lg" className="mt-2 h-11 rounded-[18px]">
+      <Button type="submit" disabled={pending} size="lg" className="mt-2 h-11 rounded-[14px]">
         {pending ? t("submitting") : t("submit")}
       </Button>
     </form>

@@ -23,7 +23,7 @@ function Panel({ title, aside, className, testId, children }: { title: string; a
   return (
     <section className={cn("flex min-h-0 flex-col surface-card px-4 py-3.5", className)} data-testid={testId} aria-label={title}>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <h2 className="text-[15px] font-bold">{title}</h2>
+        <h2 className="text-base leading-5 font-semibold">{title}</h2>
         {aside}
       </div>
       {children}
@@ -42,8 +42,8 @@ function NoData({ text }: { text: string }) {
 function Tile({ label, value, sub, tone, testId }: { label: string; value: ReactNode; sub: ReactNode; tone?: "good"; testId: string }) {
   return (
     <section className="col-span-3 surface-card px-4 py-3.5" data-testid={testId} aria-label={label}>
-      <div className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">{label}</div>
-      <div className={cn("py-1 text-[30px] leading-[1.15] font-bold tabular-nums", tone === "good" ? "text-(--tone-green-fg)" : "text-[#143A68]")} data-testid={`${testId}-value`}>
+      <div className="text-sm font-medium text-muted-foreground">{label}</div>
+      <div className={cn("py-1 text-3xl leading-9 font-semibold tabular-nums", tone === "good" && "text-foreground")} data-testid={`${testId}-value`}>
         {value}
       </div>
       <div className="text-[13px] text-muted-foreground">{sub}</div>
@@ -52,21 +52,21 @@ function Tile({ label, value, sub, tone, testId }: { label: string; value: React
 }
 
 const STAGE_COLOURS: Record<StageKey, string> = {
-  draft: "#1D4E89",
-  open: "#1D4E89",
-  evaluation: "#6FA8DC",
-  committee: "#1D4E89",
-  awarded: "#17612F",
-  completed: "#17612F",
-  cancelled: "#9AA7B2",
+  draft: "#A3A3A3",
+  open: "#8EC5FF",
+  evaluation: "#3080FF",
+  committee: "#155DFC",
+  awarded: "#1447E6",
+  completed: "#193CB8",
+  cancelled: "#D4D4D4",
 };
 
-const GRADE_COLOURS = ["#1D4E89", "#3E78C2", "#8FB8E8", "#C9D2D5", "rgba(23,38,43,0.25)"];
+const GRADE_COLOURS = ["#193CB8", "#155DFC", "#3080FF", "#8EC5FF", "#D4D4D4"];
 
 export function PeriodControl({ period }: { period: Period }) {
   const t = useTranslations("dashboard");
   return (
-    <nav aria-label={t("periodLabel")} className="inline-flex gap-1 rounded-[18px] border border-(--surface-tabs-border) bg-(--surface-tabs-bg) p-1" data-testid="period-control">
+    <nav aria-label={t("periodLabel")} className="inline-flex gap-0.5 rounded-[10px] bg-muted p-[3px]" data-testid="period-control">
       {PERIODS.map((p) => (
         <Link
           key={p}
@@ -74,8 +74,8 @@ export function PeriodControl({ period }: { period: Period }) {
           aria-current={p === period ? "true" : undefined}
           data-testid={`period-${p}`}
           className={cn(
-            "rounded-[14px] px-3.5 py-1.5 text-sm text-[#3d4a50] hover:text-[#143A68]",
-            p === period && "bg-white/90 font-semibold text-[#143A68] shadow-[0_2px_8px_rgba(23,38,43,0.1)]",
+            "rounded-lg px-3 py-1 text-sm font-medium text-muted-on-muted hover:text-foreground",
+            p === period && "bg-background text-foreground shadow-sm",
           )}
         >
           {t(`periods.${p}`)}
@@ -153,7 +153,7 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
                 <div
                   role="img"
                   aria-label={t("stages.aria", { stage: t(`stages.${r.key}`), count: r.count, total: stages.total })}
-                  className="h-3 flex-1 overflow-hidden rounded-md bg-[rgba(23,38,43,0.08)]"
+                  className="h-3 flex-1 overflow-hidden rounded-md bg-muted"
                 >
                   <div className="h-full rounded-md" style={{ width: `${barPercent(r.count, stageMax)}%`, background: STAGE_COLOURS[r.key] }} />
                 </div>
@@ -173,7 +173,7 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
               {categories.map((c) => (
                 <li key={c.name} className="py-1 text-[13px]" data-testid="category-row">
                   <div className="flex justify-between gap-3">
-                    <span className="truncate font-semibold">{c.name}</span>
+                    <span className="truncate font-medium">{c.name}</span>
                     <span className="shrink-0 text-muted-foreground">
                       {t("categories.row", { awarded: compactAmount(c.awarded), progress: compactAmount(c.inProgress) })}
                     </span>
@@ -181,17 +181,17 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
                   <div
                     role="img"
                     aria-label={t("categories.aria", { name: c.name, awarded: price(c.awarded), progress: price(c.inProgress) })}
-                    className="mt-1 flex h-[9px] overflow-hidden rounded-[5px] bg-[rgba(23,38,43,0.08)]"
+                    className="mt-1 flex h-[9px] overflow-hidden rounded-[5px] bg-muted"
                   >
-                    <div style={{ width: `${barPercent(c.awarded, categoryMax)}%`, background: "#1D4E89" }} />
-                    <div style={{ width: `${barPercent(c.inProgress, categoryMax)}%`, background: "#8FB8E8" }} />
+                    <div style={{ width: `${barPercent(c.awarded, categoryMax)}%`, background: "#155DFC" }} />
+                    <div style={{ width: `${barPercent(c.inProgress, categoryMax)}%`, background: "#8EC5FF" }} />
                   </div>
                 </li>
               ))}
             </ul>
             <div className="flex gap-4 pt-1.5 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5"><span aria-hidden className="inline-block size-2.5 rounded-[3px] bg-[#1D4E89]" />{t("categories.legendAwarded")}</span>
-              <span className="inline-flex items-center gap-1.5"><span aria-hidden className="inline-block size-2.5 rounded-[3px] bg-[#8FB8E8]" />{t("categories.legendProgress")}</span>
+              <span className="inline-flex items-center gap-1.5"><span aria-hidden className="inline-block size-2.5 rounded-[3px] bg-[#155DFC]" />{t("categories.legendAwarded")}</span>
+              <span className="inline-flex items-center gap-1.5"><span aria-hidden className="inline-block size-2.5 rounded-[3px] bg-[#8EC5FF]" />{t("categories.legendProgress")}</span>
             </div>
           </>
         )}
@@ -211,8 +211,8 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
                     ) : null,
                   )}
                 </g>
-                <text x="60" y="58" textAnchor="middle" fontSize="22" fontWeight="700" fill="#143A68">{grades.total}</text>
-                <text x="60" y="76" textAnchor="middle" fontSize="11" fill="#4A5961">{t("grades.centre")}</text>
+                <text x="60" y="58" textAnchor="middle" fontSize="22" fontWeight="600" fill="#0A0A0A">{grades.total}</text>
+                <text x="60" y="76" textAnchor="middle" fontSize="11" fill="#666666">{t("grades.centre")}</text>
               </svg>
               <ul className="flex flex-1 flex-col gap-1">
                 {gradeNames.map((name, i) => (
@@ -239,25 +239,25 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
         testId="card-top-vendors"
         className="col-span-5"
         title={t("topVendors.title")}
-        aside={<Link href="/vendors" className="text-xs font-semibold text-primary hover:underline">{t("topVendors.viewAll")}</Link>}
+        aside={<Link href="/vendors" className="text-sm font-medium underline-offset-4 hover:underline">{t("topVendors.viewAll")}</Link>}
       >
         {topVendors.length === 0 ? (
           <NoData text={noData} />
         ) : (
           <table className="w-full border-collapse text-[13px]">
             <thead>
-              <tr className="text-left text-xs font-semibold text-muted-foreground">
-                <th scope="col" className="w-[52%] py-1.5 font-semibold">{t("topVendors.vendor")}</th>
-                <th scope="col" className="py-1.5 font-semibold">{t("topVendors.awards")}</th>
-                <th scope="col" className="py-1.5 text-right font-semibold">{t("topVendors.awarded")}</th>
+              <tr className="bg-muted text-left text-xs font-medium text-muted-on-muted">
+                <th scope="col" className="w-[52%] rounded-l-[8px] px-2 py-1.5 font-medium">{t("topVendors.vendor")}</th>
+                <th scope="col" className="px-2 py-1.5 font-medium">{t("topVendors.awards")}</th>
+                <th scope="col" className="rounded-r-[8px] px-2 py-1.5 text-right font-medium">{t("topVendors.awarded")}</th>
               </tr>
             </thead>
             <tbody>
               {topVendors.map((v) => (
-                <tr key={v.name} className="border-t border-[rgba(23,38,43,0.08)]" data-testid="top-vendor-row">
-                  <td className="py-1.5 font-medium">{v.name}</td>
-                  <td className="py-1.5 tabular-nums">{v.awards}</td>
-                  <td className="py-1.5 text-right tabular-nums">{price(v.awarded)}</td>
+                <tr key={v.name} className="border-t border-border" data-testid="top-vendor-row">
+                  <td className="px-2 py-1.5 font-medium">{v.name}</td>
+                  <td className="px-2 py-1.5 tabular-nums">{v.awards}</td>
+                  <td className="px-2 py-1.5 text-right tabular-nums">{price(v.awarded)}</td>
                 </tr>
               ))}
             </tbody>
@@ -271,13 +271,13 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
         ) : (
           <ul className="flex flex-col">
             {needsAction.map((n) => (
-              <li key={n.key} className="flex items-center gap-3 border-t border-[rgba(23,38,43,0.08)] py-1 text-[13px]" data-testid="needs-action-row" data-key={n.key}>
-                <span className="flex h-7 min-w-[34px] items-center justify-center rounded-[14px] bg-[rgba(62,120,194,0.16)] font-bold text-[#143A68] tabular-nums" data-testid="needs-action-count">
+              <li key={n.key} className="flex items-center gap-3 border-t border-border py-1 text-[13px]" data-testid="needs-action-row" data-key={n.key}>
+                <span className="flex h-7 min-w-[34px] items-center justify-center rounded-full bg-secondary font-medium tabular-nums" data-testid="needs-action-count">
                   {n.count}
                 </span>
                 <span className="flex-1 font-medium">{t(`needsAction.labels.${n.key}`)}</span>
                 {needsActionHref(n.key, roles) && (
-                  <Link href={needsActionHref(n.key, roles)!} className="text-xs font-semibold text-primary hover:underline" aria-label={`${t("needsAction.open")}: ${t(`needsAction.labels.${n.key}`)}`}>
+                  <Link href={needsActionHref(n.key, roles)!} className="text-sm font-medium underline underline-offset-4" aria-label={`${t("needsAction.open")}: ${t(`needsAction.labels.${n.key}`)}`}>
                     {t("needsAction.open")}
                   </Link>
                 )}
@@ -294,12 +294,12 @@ export function DashboardView({ data, roles }: { data: DashboardSummary; roles: 
           <>
             <div className="flex gap-2" role="img" aria-label={t("committee.aria", { approved: committee.approved, rejected: committee.rejected, noDecision: committee.noDecision })}>
               {[
-                { key: "approved", value: committee.approved, colour: "text-(--tone-green-fg)" },
-                { key: "rejected", value: committee.rejected, colour: "text-(--tone-red-fg)" },
-                { key: "noDecision", value: committee.noDecision, colour: "text-(--tone-amber-fg)" },
+                { key: "approved", value: committee.approved, colour: "text-foreground" },
+                { key: "rejected", value: committee.rejected, colour: "text-destructive" },
+                { key: "noDecision", value: committee.noDecision, colour: "text-foreground" },
               ].map((c) => (
-                <div key={c.key} className="flex-1 rounded-[14px] bg-white/70 px-1 py-2 text-center">
-                  <div className={cn("text-[26px] leading-[1.1] font-bold tabular-nums", c.colour)} data-testid={`committee-${c.key}`}>{c.value}</div>
+                <div key={c.key} className="flex-1 rounded-[10px] border bg-card px-1 py-2 text-center">
+                  <div className={cn("text-[26px] leading-[1.1] font-semibold tabular-nums", c.colour)} data-testid={`committee-${c.key}`}>{c.value}</div>
                   <div className="text-xs text-muted-foreground">{t(`committee.${c.key}`)}</div>
                 </div>
               ))}
