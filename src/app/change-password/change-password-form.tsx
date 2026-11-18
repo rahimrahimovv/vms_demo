@@ -38,7 +38,7 @@ export function ChangePasswordForm() {
         <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required aria-invalid={Boolean(state.errors.confirm)} />
       </FormField>
       {/* NFR-006: disabled while the request runs, so a second click sends nothing. */}
-      <Button type="submit" disabled={pending} size="lg" className="mt-2 h-11 rounded-[14px]" data-testid="password-submit">
+      <Button type="submit" disabled={pending} className="mt-2" data-testid="password-submit">
         {pending ? t("common.saving") : t("password.fields.submit")}
       </Button>
     </form>

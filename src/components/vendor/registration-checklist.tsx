@@ -80,7 +80,7 @@ export function RegistrationChecklist({
               data-status={status}
               className={cn(
                 "surface-card flex items-start gap-3 px-5 py-4",
-                current === key && "border-primary! shadow-[0_0_0_1px_var(--primary),var(--surface-shadow)]",
+                current === key && "border-primary! shadow-[0_0_0_1px_var(--primary)]",
               )}
             >
               <StepMark status={status} />

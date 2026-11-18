@@ -63,15 +63,15 @@ export default async function CategoryApplicationsPage({ searchParams }: PagePro
 
   return (
     <div className="flex flex-col gap-5">
-      <nav className="flex w-fit gap-1 rounded-[14px] border border-(--surface-tabs-border) bg-(--surface-tabs-bg) p-1">
+      <nav className="flex w-fit gap-0.5 rounded-[10px] bg-muted p-[3px]">
         {(["review", "all"] as const).map((key) => (
           <Link
             key={key}
             href={key === "review" ? "/category-applications" : "/category-applications?tab=all"}
             aria-current={tab === key ? "page" : undefined}
             className={cn(
-              "rounded-[10px] px-3.5 py-1.5 text-sm",
-              tab === key ? "bg-background font-medium text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+              "rounded-lg px-3 py-1 text-sm font-medium",
+              tab === key ? "bg-background font-medium text-foreground shadow-sm" : "text-muted-on-muted hover:text-foreground",
             )}
           >
             {t(`applications.tabs.${key}`)}

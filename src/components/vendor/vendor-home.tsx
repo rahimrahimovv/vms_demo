@@ -158,7 +158,7 @@ export async function VendorHome({ vendorId }: { vendorId: string }) {
 
       <div className="grid grid-cols-3 gap-4">
         {counts.map((card) => (
-          <Link key={card.key} href={card.href} data-testid={`task-card-${card.key}`} className="rounded-[14px]">
+          <Link key={card.key} href={card.href} data-testid={`task-card-${card.key}`} className="rounded-[14px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
             <Card className="h-full transition-colors hover:bg-muted/50">
               <CardContent className="flex flex-col gap-1">
                 <div className="flex items-baseline gap-2.5">

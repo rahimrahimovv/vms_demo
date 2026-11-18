@@ -66,17 +66,17 @@ export default async function ChangeRequestsPage({ searchParams }: PageProps<"/c
 
   return (
     <div className="flex flex-col gap-5">
-      <nav className="flex w-fit gap-1 rounded-[14px] border border-(--surface-tabs-border) bg-(--surface-tabs-bg) p-1" aria-label={t("changeRequest.tabsLabel")}>
+      <nav className="flex w-fit gap-0.5 rounded-[10px] bg-muted p-[3px]" aria-label={t("changeRequest.tabsLabel")}>
         {(["review", "all"] as const).map((key) => (
           <Link
             key={key}
             href={key === "review" ? "/change-requests" : "/change-requests?tab=all"}
             aria-current={(key === "all") === all ? "page" : undefined}
             className={
-              "rounded-[10px] px-3.5 py-1.5 text-sm " +
+              "rounded-lg px-3 py-1 text-sm font-medium " +
               ((key === "all") === all
                 ? "bg-background font-medium text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground")
+                : "text-muted-on-muted hover:text-foreground")
             }
           >
             {t(`changeRequest.tabs.${key}`)}
