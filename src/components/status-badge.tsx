@@ -1,39 +1,41 @@
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { statusTone, type StatusTone } from "@/lib/status";
 
-const TONE_CLASSES: Record<StatusTone, string> = {
-  grey: "bg-(--tone-grey-bg) text-(--tone-grey-fg)",
-  sky: "bg-(--tone-sky-bg) text-(--tone-sky-fg)",
-  amber: "bg-(--tone-amber-bg) text-(--tone-amber-fg)",
-  green: "bg-(--tone-green-bg) text-(--tone-green-fg)",
-  red: "bg-(--tone-red-bg) text-(--tone-red-fg)",
+const DOT_CLASSES: Record<StatusTone, string> = {
+  green: "bg-(--dot-green)",
+  blue: "bg-(--dot-blue)",
+  amber: "bg-(--dot-amber)",
+  grey: "bg-(--dot-grey)",
+  red: "bg-(--dot-red)",
 };
 
-/** A chip in one of the status tones, for texts that are not a status name (it always carries its words). */
+/** The 6 px dot of a status badge. Decoration only: the badge always carries the status in words. */
+function Dot({ tone }: { tone: StatusTone }) {
+  return <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", DOT_CLASSES[tone])} />;
+}
+
+/** An outline badge with a coloured dot, for texts that are not a status name (it always carries its words). */
 export function ToneChip({ tone, className, children }: { tone: StatusTone; className?: string; children: ReactNode }) {
   return (
-    <span className={cn("inline-flex h-5 items-center rounded-full px-2.5 text-xs font-semibold whitespace-nowrap", TONE_CLASSES[tone], className)}>
+    <Badge variant={tone === "red" ? "destructive" : "outline"} className={className}>
+      {tone === "red" ? null : <Dot tone={tone} />}
       {children}
-    </span>
+    </Badge>
   );
 }
 
-/** Status badge; colour by CLAUDE.md Design, label from messages "status.<STATUS>". */
+/** Status badge: an outline badge with a dot (red = the destructive badge); label from messages "status.<STATUS>". */
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const t = useTranslations("status");
   const label = t.has(status) ? t(status) : status;
+  const tone = statusTone(status);
   return (
-    <span
-      data-status={status}
-      className={cn(
-        "inline-flex h-5 items-center rounded-full px-2.5 text-xs font-semibold whitespace-nowrap",
-        TONE_CLASSES[statusTone(status)],
-        className,
-      )}
-    >
+    <Badge data-status={status} variant={tone === "red" ? "destructive" : "outline"} className={className}>
+      {tone === "red" ? null : <Dot tone={tone} />}
       {label}
-    </span>
+    </Badge>
   );
 }

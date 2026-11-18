@@ -10,10 +10,10 @@ export type AttentionItem =
   | { kind: "certificateExpiring"; tone: "amber"; certificateType: string; days: number }
   | { kind: "certificateExpired"; tone: "amber"; certificateType: string; days: number }
   | { kind: "hold"; tone: "amber"; until: string | null }
-  | { kind: "registration"; tone: "sky" }
-  | { kind: "changeRequest"; tone: "sky"; id: string; section: string }
-  | { kind: "questionnaire"; tone: "sky" }
-  | { kind: "application"; tone: "sky"; id: string; categoryId: string };
+  | { kind: "registration"; tone: "blue" }
+  | { kind: "changeRequest"; tone: "blue"; id: string; section: string }
+  | { kind: "questionnaire"; tone: "blue" }
+  | { kind: "application"; tone: "blue"; id: string; categoryId: string };
 
 export type AttentionInput = {
   today: string;
@@ -30,7 +30,7 @@ export function buildAttention(input: AttentionInput): AttentionItem[] {
   const { today, vendor } = input;
   const items: AttentionItem[] = [];
 
-  if (vendor.status === "SUBMITTED") items.push({ kind: "registration", tone: "sky" });
+  if (vendor.status === "SUBMITTED") items.push({ kind: "registration", tone: "blue" });
   for (const s of input.sharedWith) items.push({ kind: "sharedOwner", tone: "amber", vendorId: s.vendor_id, vendorName: s.legal_name });
   for (const c of input.certificates) {
     if (!c.expires_on) continue;
@@ -41,11 +41,11 @@ export function buildAttention(input: AttentionInput): AttentionItem[] {
   }
   if (vendor.standing === "HOLD") items.push({ kind: "hold", tone: "amber", until: vendor.standing_until });
   for (const r of input.changeRequests) {
-    if (r.status === "SUBMITTED") items.push({ kind: "changeRequest", tone: "sky", id: r.id, section: r.section });
+    if (r.status === "SUBMITTED") items.push({ kind: "changeRequest", tone: "blue", id: r.id, section: r.section });
   }
-  if (input.questionnaires.some((q) => q.status === "SUBMITTED")) items.push({ kind: "questionnaire", tone: "sky" });
+  if (input.questionnaires.some((q) => q.status === "SUBMITTED")) items.push({ kind: "questionnaire", tone: "blue" });
   for (const a of input.applications) {
-    if (a.status === "PENDING") items.push({ kind: "application", tone: "sky", id: a.id, categoryId: a.category_id });
+    if (a.status === "PENDING") items.push({ kind: "application", tone: "blue", id: a.id, categoryId: a.category_id });
   }
   return items;
 }
